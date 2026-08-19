@@ -46,30 +46,6 @@
 
                         <div class="dropdown-divider"></div>
 
-                        {{-- SETTINGS --}}
-                        <div class="dropdown-header fw-semibold my-2">
-                            Settings
-                        </div>
-
-                        @if (Auth::user()->hasRole('admin'))
-                            <a class="dropdown-item" href="{{ route('kode-bagian.index') }}">
-                                <svg class="icon me-2">
-                                    <use
-                                        xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-settings') }}">
-                                    </use>
-                                </svg>
-                               Setting
-                            </a>
-                            <a class="dropdown-item" href="{{ route('activity-log.index') }}">
-                                <svg class="icon me-2">
-                                    <use
-                                        xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-lock-locked') }}">
-                                    </use>
-                                </svg>
-                                Activity Log
-                            </a>
-                        @endif
-
                         {{-- LOGOUT --}}
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

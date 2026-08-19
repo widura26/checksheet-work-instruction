@@ -17,8 +17,8 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('projects.index') ? 'active' : '' }}"
-                href="{{ route('projects.index') }}">
+            <a class="nav-link {{ request()->routeIs('master.oka.index') ? 'active' : '' }}"
+                href="{{ route('master.oka.index') }}">
                 <svg class="nav-icon">
                     <use xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-folder') }}">
                     </use>
@@ -27,7 +27,8 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link {{ request()->routeIs('master.proses.index') ? 'active' : '' }}"
+                href="{{ route('master.proses.index') }}">
                 <svg class="nav-icon">
                     <use xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-cog') }}">
                     </use>
@@ -36,7 +37,8 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link {{ request()->routeIs('md.index') ? 'active' : '' }}"
+                href="{{ route('md.index') }}">
                 <svg class="nav-icon">
                     <use xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-pencil') }}">
                     </use>
@@ -45,7 +47,8 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link {{ request()->routeIs('cp.index') ? 'active' : '' }}"
+                href="{{ route('cp.index') }}">
                 <svg class="nav-icon">
                     <use xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-calculator') }}">
                     </use>
@@ -54,7 +57,8 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link {{ request()->routeIs('grafik.index') ? 'active' : '' }}"
+                href="{{ route('grafik.index') }}">
                 <svg class="nav-icon">
                     <use xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-chart-line') }}">
                     </use>
@@ -63,7 +67,8 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link {{ request()->routeIs('wi.index') ? 'active' : '' }}"
+                href="{{ route('wi.index') }}">
                 <svg class="nav-icon">
                     <use xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-document') }}">
                     </use>
@@ -72,8 +77,8 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('daftar-kode-material.index') ? 'active' : '' }}"
-                href="{{ route('daftar-kode-material.index') }}">
+            <a class="nav-link {{ request()->routeIs('master.kode-material.index') ? 'active' : '' }}"
+                href="{{ route('master.kode-material.index') }}">
                 <svg class="nav-icon">
                     <use xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-storage') }}">
                     </use>
@@ -82,8 +87,8 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('barcode.print') ? 'active' : '' }}"
-                href="{{ route('barcode.print') }}">
+            <a class="nav-link {{ request()->routeIs('barcode.index') ? 'active' : '' }}"
+                href="{{ route('barcode.index') }}">
                 <svg class="nav-icon">
                     <use xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-barcode') }}">
                     </use>
@@ -92,7 +97,8 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link {{ request()->routeIs('sttp.index') ? 'active' : '' }}"
+                href="{{ route('sttp.index') }}">
                 <svg class="nav-icon">
                     <use xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-file') }}">
                     </use>
@@ -101,7 +107,8 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link {{ request()->routeIs('expedisi.index') ? 'active' : '' }}"
+                href="{{ route('expedisi.index') }}">
                 <svg class="nav-icon">
                     <use xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-truck') }}">
                     </use>
@@ -110,8 +117,8 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('laporan.distribusi') ? 'active' : '' }}"
-                href="{{ route('laporan.distribusi') }}">
+            <a class="nav-link {{ request()->routeIs('lap-wi.index') ? 'active' : '' }}"
+                href="{{ route('lap-wi.index') }}">
                 <svg class="nav-icon">
                     <use xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-print') }}">
                     </use>
