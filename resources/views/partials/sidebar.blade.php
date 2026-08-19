@@ -27,8 +27,8 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('master.proses.index') ? 'active' : '' }}"
-                href="{{ route('master.proses.index') }}">
+            <a class="nav-link {{ request()->routeIs('processes.index') ? 'active' : '' }}"
+                href="{{ route('processes.index') }}">
                 <svg class="nav-icon">
                     <use xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-cog') }}">
                     </use>

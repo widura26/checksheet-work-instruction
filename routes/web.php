@@ -33,7 +33,7 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
     Route::get('/grafik', [GrafikController::class, 'index'])->name('grafik.index');
 
     Route::get('/master/oka', [OkaController::class, 'index'])->name('master.oka.index');
-    Route::get('/master/proses', [ProsesController::class, 'index'])->name('master.proses.index');
+    Route::get('/processes', [ProsesController::class, 'index'])->name('processes.index');
     Route::get('/master/kode-material', [KodeMaterialController::class, 'index'])->name('master.kode-material.index');
 
     Route::get('/md', [MdController::class, 'index'])->name('md.index');
