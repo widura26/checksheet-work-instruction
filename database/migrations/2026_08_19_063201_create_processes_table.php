@@ -9,8 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('processes', function (Blueprint $table) {
-            $table->id();
-            $table->string('id_proses')->unique();
+            $table->uuid('id')->primary();
             $table->string('kode_proses')->unique();
             $table->string('nama');
             $table->string('id_kel')->nullable();

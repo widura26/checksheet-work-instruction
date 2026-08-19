@@ -19,7 +19,7 @@ class ProsesController extends Controller
             abort(404);
         }
 
-        $query = Proses::select(['id', 'id_proses', 'kode_proses', 'nama', 'id_kel']);
+        $query = Proses::select(['id', 'kode_proses', 'nama', 'id_kel']);
 
         if ($request->filled('kode_proses')) {
             $query->where('kode_proses', 'LIKE', '%' . $request->kode_proses . '%');
