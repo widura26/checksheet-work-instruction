@@ -1,0 +1,79 @@
+@import 'select2/dist/css/select2.min.css';
+@import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css';
+@import 'datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css';
+
+/* Custom Sidebar Primary Theme */
+.sidebar-primary {
+  --cui-body-color: #ffffff;
+  --cui-body-bg: #0d6efd; /* Bootstrap primary color */
+  --cui-emphasis-color: #fff;
+  --cui-secondary-color: rgba(255, 255, 255, 0.8);
+  --cui-secondary-bg: #0b5ed7;
+  --cui-tertiary-color: rgba(255, 255, 255, 0.6);
+  --cui-tertiary-bg: #0a58ca;
+  --cui-border-color: #0b5ed7;
+}
+
+.sidebar-primary .sidebar-toggler {
+  filter: var(--cui-sidebar-toggler-white-filter);
+}
+
+/* Optional: Custom hover effects for primary sidebar */
+.sidebar-primary .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-primary .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+/* Offline PWA-Lite banner */
+.offline-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  padding: .35rem 1rem;
+  font-size: .85rem;
+  font-weight: 500;
+  background: #212529;
+  color: #fff;
+}
+.offline-banner-dot {
+  width: .6rem;
+  height: .6rem;
+  border-radius: 50%;
+  background: #198754;
+  display: inline-block;
+}
+.offline-banner--offline { background: #dc3545; }
+.offline-banner--offline .offline-banner-dot { background: #fff; }
+.offline-banner--sync { background: #fd7e14; }
+.offline-banner--sync .offline-banner-dot { background: #fff; }
+
+.offline-toast-container {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  max-width: 24rem;
+}
+.offline-toast {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-left: 4px solid #dc3545;
+  border-radius: .375rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+  padding: .75rem 1rem;
+  font-size: .875rem;
+}
+.offline-toast button { margin-top: .5rem; }

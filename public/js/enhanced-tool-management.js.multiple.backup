@@ -1,0 +1,446 @@
+/**
+ * Enhanced Tool Management JavaScript Module
+ * Handles dynamic form behavior with AJAX integration for intelligent tool creation/update
+ */
+
+class EnhancedToolManagement {
+    constructor(options = {}) {
+        this.options = {
+            materialCodeSelector: "#kode_material",
+            posisiCtSelector: "#posisi_ct_id",
+            formSelector: "#myForm", // Corrected selector
+            loadingClass: "loading",
+            errorClass: "is-invalid",
+            successClass: "is-valid",
+            readonlyClass: "readonly-field",
+            ajaxTimeout: 10000,
+            ...options,
+        };
+
+        this.currentMode = null; // 'create' or 'update'
+        this.isLoading = false;
+        this.xhr = null; // To hold the current AJAX request
+
+        this.init();
+    }
+
+    init() {
+        this.bindEvents();
+    }
+
+    bindEvents() {
+        const materialCodeInput = $(this.options.materialCodeSelector);
+        const posisiCtSelect = $(this.options.posisiCtSelector);
+        const projectCheckboxes = $(".project-checkbox");
+
+        // Use 'input' for instant feedback on typing/pasting, and 'change' for select dropdown
+        materialCodeInput.on(
+            "input",
+            this.debounce(() => this.handleInputChange(), 500)
+        );
+        posisiCtSelect.on("change", () => this.handleInputChange());
+
+        // Add event listener for project checkboxes
+        projectCheckboxes.on("change", () => {
+            this.handleInputChange();
+            // Also regenerate inputs if we're already in a mode
+            if (this.currentMode) {
+                this.handleProjectSelectionChange();
+            }
+        });
+    }
+
+    debounce(func, delay) {
+        let timeout;
+        return function (...args) {
+            const context = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), delay);
+        };
+    }
+
+    handleInputChange() {
+        const kodeMaterial = $(this.options.materialCodeSelector).val().trim();
+        const posisiCtId = $(this.options.posisiCtSelector).val();
+        const selectedProjects = $(".project-checkbox:checked")
+            .map(function () {
+                return $(this).val();
+            })
+            .get();
+
+        // Only proceed if all required fields have values
+        if (!kodeMaterial || !posisiCtId || selectedProjects.length === 0) {
+            this.resetForm();
+            return;
+        }
+
+        if (this.isLoading) {
+            if (this.xhr) {
+                this.xhr.abort(); // Abort previous request if a new one is made
+            }
+        }
+
+        this.validateCombination(kodeMaterial, posisiCtId, selectedProjects);
+    }
+
+    async validateCombination(kodeMaterial, posisiCtId, selectedProjects) {
+        this.setLoadingState(true);
+
+        // Construct URL with query parameters including projects
+        const projectParams = selectedProjects
+            .map((id) => `projects[]=${encodeURIComponent(id)}`)
+            .join("&");
+        const url = `/tool/api/tools/find?kode_material=${encodeURIComponent(
+            kodeMaterial
+        )}&posisi_ct_id=${encodeURIComponent(posisiCtId)}&${projectParams}`;
+
+        this.xhr = $.ajax({
+            url: url,
+            type: "GET",
+            dataType: "json",
+            timeout: this.options.ajaxTimeout,
+        })
+            .done((response) => {
+                if (response.success) {
+                    this.switchFormMode(response.mode, response.data);
+                    this.populateFields(response.data);
+                    const message =
+                        response.mode === "update"
+                            ? "Tool ditemukan dengan project yang sama - mode update"
+                            : "Kode material valid - mode buat baru";
+                    this.showSuccessFeedback(
+                        $(this.options.materialCodeSelector),
+                        message
+                    );
+                }
+            })
+            .fail((xhr, status, error) => {
+                this.showErrorFeedback(
+                    $(this.options.materialCodeSelector),
+                    "Kode Material Tidak Ditemukan."
+                );
+                Swal.fire({
+                    title: "Error",
+                    text: "Kode Material Tidak Ditemukan Di Database",
+                    icon: "error",
+                });
+                this.resetForm();
+            })
+            .always(() => {
+                this.setLoadingState(false);
+                this.xhr = null;
+            });
+    }
+
+    handleProjectSelectionChange() {
+        const selectedProjects = this.getSelectedProjects();
+
+        if (selectedProjects.length === 0) {
+            $("#project_quantity_inputs").html("");
+            $("#current_stock_display").html("");
+            return;
+        }
+
+        // Get current data from the last successful validation
+        const currentData = this.lastValidationData || {};
+
+        if (this.currentMode === "update") {
+            this.displayCurrentStock(
+                currentData.stock_project || [],
+                selectedProjects
+            );
+            this.generateProjectQuantityInputs(
+                selectedProjects,
+                "update",
+                currentData.stock_project || []
+            );
+        } else if (this.currentMode === "create") {
+            this.generateProjectQuantityInputs(selectedProjects, "create");
+        }
+    }
+
+    switchFormMode(mode, data) {
+        this.currentMode = mode;
+        this.lastValidationData = data; // Store data for project selection changes
+        $(document).trigger("toolManagement:modeChanged", { mode, data });
+    }
+
+    populateFields(data) {
+        // Populate fields that are common or from master data
+        $("#deskripsi")
+            .val(data.deskripsi || "")
+            .prop("readonly", true)
+            .addClass(this.options.readonlyClass);
+        $("#spesifikasi")
+            .val(data.spesifikasi || "")
+            .prop("readonly", true)
+            .addClass(this.options.readonlyClass);
+        $("#satuan")
+            .val(data.satuan || "")
+            .prop("readonly", true)
+            .addClass(this.options.readonlyClass);
+
+        // Get selected projects
+        const selectedProjects = this.getSelectedProjects();
+
+        if (this.currentMode === "update") {
+            // Display current stock per selected project only
+            this.displayCurrentStock(
+                data.stock_project || [],
+                selectedProjects
+            );
+            // Generate update quantity inputs for selected projects
+            this.generateProjectQuantityInputs(
+                selectedProjects,
+                "update",
+                data.stock_project || []
+            );
+        } else {
+            // 'create' mode - generate initial quantity inputs for selected projects
+            this.generateProjectQuantityInputs(selectedProjects, "create");
+        }
+    }
+
+    getSelectedProjects() {
+        const selectedProjects = [];
+        $(".project-checkbox:checked").each(function () {
+            const projectId = $(this).val();
+            const projectName =
+                $(this).next("label").text().split(" - ")[1] ||
+                $(this).next("label").text();
+            selectedProjects.push({
+                project_id: projectId,
+                nama_project: projectName,
+            });
+        });
+        return selectedProjects;
+    }
+
+    generateProjectQuantityInputs(selectedProjects, mode, stockProjects = []) {
+        const container = $("#project_quantity_inputs");
+        container.empty();
+
+        if (selectedProjects.length === 0) {
+            return;
+        }
+
+        let inputsHtml = "";
+
+        if (mode === "create") {
+            inputsHtml +=
+                '<div class="mb-3"><label class="form-label">Jumlah Awal Per Project <span class="text-danger">*</span></label></div>';
+        } else {
+            inputsHtml +=
+                '<div class="mb-3"><label class="form-label">Jumlah Ditambah Per Project <span class="text-danger">*</span></label></div>';
+        }
+
+        selectedProjects.forEach((project) => {
+            const currentStock = this.getCurrentStockForProject(
+                project.project_id,
+                stockProjects
+            );
+            const inputName =
+                mode === "create"
+                    ? `qty[${project.project_id}]`
+                    : `qty_ditambah[${project.project_id}]`;
+            const inputId =
+                mode === "create"
+                    ? `qty_${project.project_id}`
+                    : `qty_ditambah_${project.project_id}`;
+
+            inputsHtml += `
+                <div class="project-quantity-input ${mode}-mode">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="project-label">${project.project_id}</div>
+                        ${
+                            mode === "update" && currentStock !== null
+                                ? `<span class="badge bg-info current-stock-badge">Stok: ${currentStock} pcs</span>`
+                                : ""
+                        }
+                    </div>
+                    <div class="small text-muted mb-2">${
+                        project.nama_project
+                    }</div>
+                    <input type="number" 
+                           class="form-control project-qty-input" 
+                           id="${inputId}"
+                           name="${inputName}" 
+                           min="${mode === "create" ? "0" : "1"}" 
+                           value="${mode === "create" ? "0" : ""}"
+                           placeholder="Masukkan ${
+                               mode === "create"
+                                   ? "jumlah awal"
+                                   : "jumlah ditambah"
+                           }"
+                           required>
+                </div>
+            `;
+        });
+
+        container.html(inputsHtml);
+    }
+
+    getCurrentStockForProject(projectId, stockProjects) {
+        const project = stockProjects.find((p) => p.project_id === projectId);
+        return project && project.pivot ? project.pivot.qty : null;
+    }
+
+    displayCurrentStock(stockProjects, selectedProjects) {
+        const stockDisplay = $("#current_stock_display");
+
+        // Filter stock projects to show only selected projects
+        const filteredStockProjects = stockProjects.filter((project) =>
+            selectedProjects.some(
+                (selected) => selected.project_id === project.project_id
+            )
+        );
+
+        if (!filteredStockProjects || filteredStockProjects.length === 0) {
+            stockDisplay.html(
+                '<p class="text-muted mb-0"><i class="fas fa-info-circle"></i> Tidak ada data stok untuk project yang dipilih</p>'
+            );
+            return;
+        }
+
+        let stockHtml = '<div class="row g-0">';
+        let totalStock = 0;
+
+        filteredStockProjects.forEach((project, index) => {
+            const qty = project.pivot ? project.pivot.qty : 0;
+            totalStock += qty;
+
+            stockHtml += `
+                <div class="col-12">
+                    <div class="stock-project-item d-flex justify-content-between align-items-center py-2 px-2 ${
+                        index < filteredStockProjects.length - 1
+                            ? "border-bottom"
+                            : ""
+                    }">
+                        <div class="flex-grow-1">
+                            <div class="fw-bold text-dark">${
+                                project.project_id
+                            }</div>
+                            <div class="small text-muted">${
+                                project.nama_project
+                            }</div>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-primary fs-6">${qty} pcs</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        stockHtml += "</div>";
+        stockDisplay.html(stockHtml);
+    }
+
+    resetForm() {
+        // Clear auto-populated fields and remove readonly state
+        $("#deskripsi, #spesifikasi, #satuan")
+            .val("")
+            .prop("readonly", false)
+            .removeClass(this.options.readonlyClass);
+
+        // Clear stock display
+        $("#current_stock_display").html("");
+
+        // Clear dynamic project quantity inputs
+        $("#project_quantity_inputs").html("");
+
+        // Reset project checkboxes
+        $(".project-checkbox").prop("checked", false);
+
+        // Reset form mode and trigger event
+        this.currentMode = null;
+        this.lastValidationData = null;
+        $(document).trigger("toolManagement:formReset");
+
+        // Clear feedback
+        // this.clearFeedback($(this.options.materialCodeSelector));
+        // this.clearFeedback($(this.options.posisiCtSelector));
+    }
+
+    setLoadingState(isLoading) {
+        this.isLoading = isLoading;
+        const loadingIndicator = $(".loading-indicator");
+        if (isLoading) {
+            loadingIndicator.show();
+        } else {
+            loadingIndicator.hide();
+        }
+    }
+
+    showSuccessFeedback(input, message) {
+        this.clearFeedback(input);
+        input.addClass(this.options.successClass);
+        const feedback = input.closest(".mb-3").find(".valid-feedback");
+        if (feedback.length) {
+            feedback.text(message).show();
+        } else {
+            input.after(`<div class="valid-feedback">${message}</div>`);
+        }
+    }
+
+    // showErrorFeedback(input, message) {
+    //     this.clearFeedback(input);
+    //     input.addClass(this.options.errorClass);
+    //     const feedback = input.closest(".mb-3").find(".invalid-feedback");
+    //     if (feedback.length) {
+    //         feedback.text(message).show();
+    //     } else {
+    //         // Use existing invalid-feedback div if it exists from Laravel's validation
+    //         const existingFeedback = input.siblings(".invalid-feedback");
+    //         if (existingFeedback.length) {
+    //             existingFeedback.text(message);
+    //         } else {
+    //             input.after(
+    //                 `<div class="invalid-feedback d-block">${message}</div>`
+    //             );
+    //         }
+    //     }
+    // }
+    showErrorFeedback(input, message) {
+        this.clearFeedback(input);
+        input.addClass(this.options.errorClass);
+
+        let feedback = input.siblings(".invalid-feedback");
+
+        if (!feedback.length) {
+            feedback = $('<div class="invalid-feedback d-block"></div>');
+            input.after(feedback);
+        }
+
+        feedback.text(message).addClass("d-block").show();
+    }
+
+    // clearFeedback(input) {
+    //     input.removeClass(
+    //         `${this.options.successClass} ${this.options.errorClass}`
+    //     );
+    //     input
+    //         .closest(".mb-3")
+    //         .find(".valid-feedback, .invalid-feedback")
+    //         .hide()
+    //         .text("");
+    // }
+    clearFeedback(input) {
+        input.removeClass(
+            `${this.options.successClass} ${this.options.errorClass}`
+        );
+
+        input
+            .siblings(".valid-feedback, .invalid-feedback")
+            .removeClass("d-block")
+            .hide()
+            .text("");
+    }
+}
+
+// Auto-initialize when DOM is ready
+$(document).ready(function () {
+    if ($(".enhanced-tool-form").length) {
+        new EnhancedToolManagement();
+    }
+});
