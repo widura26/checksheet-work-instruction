@@ -938,6 +938,28 @@ Kolom relasi saat ini semuanya bertipe `text`; saat normalisasi dikonversi ke `u
 | klp_st / klp_weld / klp_mch / klp_int / klp_wir / klp_pmk / klp_pip / klp_pa / klp_final | text | kelompok kerja | data |
 | status | text | status | data |
 
+## Lampiran B: Keputusan Implementasi (2026-08-19)
+
+Keputusan yang disepakati saat generate migration + model dari Lampiran A:
+
+1. **Primary key**: SEMUA tabel memakai `uuid('id')->primary()` (mengikuti pola `processes` yang sudah ada di codebase).
+2. **Business key** dipertahankan sebagai kolom `string` + `unique()`/`index()`, BUKAN dihapus.
+3. **FK**: kolom `foreignUuid('xxx_id')->nullable()` + DB constraint `constrained(...)`.
+   - Nama kolom FK memakai **nama eksplisit tabel Fase 2** bila tersedia (`oka_id`, `material_id`, `bpm_cp_id`, `md_header_id`, `jenis_kereta_id`, `cp_id`, `memo_id`, `spm_ims_id`, `wi_trn_id`, `exp_cp_id`, `sttpp_id`, `piecepart_datang_id`, `spm_org_id`, `spm_ims_org_id`, `jadwal_id`, `md_header_id`).
+   - Selainnya diturunkan dari business key + `_id` (mis. `no_bpm` → `bpm_id`, `kode_mesin` → `mesin_id`, `kode_proyek` → `proyek_id`, `no_exp` → `exp_id`, `cp_no` → `cp_detail_id`, `nosttpp` → `sttpp_id`).
+4. **FK ke tabel yang tidak dibuat** (`md2s`, `md_laps`, `sttpp_details`, `spms` legacy): kolom `uuid` polos + `index()` TANPA DB constraint (target belum ada / nama bentrok). Ditandai TODO.
+5. **Timestamps**: `$table->timestamps()` di semua tabel.
+6. **Model**: pola `Proses` — `HasFactory`, `$guarded=['id']`, `$incrementing=false`, `$keyType='string'`, boot `Str::uuid()` saat `creating`, `protected $table = '...'`. Relasi `belongsTo`/`hasMany`/`belongsToMany` sesuai Lampiran A.
+
+**Tabel yang DI-SKIP** (sudah ada di codebase):
+- `users` (Laravel default) — `notifications` (bentrok dgn Laravel) — `processes` (sudah ada sbg `proses`) — `spms` (sudah ada fitur SPM sistem baru) — tabel Spatie (`roles`, `permissions`, `model_has_roles`, `model_has_permissions`, `role_has_permissions`, `activity_log`).
+
+**Rename lokal**:
+- `cp` → `cps`, `cp_1` → `cp_details` (keduanya dibuat).
+- `spm_ppcb` → `spm_ppcbs`.
+- `jenis_kereta_tb` → `jenis_keretas`.
+- `tool_fab_ims` → `tool_fabs_ims`, `tool_fin_ims` → `tool_fins_ims`.
+
 ## Catatan / Keputusan Terbuka
 
 - `cp` vs `cp_1`: `cp_1` yang dipakai aktif sebagai tabel Cutting Plan (dikonfirmasi dari `cp/data.php`, `cp_bpm/`, `cp_lap/`). `cp` masih dipakai di `grafik/proses.php` dan `lap_wi/data.php`. Perlu keputusan akhir apakah digabung sebelum rename.
