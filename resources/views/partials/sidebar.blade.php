@@ -116,15 +116,40 @@
                 Ekspedisi
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('laporan-work-instruction.index') ? 'active' : '' }}"
-                href="{{ route('laporan-work-instruction.index') }}">
+        <li class="nav-group">
+            <a class="nav-link nav-group-toggle" href="#">
                 <svg class="nav-icon">
                     <use xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-print') }}">
                     </use>
                 </svg>
                 Laporan
             </a>
+            <ul class="nav-group-items">
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('laporan-work-instruction.index') ? 'active' : '' }}"
+                        href="{{ route('laporan-work-instruction.index') }}">
+                        Work Instruction
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('laporan-surat-permintaan-material.index') ? 'active' : '' }}"
+                        href="{{ route('laporan-surat-permintaan-material.index') }}">
+                        Surat Permintaan Material
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('laporan-cutting-plan.index') ? 'active' : '' }}"
+                        href="{{ route('laporan-cutting-plan.index') }}">
+                        Cutting Plan
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('laporan-bon-permintaan-material.index') ? 'active' : '' }}"
+                        href="{{ route('laporan-bon-permintaan-material.index') }}">
+                        Bon Permintaan Material
+                    </a>
+                </li>
+            </ul>
         </li>
         <li class="nav-item">
             <form method="POST" action="{{ route('logout') }}">
