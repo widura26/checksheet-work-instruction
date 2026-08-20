@@ -22,26 +22,32 @@ class UserSeeder extends Seeder
         $viewer = Role::firstOrCreate(['name' => 'viewer']);
 
         // Create Admin User
-        $adminPpc = User::create([
-            'name' => 'admin ppp',
-            'nip' => '991200017',
-            'email' => 'hadi.wuriyanto@inka.co.id',
-            'password' => Hash::make('123456789'),
-        ]);
+        $adminPpc = User::firstOrCreate(
+            ['email' => 'hadi.wuriyanto@inka.co.id'],
+            [
+                'name' => 'admin ppp',
+                'nip' => '991200017',
+                'password' => Hash::make('123456789'),
+            ]
+        );
         $adminPpc->assignRole($adminRole);
-        $adminDmtp = User::create([
-            'name' => 'admin dmtp bwi',
-            'nip' => '991700045',
-            'email' => 'dedy.kurniawan@inka.co.id',
-            'password' => Hash::make('123456789'),
-        ]);
+        $adminDmtp = User::firstOrCreate(
+            ['email' => 'dedy.kurniawan@inka.co.id'],
+            [
+                'name' => 'admin dmtp bwi',
+                'nip' => '991700045',
+                'password' => Hash::make('123456789'),
+            ]
+        );
         $adminDmtp->assignRole($adminRole);
-        $adminIt = User::create([
-            'name' => 'admin it',
-            'nip' => '123456789',
-            'email' => 'it@gmail.com',
-            'password' => Hash::make('123456789'),
-        ]);
+        $adminIt = User::firstOrCreate(
+            ['email' => 'it@gmail.com'],
+            [
+                'name' => 'admin it',
+                'nip' => '123456789',
+                'password' => Hash::make('123456789'),
+            ]
+        );
         $adminIt->assignRole($adminRole);
     }
 }
