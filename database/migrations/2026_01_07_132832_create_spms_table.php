@@ -23,10 +23,6 @@ return new class extends Migration
                 ->on('projects')
                 ->cascadeOnUpdate()
                 ->restrictOnDelete();
-            $table->foreignId('posisi_ct_id')
-                ->constrained('posisi__c_t_s')
-                ->cascadeOnUpdate()
-                ->restrictOnDelete();
             $table->foreignId('departemen_id')->nullable()->constrained('departemens');
             $table->foreignId('bagian_id')->nullable()->constrained('bagians');
             $table->foreignId('unit_id')->nullable()->constrained('units');
