@@ -38,6 +38,7 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
 
     Route::prefix('project-code')->group(function(){
         Route::get('/', [ProjectCodeController::class, 'index'])->name('project-code.index');
+        Route::get('/data', [ProjectCodeController::class, 'data'])->name('project-code.data');
     });
 
     Route::prefix("processes")->group(function(){

@@ -1,11 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Proses')
+@section('title', 'Daftar Proyek')
 
 @section('content')
+
     <div class="card mb-4">
         <div class="card-header">
-            <h5 class="card-title mb-0">Data Kode Proyek</h5>
+            Menampilkan Seluruh Project
         </div>
         <div class="card-body">
             @if (session('success'))
@@ -20,91 +21,127 @@
                     <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
-            <div class="row mb-3">
-                <div class="col-4">
-                    <input type="text" class="form-control" name="kode_proses_filter" id="kode_proses_filter"
-                        placeholder="Masukkan Kode Proses">
+            @if ($errors->any())
+                <div id="error-alert" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
-                <div class="col-4">
-                    <input type="text" class="form-control" name="nama_filter" id="nama_filter"
-                        placeholder="Masukkan Nama Proses">
-                </div>
-                <div class="col-4">
-                </div>
+            @endif
+            <div class="d-flex justify-content-end mb-3 gap-2">
+                @if (Auth::user()->hasRole('admin'))
+                    <button type="button" class="btn btn-success text-white" data-coreui-toggle="modal"
+                        data-coreui-target="#importExcelModal">
+                        <i class="fas fa-plus me-1"></i>
+                        Import Excel
+                    </button>
+                @endif
             </div>
-            <div class="mt-3 mb-3">
-                <button id="filter-button" class="btn btn-primary">
-                    <i class="fas fa-filter me-1"></i>
-                    Filter
-                </button>
-                <button id="reset-filter-button" class="btn btn-secondary">
-                    <i class="fas fa-undo me-1"></i>
-                    Reset
-                </button>
-            </div>
+
             <div class="table-responsive">
-                <table id="table-proses" class="table table-striped table-hover">
+                <table id="projects-table" class="table table-striped table-hover">
                     <thead class="text-center">
                         <tr>
                             <th>No</th>
-                            <th>Kode Proses</th>
-                            <th>Nama Proses</th>
-                            <th>ID Kelompok</th>
+                            <th>Project ID</th>
+                            <th>Nama Project</th>
+                            @if (Auth::user()->hasRole('admin'))
+                                <th>Action</th>
+                            @endif
                         </tr>
                     </thead>
-                    <tbody>
-                    </tbody>
                 </table>
             </div>
         </div>
     </div>
+
+    <!-- Modal Import Excel -->
+    {{-- <div class="modal fade" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importExcelModalLabel">Import Excel Project</h5>
+                    <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('projects.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="excel_file" class="form-label">Pilih File Excel</label>
+                            <input class="form-control" type="file" name="excel_file" id="excel_file"
+                                accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+                                required>
+                            <div class="form-text">Format file yang didukung: .xlsx, .xls</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-coreui-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-success text-white">Import</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div> --}}
 @endsection
 
 @push('js')
     <script type="module">
-        $(document).ready(function() {
-            var table = $('#table-proses').DataTable({
+        document.addEventListener('click', function(e) {
+            let button = e.target.closest('.btn-close-project');
+            if (!button) return;
+            let form = button.closest('form');
+            if (button.dataset.submitted === "true") return;
+            Swal.fire({
+                title: 'Apakah Anda Yakin ?',
+                text: "Project akan ditutup dan tidak bisa dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, tutup!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    button.dataset.submitted = "true";
+                    button.disabled = true;
+                    button.innerHTML = 'Processing...';
+                    form.submit();
+                }
+            });
+        });
+        $(function() {
+            $('#projects-table').DataTable({
                 processing: true,
                 serverSide: true,
                 responsive: true,
-                ajax: {
-                    url: "{{ route('processes.data') }}",
-                    data: function(d) {
-                        d.kode_proses = $('#kode_proses_filter').val();
-                        d.nama = $('#nama_filter').val();
-                    }
-                },
+                dom: 'lfrtip',
+                ajax: "{{ route('project-code.data') }}",
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
                         orderable: false,
                         searchable: false,
                         className: 'text-center'
+                    }, {
+                        data: 'project_code',
+                        name: 'project_code'
                     },
                     {
-                        data: 'kode_proses',
-                        name: 'kode_proses'
+                        data: 'name',
+                        name: 'name'
                     },
-                    {
-                        data: 'nama',
-                        name: 'nama'
-                    },
-                    {
-                        data: 'id_kel',
-                        name: 'id_kel'
-                    },
-                ],
-                autoWidth: false,
-                scrollX: true,
-                scrollCollapse: true,
-            });
-            $('#filter-button').click(function() {
-                table.ajax.reload();
-            });
-            $('#reset-filter-button').click(function() {
-                $('#kode_proses_filter').val('');
-                $('#nama_filter').val('');
-                table.ajax.reload();
+                    @if (Auth::user()->hasRole('admin'))
+                        {
+                            data: 'action',
+                            name: 'action',
+                            orderable: false,
+                            searchable: false,
+                            className: 'text-center'
+                        }
+                    @endif
+                ]
             });
         });
     </script>
