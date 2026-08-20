@@ -31,23 +31,48 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'auth.active'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/grafik', [GrafikController::class, 'index'])->name('grafik.index');
+    Route::get('/oka', [OkaController::class, 'index'])->name('oka.index');
+    Route::get('/kode-material', [KodeMaterialController::class, 'index'])->name('kode-material.index');
+    Route::get('/barcode', [BarcodeController::class, 'index'])->name('barcode.index');
+
     Route::prefix('project-code')->group(function(){
         Route::get('/', [ProjectCodeController::class, 'index'])->name('project-code.index');
     });
-    Route::get('/grafik', [GrafikController::class, 'index'])->name('grafik.index');
 
-    Route::get('/master/oka', [OkaController::class, 'index'])->name('master.oka.index');
-    Route::get('/processes', [ProsesController::class, 'index'])->name('processes.index');
-    Route::get('/processes/data', [ProsesController::class, 'data'])->name('processes.data');
-    Route::get('/master/kode-material', [KodeMaterialController::class, 'index'])->name('master.kode-material.index');
+    Route::prefix("processes")->group(function(){
+        Route::get('/', [ProsesController::class, 'index'])->name('processes.index');
+        Route::get('/data', [ProsesController::class, 'data'])->name('processes.data');
+    });
 
-    Route::get('/md', [MdController::class, 'index'])->name('md.index');
-    Route::prefix('cp')->group(function () {
+    Route::prefix('manufacture-drawing')->group(function () {
+        Route::get('/', [MdController::class, 'index'])->name('md.index');
+        Route::get('/data', [MdController::class, 'data'])->name('md.data');
+    });
+
+    Route::prefix('cutting-plan')->group(function () {
         Route::get('/', [CpController::class, 'index'])->name('cp.index');
     });
-    Route::get('/wi', [WiController::class, 'index'])->name('wi.index');
-    Route::get('/barcode', [BarcodeController::class, 'index'])->name('barcode.index');
-    Route::get('/sttp', [SttpController::class, 'index'])->name('sttp.index');
-    Route::get('/expedisi', [ExpedisiController::class, 'index'])->name('expedisi.index');
-    Route::get('/lap-wi', [WiLapController::class, 'index'])->name('lap-wi.index');
+
+    Route::prefix('work-instruction')->group(function () {
+        Route::get('/', [WiController::class, 'index'])->name('wi.index');
+        Route::get('/data', [WiController::class, 'data'])->name('wi.data');
+    });
+
+    Route::prefix('surat-tanda-terima-penyerahan-produk')->group(function () {
+        Route::get('/', [SttpController::class, 'index'])->name('sttp.index');
+        Route::get('/data', [SttpController::class, 'data'])->name('sttp.data');
+    });
+
+    Route::prefix('ekspedisi')->group(function () {
+        Route::get('/', [ExpedisiController::class, 'index'])->name('ekspedisi.index');
+        Route::get('/data', [ExpedisiController::class, 'data'])->name('ekspedisi.data');
+    });
+
+    Route::prefix('laporan')->group(function () {
+        Route::get('/work-instruction', [WiLapController::class, 'index'])->name('laporan-work-instruction.index');
+        Route::get('/surat-permintaan-material', [WiLapController::class, 'index'])->name('laporan-surat-permintaan-material.index');
+        Route::get('/cutting-plan', [WiLapController::class, 'index'])->name('laporan-cutting-plan.index');
+        Route::get('/bon-permintaan-material', [WiLapController::class, 'index'])->name('laporan-bon-permintaan-material.index');
+    });
 });
