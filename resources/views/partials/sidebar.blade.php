@@ -17,8 +17,8 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('master.oka.index') ? 'active' : '' }}"
-                href="{{ route('master.oka.index') }}">
+            <a class="nav-link {{ request()->routeIs('project-code.index') ? 'active' : '' }}"
+                href="{{ route('project-code.index') }}">
                 <svg class="nav-icon">
                     <use xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-folder') }}">
                     </use>

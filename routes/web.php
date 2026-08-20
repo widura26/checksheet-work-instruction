@@ -9,6 +9,7 @@ use App\Http\Controllers\KodeMaterialController;
 use App\Http\Controllers\MdController;
 use App\Http\Controllers\OkaController;
 use App\Http\Controllers\ProsesController;
+use App\Http\Controllers\ProjectCodeController;
 use App\Http\Controllers\SttpController;
 use App\Http\Controllers\WiController;
 use App\Http\Controllers\WiLapController;
@@ -30,6 +31,9 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'auth.active'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::prefix('project-code')->group(function(){
+        Route::get('/', [ProjectCodeController::class, 'index'])->name('project-code.index');
+    });
     Route::get('/grafik', [GrafikController::class, 'index'])->name('grafik.index');
 
     Route::get('/master/oka', [OkaController::class, 'index'])->name('master.oka.index');
@@ -38,7 +42,9 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
     Route::get('/master/kode-material', [KodeMaterialController::class, 'index'])->name('master.kode-material.index');
 
     Route::get('/md', [MdController::class, 'index'])->name('md.index');
-    Route::get('/cp', [CpController::class, 'index'])->name('cp.index');
+    Route::prefix('cp')->group(function () {
+        Route::get('/', [CpController::class, 'index'])->name('cp.index');
+    });
     Route::get('/wi', [WiController::class, 'index'])->name('wi.index');
     Route::get('/barcode', [BarcodeController::class, 'index'])->name('barcode.index');
     Route::get('/sttp', [SttpController::class, 'index'])->name('sttp.index');
