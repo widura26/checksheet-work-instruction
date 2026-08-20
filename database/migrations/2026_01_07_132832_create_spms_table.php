@@ -19,7 +19,7 @@ return new class extends Migration
                 ->restrictOnDelete();
             $table->string('project_id', 50);
             $table->foreign('project_id')
-                ->references('project_id')
+                ->references('id')
                 ->on('projects')
                 ->cascadeOnUpdate()
                 ->restrictOnDelete();

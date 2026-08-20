@@ -41,6 +41,6 @@ class LapWi extends Model
 
     public function proyek()
     {
-        return $this->belongsTo(Proyek::class, 'proyek_id');
+        return $this->belongsTo(Proyek::class, 'project_id');
     }
 }

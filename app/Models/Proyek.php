@@ -10,7 +10,7 @@ class Proyek extends Model
 {
     use HasFactory;
 
-    protected $table = 'proyeks';
+    protected $table = 'projects';
 
     protected $guarded = ['id'];
 

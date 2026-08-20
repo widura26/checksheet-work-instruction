@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('drawings', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('proyek_id')->nullable()->index();
+            $table->foreignUuid('project_id')->nullable()->index();
             $table->string('nogbr')->unique();
             $table->string('nama')->nullable();
             $table->date('tgl')->nullable();

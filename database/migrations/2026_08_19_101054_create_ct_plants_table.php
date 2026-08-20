@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('oka')->nullable();
             $table->foreignUuid('oka_id')->nullable()->index();
             $table->string('kode_proyek')->nullable();
-            $table->foreignUuid('proyek_id')->nullable()->index();
+            $table->foreignUuid('project_id')->nullable()->index();
             $table->string('lot')->nullable();
             $table->string('no_ctplan')->nullable();
             $table->foreignUuid('cp_detail_id')->nullable()->index();

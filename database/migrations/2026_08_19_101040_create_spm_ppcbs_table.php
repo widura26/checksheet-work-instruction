@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignUuid('material_id')->nullable()->index();
             $table->bigInteger('qty_bpm_ppcb')->nullable();
             $table->foreignUuid('oka_id')->nullable()->index();
-            $table->foreignUuid('proyek_id')->nullable()->index();
+            $table->foreignUuid('project_id')->nullable()->index();
             $table->string('lot_ppcb')->nullable();
             $table->bigInteger('qty_spm_ppcb')->nullable();
             $table->foreignId('pengirim_id')->nullable()->index();

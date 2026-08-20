@@ -12,7 +12,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('nosttpp')->unique();
             $table->foreignUuid('oka_id')->nullable()->index();
-            $table->foreignUuid('proyek_id')->nullable()->index();
+            $table->foreignUuid('project_id')->nullable()->index();
             $table->string('kontrak')->nullable();
             $table->string('lppb')->nullable();
             $table->date('tgl_lppb')->nullable();

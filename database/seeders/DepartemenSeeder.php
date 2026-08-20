@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Bagian;
 use App\Models\Departemen;
-use App\Models\Posisi_CT;
+// use App\Models\Posisi_CT;
 use Illuminate\Database\Seeder;
 
 class DepartemenSeeder extends Seeder
@@ -15,9 +15,9 @@ class DepartemenSeeder extends Seeder
     public function run(): void
     {
         //tambah CT_UU
-        Posisi_CT::create([
-            'nama_posisi_ct' => 'CT_UU'
-        ]);
+        // Posisi_CT::create([
+        //     'nama_posisi_ct' => 'CT_UU'
+        // ]);
         // tambah departemen
         $ppc = Departemen::create(['nama_departemen' => 'Perencanaan dan Pengendalian Produksi Banyuwangi']);
         $fabrikasi = Departemen::create(['nama_departemen' => 'Fabrikasi Banyuwangi']);

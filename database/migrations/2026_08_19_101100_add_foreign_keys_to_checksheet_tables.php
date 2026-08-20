@@ -9,11 +9,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('okas', function (Blueprint $table) {
-            $table->foreign('proyek_id')->references('id')->on('proyeks')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
         });
 
         Schema::table('drawings', function (Blueprint $table) {
-            $table->foreign('proyek_id')->references('id')->on('proyeks')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
         });
 
         Schema::table('mesins', function (Blueprint $table) {
@@ -112,7 +112,7 @@ return new class extends Migration
         });
 
         Schema::table('grafik_md', function (Blueprint $table) {
-            $table->foreign('proyek_id')->references('id')->on('proyeks')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
         });
 
         Schema::table('ims_bpms', function (Blueprint $table) {
@@ -137,23 +137,23 @@ return new class extends Migration
         Schema::table('lap_wi', function (Blueprint $table) {
             $table->foreign('md_header_id')->references('id')->on('md_headers')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('proyek_id')->references('id')->on('proyeks')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
         });
 
         Schema::table('md_gambars', function (Blueprint $table) {
-            $table->foreign('proyek_id')->references('id')->on('proyeks')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('md_header_id')->references('id')->on('md_headers')->cascadeOnUpdate()->restrictOnDelete();
         });
 
         Schema::table('mdrs', function (Blueprint $table) {
-            $table->foreign('proyek_id')->references('id')->on('proyeks')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
         });
 
         Schema::table('memos', function (Blueprint $table) {
             $table->foreign('md_header_id')->references('id')->on('md_headers')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('proyek_id')->references('id')->on('proyeks')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
         });
 
@@ -176,7 +176,7 @@ return new class extends Migration
         Schema::table('pieceparts', function (Blueprint $table) {
             $table->foreign('piecepart_datang_id')->references('id')->on('piecepart_datangs')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('md_header_id')->references('id')->on('md_headers')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('proyek_id')->references('id')->on('proyeks')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
         });
 
@@ -223,7 +223,7 @@ return new class extends Migration
             $table->foreign('bpm_id')->references('id')->on('bpms')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('material_id')->references('id')->on('wi_trn_bpms')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('proyek_id')->references('id')->on('proyeks')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('pengirim_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('mengetahui_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('penerima_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
@@ -232,13 +232,13 @@ return new class extends Migration
         Schema::table('sttp_dalmats', function (Blueprint $table) {
             $table->foreign('md_header_id')->references('id')->on('md_headers')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('proyek_id')->references('id')->on('proyeks')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
         });
 
         Schema::table('sttp_dalmat_datangs', function (Blueprint $table) {
             $table->foreign('md_header_id')->references('id')->on('md_headers')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('proyek_id')->references('id')->on('proyeks')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
         });
 
         Schema::table('sttp_dalmat_datang_orgs', function (Blueprint $table) {
@@ -250,7 +250,7 @@ return new class extends Migration
 
         Schema::table('sttpps', function (Blueprint $table) {
             $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('proyek_id')->references('id')->on('proyeks')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('pengirim_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('penerima_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
         });
@@ -259,7 +259,7 @@ return new class extends Migration
             $table->foreign('sttpp_id')->references('id')->on('sttpps')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('md_header_id')->references('id')->on('md_headers')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('proyek_id')->references('id')->on('proyeks')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('jenis_kereta_id')->references('id')->on('jenis_keretas')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('pengirim_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('penerima_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
@@ -286,7 +286,7 @@ return new class extends Migration
 
         Schema::table('wi_finishes', function (Blueprint $table) {
             $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('proyek_id')->references('id')->on('proyeks')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('wi_trn_id')->references('id')->on('wi_trns')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('jenis_kereta_id')->references('id')->on('jenis_keretas')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('sttpp_id')->references('id')->on('sttpps')->cascadeOnUpdate()->restrictOnDelete();
@@ -310,13 +310,13 @@ return new class extends Migration
 
         Schema::table('bobot_parts', function (Blueprint $table) {
             $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('proyek_id')->references('id')->on('proyeks')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('md_header_id')->references('id')->on('md_headers')->cascadeOnUpdate()->restrictOnDelete();
         });
 
         Schema::table('ct_plants', function (Blueprint $table) {
             $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('proyek_id')->references('id')->on('proyeks')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('cp_detail_id')->references('id')->on('cp_details')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('bpm_id')->references('id')->on('bpms')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('material_id')->references('id')->on('wi_trn_bpms')->cascadeOnUpdate()->restrictOnDelete();
@@ -325,7 +325,7 @@ return new class extends Migration
 
         Schema::table('wi_trns', function (Blueprint $table) {
             $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('proyek_id')->references('id')->on('proyeks')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('material_id')->references('id')->on('wi_trn_bpms')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('md_header_id')->references('id')->on('md_headers')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('jenis_kereta_id')->references('id')->on('jenis_keretas')->cascadeOnUpdate()->restrictOnDelete();
@@ -346,7 +346,7 @@ return new class extends Migration
     {
         Schema::table('wi_trns', function (Blueprint $table) {
             $table->dropForeign(['oka_id']);
-            $table->dropForeign(['proyek_id']);
+            $table->dropForeign(['project_id']);
             $table->dropForeign(['material_id']);
             $table->dropForeign(['md_header_id']);
             $table->dropForeign(['jenis_kereta_id']);
@@ -364,7 +364,7 @@ return new class extends Migration
 
         Schema::table('ct_plants', function (Blueprint $table) {
             $table->dropForeign(['oka_id']);
-            $table->dropForeign(['proyek_id']);
+            $table->dropForeign(['project_id']);
             $table->dropForeign(['cp_detail_id']);
             $table->dropForeign(['bpm_id']);
             $table->dropForeign(['material_id']);
@@ -373,7 +373,7 @@ return new class extends Migration
 
         Schema::table('bobot_parts', function (Blueprint $table) {
             $table->dropForeign(['oka_id']);
-            $table->dropForeign(['proyek_id']);
+            $table->dropForeign(['project_id']);
             $table->dropForeign(['md_header_id']);
         });
 
@@ -393,7 +393,7 @@ return new class extends Migration
 
         Schema::table('wi_finishes', function (Blueprint $table) {
             $table->dropForeign(['oka_id']);
-            $table->dropForeign(['proyek_id']);
+            $table->dropForeign(['project_id']);
             $table->dropForeign(['wi_trn_id']);
             $table->dropForeign(['jenis_kereta_id']);
             $table->dropForeign(['sttpp_id']);
@@ -423,7 +423,7 @@ return new class extends Migration
             $table->dropForeign(['sttpp_id']);
             $table->dropForeign(['md_header_id']);
             $table->dropForeign(['oka_id']);
-            $table->dropForeign(['proyek_id']);
+            $table->dropForeign(['project_id']);
             $table->dropForeign(['jenis_kereta_id']);
             $table->dropForeign(['pengirim_id']);
             $table->dropForeign(['penerima_id']);
@@ -432,7 +432,7 @@ return new class extends Migration
 
         Schema::table('sttpps', function (Blueprint $table) {
             $table->dropForeign(['oka_id']);
-            $table->dropForeign(['proyek_id']);
+            $table->dropForeign(['project_id']);
             $table->dropForeign(['pengirim_id']);
             $table->dropForeign(['penerima_id']);
         });
@@ -447,13 +447,13 @@ return new class extends Migration
         Schema::table('sttp_dalmat_datangs', function (Blueprint $table) {
             $table->dropForeign(['md_header_id']);
             $table->dropForeign(['oka_id']);
-            $table->dropForeign(['proyek_id']);
+            $table->dropForeign(['project_id']);
         });
 
         Schema::table('sttp_dalmats', function (Blueprint $table) {
             $table->dropForeign(['md_header_id']);
             $table->dropForeign(['oka_id']);
-            $table->dropForeign(['proyek_id']);
+            $table->dropForeign(['project_id']);
         });
 
         Schema::table('spm_ppcbs', function (Blueprint $table) {
@@ -461,7 +461,7 @@ return new class extends Migration
             $table->dropForeign(['bpm_id']);
             $table->dropForeign(['material_id']);
             $table->dropForeign(['oka_id']);
-            $table->dropForeign(['proyek_id']);
+            $table->dropForeign(['project_id']);
             $table->dropForeign(['pengirim_id']);
             $table->dropForeign(['mengetahui_id']);
             $table->dropForeign(['penerima_id']);
@@ -508,7 +508,7 @@ return new class extends Migration
         Schema::table('pieceparts', function (Blueprint $table) {
             $table->dropForeign(['piecepart_datang_id']);
             $table->dropForeign(['md_header_id']);
-            $table->dropForeign(['proyek_id']);
+            $table->dropForeign(['project_id']);
             $table->dropForeign(['oka_id']);
         });
 
@@ -530,25 +530,25 @@ return new class extends Migration
 
         Schema::table('memos', function (Blueprint $table) {
             $table->dropForeign(['md_header_id']);
-            $table->dropForeign(['proyek_id']);
+            $table->dropForeign(['project_id']);
             $table->dropForeign(['oka_id']);
         });
 
         Schema::table('mdrs', function (Blueprint $table) {
-            $table->dropForeign(['proyek_id']);
+            $table->dropForeign(['project_id']);
             $table->dropForeign(['oka_id']);
             $table->dropForeign(['user_id']);
         });
 
         Schema::table('md_gambars', function (Blueprint $table) {
-            $table->dropForeign(['proyek_id']);
+            $table->dropForeign(['project_id']);
             $table->dropForeign(['md_header_id']);
         });
 
         Schema::table('lap_wi', function (Blueprint $table) {
             $table->dropForeign(['md_header_id']);
             $table->dropForeign(['oka_id']);
-            $table->dropForeign(['proyek_id']);
+            $table->dropForeign(['project_id']);
         });
 
         Schema::table('jadwals', function (Blueprint $table) {
@@ -571,7 +571,7 @@ return new class extends Migration
         });
 
         Schema::table('grafik_md', function (Blueprint $table) {
-            $table->dropForeign(['proyek_id']);
+            $table->dropForeign(['project_id']);
         });
 
         Schema::table('gases', function (Blueprint $table) {
@@ -670,11 +670,11 @@ return new class extends Migration
         });
 
         Schema::table('drawings', function (Blueprint $table) {
-            $table->dropForeign(['proyek_id']);
+            $table->dropForeign(['project_id']);
         });
 
         Schema::table('okas', function (Blueprint $table) {
-            $table->dropForeign(['proyek_id']);
+            $table->dropForeign(['project_id']);
         });
     }
 };

@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('projects', function (Blueprint $table) {
-            $table->timestamp('closed_at')->nullable()->after('updated_at');
+        Schema::create('kode_bagian_spm', function (Blueprint $table) {
+            $table->id();
+            $table->string('kode');
+            $table->string('jabatan');
+            $table->string('nama_manager');
+            $table->integer('stok_rendah');
         });
     }
 
@@ -21,8 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('projects', function (Blueprint $table) {
-            $table->dropColumn('closed_at');
-        });
+        Schema::dropIfExists('kode_bagian_spm');
     }
 };

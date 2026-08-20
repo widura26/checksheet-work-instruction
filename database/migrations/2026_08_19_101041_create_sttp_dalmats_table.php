@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignUuid('md_header_id')->nullable()->index();
             $table->string('nama_part')->nullable();
             $table->foreignUuid('oka_id')->nullable()->index();
-            $table->foreignUuid('proyek_id')->nullable()->index();
+            $table->foreignUuid('project_id')->nullable()->index();
             $table->string('lot')->nullable();
             $table->bigInteger('qty_kirim')->nullable();
             $table->date('tgl_kirim')->nullable();

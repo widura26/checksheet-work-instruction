@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('okas', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('oka')->unique();
-            $table->foreignUuid('proyek_id')->nullable()->index();
+            $table->foreignUuid('project_id')->nullable()->index();
             $table->string('wbs')->nullable();
             $table->text('ket')->nullable();
             $table->bigInteger('total_car')->nullable();

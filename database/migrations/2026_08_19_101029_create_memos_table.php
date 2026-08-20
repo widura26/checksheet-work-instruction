@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('id_memo')->unique();
             $table->foreignUuid('md_header_id')->nullable()->index();
             $table->string('title')->nullable();
-            $table->foreignUuid('proyek_id')->nullable()->index();
+            $table->foreignUuid('project_id')->nullable()->index();
             $table->foreignUuid('oka_id')->nullable()->index();
             $table->string('status_p')->nullable();
             $table->text('ket')->nullable();
