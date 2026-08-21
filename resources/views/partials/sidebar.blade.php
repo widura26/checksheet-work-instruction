@@ -102,7 +102,7 @@
                     <use xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-file') }}">
                     </use>
                 </svg>
-                STTP
+                STTPP
             </a>
         </li>
         <li class="nav-item">
