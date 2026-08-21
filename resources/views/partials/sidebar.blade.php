@@ -9,27 +9,6 @@
 
         @include('components.parts.sidebar-list-item', [
             'navtype' => 'nav-item',
-            'route' => 'dashboard',
-            'icon' => 'cil-speedometer',
-            'label' => 'Dashboard'
-        ])
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'project-code.index',
-            'icon' => 'cil-folder',
-            'label' => 'Kode Proyek'
-        ])
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'processes.index',
-            'icon' => 'cil-cog',
-            'label' => 'Proses'
-        ])
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
             'route' => 'md.index',
             'icon' => 'cil-pencil',
             'label' => 'Manufacture Drawing'
@@ -40,48 +19,6 @@
             'route' => 'cp.index',
             'icon' => 'cil-calculator',
             'label' => 'Cutting Plan'
-        ])
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'grafik.index',
-            'icon' => 'cil-chart-line',
-            'label' => 'Grafik'
-        ])
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'wi.index',
-            'icon' => 'cil-document',
-            'label' => 'Work Instruction'
-        ])
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'kode-material.index',
-            'icon' => 'cil-storage',
-            'label' => 'Data Material'
-        ])
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'barcode.index',
-            'icon' => 'cil-barcode',
-            'label' => 'Barcode'
-        ])
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'sttp.index',
-            'icon' => 'cil-file',
-            'label' => 'STTPP'
-        ])
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'ekspedisi.index',
-            'icon' => 'cil-truck',
-            'label' => 'Ekspedisi'
         ])
 
         @include('components.parts.sidebar-list-item', [
@@ -110,6 +47,69 @@
                     'label' => 'Bon Permintaan Material',
                 ],
             ]
+        ])
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
+            'route' => 'wi.index',
+            'icon' => 'cil-document',
+            'label' => 'Work Instruction'
+        ])
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
+            'route' => 'dashboard',
+            'icon' => 'cil-speedometer',
+            'label' => 'Dashboard'
+        ])
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
+            'route' => 'project-code.index',
+            'icon' => 'cil-folder',
+            'label' => 'Kode Proyek'
+        ])
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
+            'route' => 'processes.index',
+            'icon' => 'cil-cog',
+            'label' => 'Proses'
+        ])
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
+            'route' => 'grafik.index',
+            'icon' => 'cil-chart-line',
+            'label' => 'Grafik'
+        ])
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
+            'route' => 'kode-material.index',
+            'icon' => 'cil-storage',
+            'label' => 'Data Material'
+        ])
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
+            'route' => 'barcode.index',
+            'icon' => 'cil-barcode',
+            'label' => 'Barcode'
+        ])
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
+            'route' => 'sttp.index',
+            'icon' => 'cil-file',
+            'label' => 'STTPP'
+        ])
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
+            'route' => 'ekspedisi.index',
+            'icon' => 'cil-truck',
+            'label' => 'Ekspedisi'
         ])
 
         @include('components.parts.sidebar-list-item', [
