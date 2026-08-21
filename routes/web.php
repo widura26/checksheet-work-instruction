@@ -57,16 +57,25 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
     Route::prefix('manufacture-drawing')->group(function () {
         Route::get('/', [MdController::class, 'index'])->name('md.index');
         Route::get('/data', [MdController::class, 'data'])->name('md.data');
+        Route::post('/', [MdController::class, 'store'])->name('md.store');
+        Route::put('/{mdr}', [MdController::class, 'update'])->name('md.update');
+        Route::delete('/{mdr}', [MdController::class, 'destroy'])->name('md.destroy');
     });
 
     Route::prefix('cutting-plan')->group(function () {
         Route::get('/', [CpController::class, 'index'])->name('cp.index');
         Route::get('/data', [CpController::class, 'getData'])->name('cp.data');
+        Route::post('/', [CpController::class, 'store'])->name('cp.store');
+        Route::put('/{cp}', [CpController::class, 'update'])->name('cp.update');
+        Route::delete('/{cp}', [CpController::class, 'destroy'])->name('cp.destroy');
     });
 
     Route::prefix('work-instruction')->group(function () {
         Route::get('/', [WiController::class, 'index'])->name('wi.index');
         Route::get('/data', [WiController::class, 'data'])->name('wi.data');
+        Route::post('/', [WiController::class, 'store'])->name('wi.store');
+        Route::put('/{wiTrn}', [WiController::class, 'update'])->name('wi.update');
+        Route::delete('/{wiTrn}', [WiController::class, 'destroy'])->name('wi.destroy');
     });
 
     Route::prefix('surat-tanda-terima-penyerahan-produk')->group(function () {

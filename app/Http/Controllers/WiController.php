@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MdHeader;
 use App\Models\WiTrn;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
 class WiController extends Controller
 {
     public function index()
     {
-        return view('wi.index');
+        $mdHeaders = MdHeader::orderBy('part_no')->get(['id', 'part_no', 'title']);
+
+        return view('wi.index', compact('mdHeaders'));
     }
 
     public function data(Request $request)
@@ -34,6 +38,7 @@ class WiController extends Controller
             )
             ->select([
                 'wi_trns.id',
+                'wi_trns.md_header_id',
                 'wi_trns.part_no',
                 'wi_trns.name',
                 'wi_trns.mat_cp as mat',
@@ -60,21 +65,75 @@ class WiController extends Controller
 
         return DataTables::of($query)
             ->addIndexColumn()
-            ->editColumn('tgl_ctplan', function ($row) {
-                return $row->tgl_ctplan
-                    ? \Carbon\Carbon::parse($row->tgl_ctplan)->format('d-m-Y')
-                    : '-';
-            })
-            ->editColumn('tgl_bpm', function ($row) {
-                return $row->tgl_bpm
-                    ? \Carbon\Carbon::parse($row->tgl_bpm)->format('d-m-Y')
-                    : '-';
-            })
-            ->editColumn('tgl_trn', function ($row) {
-                return $row->tgl_trn
-                    ? \Carbon\Carbon::parse($row->tgl_trn)->format('d-m-Y')
-                    : '-';
-            })
             ->make(true);
+    }
+
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'part_no' => 'nullable|string|max:255',
+            'name' => 'nullable|string|max:255',
+            'mat_cp' => 'nullable|string|max:255',
+            'md_header_id' => 'nullable|exists:md_headers,id',
+            'no_ctplan' => 'nullable|string|max:255',
+            'tgl_ctplan' => 'nullable|date',
+            'qty_lot' => 'nullable|integer',
+            'no_bpm' => 'nullable|string|max:255',
+            'tgl_bpm' => 'nullable|date',
+            'tgl_trn' => 'nullable|date',
+            'keterangan' => 'nullable|string',
+        ], [
+            'md_header_id.exists' => 'Manufacture Drawing tidak ditemukan.',
+            'tgl_ctplan.date' => 'Tgl Cp harus berupa tanggal.',
+            'tgl_bpm.date' => 'Tgl Bpm harus berupa tanggal.',
+            'tgl_trn.date' => 'Tgl WI Trn harus berupa tanggal.',
+            'qty_lot.integer' => 'Qty/lot harus berupa angka.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        WiTrn::create($validator->validated());
+
+        return response()->json(['success' => true, 'message' => 'Data berhasil ditambahkan.']);
+    }
+
+    public function update(Request $request, WiTrn $wiTrn)
+    {
+        $validator = Validator::make($request->all(), [
+            'part_no' => 'nullable|string|max:255',
+            'name' => 'nullable|string|max:255',
+            'mat_cp' => 'nullable|string|max:255',
+            'md_header_id' => 'nullable|exists:md_headers,id',
+            'no_ctplan' => 'nullable|string|max:255',
+            'tgl_ctplan' => 'nullable|date',
+            'qty_lot' => 'nullable|integer',
+            'no_bpm' => 'nullable|string|max:255',
+            'tgl_bpm' => 'nullable|date',
+            'tgl_trn' => 'nullable|date',
+            'keterangan' => 'nullable|string',
+        ], [
+            'md_header_id.exists' => 'Manufacture Drawing tidak ditemukan.',
+            'tgl_ctplan.date' => 'Tgl Cp harus berupa tanggal.',
+            'tgl_bpm.date' => 'Tgl Bpm harus berupa tanggal.',
+            'tgl_trn.date' => 'Tgl WI Trn harus berupa tanggal.',
+            'qty_lot.integer' => 'Qty/lot harus berupa angka.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $wiTrn->update($validator->validated());
+
+        return response()->json(['success' => true, 'message' => 'Data berhasil diperbarui.']);
+    }
+
+    public function destroy(WiTrn $wiTrn)
+    {
+        $wiTrn->delete();
+
+        return response()->json(['success' => true, 'message' => 'Data berhasil dihapus.']);
     }
 }
