@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BarcodeController;
+use App\Http\Controllers\CheckSheetController;
 use App\Http\Controllers\CpController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpedisiController;
@@ -77,6 +78,8 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::put('/{wiTrn}', [WiController::class, 'update'])->name('wi.update');
         Route::delete('/{wiTrn}', [WiController::class, 'destroy'])->name('wi.destroy');
     });
+
+    Route::get('/check-sheet', [CheckSheetController::class, 'index'])->name('check-sheet.index');
 
     Route::prefix('surat-tanda-terima-penyerahan-produk')->group(function () {
         Route::get('/', [SttpController::class, 'index'])->name('sttp.index');

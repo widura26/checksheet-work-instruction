@@ -50,6 +50,13 @@
 
         @include('components.parts.sidebar-list-item', [
             'navtype' => 'nav-item',
+            'route' => 'check-sheet.index',
+            'icon' => 'cil-task',
+            'label' => 'Check Sheet'
+        ])
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
             'route' => 'md.index',
             'icon' => 'cil-pencil',
             'label' => 'Manufacture Drawing'
