@@ -14,6 +14,14 @@ $.fn.DataTable.defaults.scrollX = true;
 $.fn.DataTable.defaults.scrollCollapse = true;
 $.fn.DataTable.defaults.responsive = true;
 
+// Loading indicator: tampilkan spinner (bukan teks "Processing...")
+if (!$.fn.DataTable.defaults.language) {
+    $.fn.DataTable.defaults.language = {};
+}
+$.fn.DataTable.defaults.language.processing =
+    '<div class="spinner-border text-primary" role="status">' +
+    '<span class="visually-hidden">Memuat...</span></div>';
+
 // Select2
 import select2 from "select2/dist/js/select2.full";
 select2(window, $);

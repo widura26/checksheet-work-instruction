@@ -202,6 +202,16 @@
   color: #1e293b;
 }
 
+/* DataTables loading spinner */
+.dataTables_processing {
+    z-index: 20 !important;
+    background: rgba(255, 255, 255, 0.65);
+}
+.dataTables_processing .spinner-border {
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
 /* Offline PWA-Lite banner */
 .offline-banner {
   position: fixed;
