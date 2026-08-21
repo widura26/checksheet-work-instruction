@@ -32,7 +32,7 @@ class Mdr extends Model
 
     public function proyek(): BelongsTo
     {
-        return $this->belongsTo(Proyek::class);
+        return $this->belongsTo(Project::class);
     }
 
     public function oka(): BelongsTo

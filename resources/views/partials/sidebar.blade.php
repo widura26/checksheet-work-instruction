@@ -74,7 +74,7 @@
             'navtype' => 'nav-item',
             'route' => 'processes.index',
             'icon' => 'cil-cog',
-            'label' => 'Proses'
+            'label' => 'Kode Proses'
         ])
 
         @include('components.parts.sidebar-list-item', [
