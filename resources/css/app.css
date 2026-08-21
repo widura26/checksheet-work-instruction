@@ -212,6 +212,21 @@
     height: 2.5rem;
 }
 
+/* Sidebar: smaller font + ellipsis for long labels */
+.sidebar .nav-link {
+  font-size: 0.8125rem;
+}
+.sidebar .nav-title {
+  font-size: 0.6875rem;
+}
+.sidebar .nav-link .sidebar-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* Offline PWA-Lite banner */
 .offline-banner {
   position: fixed;

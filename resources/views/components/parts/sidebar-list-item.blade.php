@@ -25,7 +25,7 @@
                     </use>
                 </svg>
             @endif
-            {{ $label }}
+            <span class="sidebar-label">{{ $label }}</span>
         </a>
 
         <ul class="nav-group-items">
@@ -33,13 +33,13 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs($subItem['route']) ? 'active' : '' }}"
                         href="{{ route($subItem['route']) }}">
-                        {{ $subItem['label'] }}
+                        <span class="sidebar-label">{{ $subItem['label'] }}</span>
                     </a>
                 </li>
             @endforeach
         </ul>
     @else
-        <a class="nav-link {{ $isActive ? 'active' : '' }}" href="{{ route($route) }}">
+                <a class="nav-link {{ $isActive ? 'active' : '' }}" href="{{ route($route) }}">
             @if(!empty($icon))
                 <svg class="nav-icon">
                     <use
@@ -47,7 +47,7 @@
                     </use>
                 </svg>
             @endif
-            {{ $label }}
+            <span class="sidebar-label">{{ $label }}</span>
         </a>
     @endif
 </li>

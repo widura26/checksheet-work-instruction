@@ -7,12 +7,23 @@
     </div>
     <ul class="sidebar-nav" data-coreui="navigation" data-simplebar="">
 
+        <li class="nav-title">Menu Utama</li>
+
         @include('components.parts.sidebar-list-item', [
             'navtype' => 'nav-item',
             'route' => 'dashboard',
             'icon' => 'cil-speedometer',
             'label' => 'Dashboard'
         ])
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
+            'route' => 'grafik.index',
+            'icon' => 'cil-chart-line',
+            'label' => 'Grafik'
+        ])
+
+        <li class="nav-title">Master Data</li>
 
         @include('components.parts.sidebar-list-item', [
             'navtype' => 'nav-item',
@@ -35,12 +46,7 @@
             'label' => 'Kode Material'
         ])
 
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'grafik.index',
-            'icon' => 'cil-chart-line',
-            'label' => 'Grafik'
-        ])
+        <li class="nav-title">Transaksi</li>
 
         @include('components.parts.sidebar-list-item', [
             'navtype' => 'nav-item',
@@ -54,34 +60,6 @@
             'route' => 'cp.index',
             'icon' => 'cil-calculator',
             'label' => 'Cutting Plan'
-        ])
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-group',
-            'icon' => 'cil-print',
-            'label' => 'Laporan',
-            'subitems' => [
-                [
-                    'navtype' => 'nav-item',
-                    'route' => 'laporan-work-instruction.index',
-                    'label' => 'Work Instruction',
-                ],
-                [
-                    'navtype' => 'nav-item',
-                    'route' => 'laporan-surat-permintaan-material.index',
-                    'label' => 'Surat Permintaan Material',
-                ],
-                [
-                    'navtype' => 'nav-item',
-                    'route' => 'laporan-cutting-plan.index',
-                    'label' => 'Cutting Plan',
-                ],
-                [
-                    'navtype' => 'nav-item',
-                    'route' => 'laporan-bon-permintaan-material.index',
-                    'label' => 'Bon Permintaan Material',
-                ],
-            ]
         ])
 
         @include('components.parts.sidebar-list-item', [
@@ -111,6 +89,38 @@
             'icon' => 'cil-truck',
             'label' => 'Ekspedisi'
         ])
+
+        <li class="nav-title">Laporan</li>
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-group',
+            'icon' => 'cil-print',
+            'label' => 'Laporan',
+            'subitems' => [
+                [
+                    'navtype' => 'nav-item',
+                    'route' => 'laporan-work-instruction.index',
+                    'label' => 'Work Instruction',
+                ],
+                [
+                    'navtype' => 'nav-item',
+                    'route' => 'laporan-surat-permintaan-material.index',
+                    'label' => 'Surat Permintaan Material',
+                ],
+                [
+                    'navtype' => 'nav-item',
+                    'route' => 'laporan-cutting-plan.index',
+                    'label' => 'Cutting Plan',
+                ],
+                [
+                    'navtype' => 'nav-item',
+                    'route' => 'laporan-bon-permintaan-material.index',
+                    'label' => 'Bon Permintaan Material',
+                ],
+            ]
+        ])
+
+        <li class="nav-title">Akun</li>
 
         @include('components.parts.sidebar-list-item', [
             'navtype' => 'nav-item',
