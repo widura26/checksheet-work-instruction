@@ -53,6 +53,7 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
 
     Route::prefix('cutting-plan')->group(function () {
         Route::get('/', [CpController::class, 'index'])->name('cp.index');
+        Route::get('/data', [CpController::class, 'getData'])->name('cp.data');
     });
 
     Route::prefix('work-instruction')->group(function () {
