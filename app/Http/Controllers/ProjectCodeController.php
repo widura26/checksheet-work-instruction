@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 
 use App\Models\Project;
-use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Http\Request;
 
 class ProjectCodeController extends Controller
@@ -13,23 +12,43 @@ class ProjectCodeController extends Controller
         return view('project-code.index');
     }
 
-    public function data(Request $request){
+    public function getData(Request $request){
         if (! $request->ajax()) {
             abort(404);
         }
 
-        $query = Project::select(['id', 'project_code', 'name', 'status']);
+        $query = Project::select(['id', 'project_code', 'name']);
 
-        if ($request->filled('project_code')) {
-            $query->where('project_code', 'LIKE', '%' . $request->project_code . '%');
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('project_code', 'LIKE', "%{$search}%")
+                    ->orWhere('name', 'LIKE', "%{$search}%");
+            });
         }
 
-        if ($request->filled('nama')) {
-            $query->where('nama', 'LIKE', '%' . $request->nama . '%');
-        }
+        $perPage = (int) $request->get('per_page', 10);
+        $projects = $query->paginate($perPage);
 
-        return DataTables::of($query)
-            ->addIndexColumn()
-            ->make(true);
+        return response()->json($projects);
+    }
+
+    public function create(Request $request){
+        $validated = $request->validate([
+            'project_code' => 'required|unique:projects,project_code',
+            'name' => 'required',
+        ]);
+
+        try {
+            $project = Project::create([
+                'project_code' => $validated['project_code'],
+                'name' => $validated['name'],
+                'status' => true,
+            ]);
+    
+            return response()->json(['message' => 'Project created successfully', 'project' => $project], 201);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => 'Failed to create project', 'error' => $th->getMessage()], 500);
+        }
     }
 }

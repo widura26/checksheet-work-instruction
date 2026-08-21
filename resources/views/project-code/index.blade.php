@@ -47,9 +47,6 @@
                             <th>No</th>
                             <th>Project ID</th>
                             <th>Nama Project</th>
-                            @if (Auth::user()->hasRole('admin'))
-                                <th>Action</th>
-                            @endif
                         </tr>
                     </thead>
                 </table>
@@ -117,30 +114,38 @@
                 serverSide: true,
                 responsive: true,
                 dom: 'lfrtip',
-                ajax: "{{ route('project-code.data') }}",
+                ajax: function (data, callback, settings) {
+                    $.get("{{ route('project-code.data') }}", {
+                        page: (data.start / data.length) + 1,
+                        per_page: data.length,
+                        search: data.search.value
+                    }).done(function (json) {
+                        callback({
+                            draw: data.draw,
+                            recordsTotal: json.total,
+                            recordsFiltered: json.total,
+                            data: json.data
+                        });
+                    });
+                },
                 columns: [{
-                        data: 'DT_RowIndex',
+                        data: null,
                         name: 'DT_RowIndex',
                         orderable: false,
                         searchable: false,
-                        className: 'text-center'
-                    }, {
+                        className: 'text-center',
+                        render: function (data, type, row, meta) {
+                            return meta.row + 1;
+                        }
+                    },
+                    {
                         data: 'project_code',
                         name: 'project_code'
                     },
                     {
                         data: 'name',
                         name: 'name'
-                    },
-                    @if (Auth::user()->hasRole('admin'))
-                        {
-                            data: 'action',
-                            name: 'action',
-                            orderable: false,
-                            searchable: false,
-                            className: 'text-center'
-                        }
-                    @endif
+                    }
                 ]
             });
         });
