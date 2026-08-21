@@ -41,12 +41,20 @@
             </div>
 
             <div class="table-responsive">
-                <table id="projects-table" class="table table-striped table-hover">
+                <table id="projects-table" class="table table-bordered table-hover" style="width:100%">
                     <thead class="text-center">
                         <tr>
                             <th>No</th>
-                            <th>Project ID</th>
-                            <th>Nama Project</th>
+                            <th>Oka</th>
+                            <th>Kode Proyek</th>
+                            <th>Wbs</th>
+                            <th>Nama</th>
+                            <th>Label Proyek</th>
+                            <th>Total Lot Car</th>
+                            <th>Total Lot Jig</th>
+                            <th>Total Lot Prototype</th>
+                            <th>Tgl</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                 </table>
@@ -109,45 +117,90 @@
             });
         });
         $(function() {
-            $('#projects-table').DataTable({
-                processing: true,
-                serverSide: true,
-                responsive: true,
-                dom: 'lfrtip',
-                ajax: function (data, callback, settings) {
-                    $.get("{{ route('project-code.data') }}", {
-                        page: (data.start / data.length) + 1,
-                        per_page: data.length,
-                        search: data.search.value
-                    }).done(function (json) {
-                        callback({
-                            draw: data.draw,
-                            recordsTotal: json.total,
-                            recordsFiltered: json.total,
-                            data: json.data
+                $('#projects-table').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    scrollX: true,
+                    scrollCollapse: true,
+                    dom: 'lfrtip',
+                    ajax: function (data, callback, settings) {
+                        $.get("{{ route('project-code.data') }}", {
+                            page: (data.start / data.length) + 1,
+                            per_page: data.length,
+                            search: data.search.value
+                        }).done(function (json) {
+                            callback({
+                                draw: data.draw,
+                                recordsTotal: json.total,
+                                recordsFiltered: json.total,
+                                data: json.data
+                            });
                         });
-                    });
-                },
-                columns: [{
-                        data: null,
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false,
-                        className: 'text-center',
-                        render: function (data, type, row, meta) {
-                            return meta.row + 1;
+                    },
+                    columns: [{
+                            data: null,
+                            name: 'DT_RowIndex',
+                            orderable: false,
+                            searchable: false,
+                            className: 'text-center',
+                            render: function (data, type, row, meta) {
+                                return meta.row + 1;
+                            }
+                        },
+                        {
+                            data: 'oka',
+                            name: 'oka'
+                        },
+                        {
+                            data: 'project_code',
+                            name: 'project_code'
+                        },
+                        {
+                            data: 'wbs',
+                            name: 'wbs'
+                        },
+                        {
+                            data: 'name',
+                            name: 'name'
+                        },
+                        {
+                            data: 'label_proyek',
+                            name: 'label_proyek'
+                        },
+                        {
+                            data: 'total_car',
+                            name: 'total_car',
+                            className: 'text-center'
+                        },
+                        {
+                            data: 'jig',
+                            name: 'jig',
+                            className: 'text-center'
+                        },
+                        {
+                            data: 'prototype',
+                            name: 'prototype',
+                            className: 'text-center'
+                        },
+                        {
+                            data: 'tgl_oka',
+                            name: 'tgl_oka',
+                            className: 'text-center'
+                        },
+                        {
+                            data: 'id',
+                            name: 'action',
+                            orderable: false,
+                            searchable: false,
+                            className: 'text-center',
+                            render: function (data, type, row) {
+                                return '<a href="/project-code/' + data + '/edit" class="btn btn-sm btn-primary">' +
+                                    '<i class="fas fa-edit me-1"></i> Edit</a>';
+                            }
                         }
-                    },
-                    {
-                        data: 'project_code',
-                        name: 'project_code'
-                    },
-                    {
-                        data: 'name',
-                        name: 'name'
-                    }
-                ]
-            });
+                    ]
+                });
         });
     </script>
 @endpush

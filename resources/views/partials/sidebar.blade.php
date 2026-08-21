@@ -9,6 +9,41 @@
 
         @include('components.parts.sidebar-list-item', [
             'navtype' => 'nav-item',
+            'route' => 'dashboard',
+            'icon' => 'cil-speedometer',
+            'label' => 'Dashboard'
+        ])
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
+            'route' => 'project-code.index',
+            'icon' => 'cil-folder',
+            'label' => 'Kode Proyek'
+        ])
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
+            'route' => 'processes.index',
+            'icon' => 'cil-cog',
+            'label' => 'Kode Proses'
+        ])
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
+            'route' => 'kode-material.index',
+            'icon' => 'cil-storage',
+            'label' => 'Kode Material'
+        ])
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
+            'route' => 'grafik.index',
+            'icon' => 'cil-chart-line',
+            'label' => 'Grafik'
+        ])
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
             'route' => 'md.index',
             'icon' => 'cil-pencil',
             'label' => 'Manufacture Drawing'
@@ -54,41 +89,6 @@
             'route' => 'wi.index',
             'icon' => 'cil-document',
             'label' => 'Work Instruction'
-        ])
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'dashboard',
-            'icon' => 'cil-speedometer',
-            'label' => 'Dashboard'
-        ])
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'project-code.index',
-            'icon' => 'cil-folder',
-            'label' => 'Kode Proyek'
-        ])
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'processes.index',
-            'icon' => 'cil-cog',
-            'label' => 'Kode Proses'
-        ])
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'grafik.index',
-            'icon' => 'cil-chart-line',
-            'label' => 'Grafik'
-        ])
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'kode-material.index',
-            'icon' => 'cil-storage',
-            'label' => 'Data Material'
         ])
 
         @include('components.parts.sidebar-list-item', [

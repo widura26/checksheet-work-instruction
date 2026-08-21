@@ -28,4 +28,9 @@ class Project extends Model
             }
         });
     }
+
+    public function okas()
+    {
+        return $this->hasMany(Oka::class, 'project_id');
+    }
 }
