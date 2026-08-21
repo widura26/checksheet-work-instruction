@@ -87,7 +87,7 @@
         @include('components.parts.sidebar-list-item', [
             'navtype' => 'nav-item',
             'route' => 'wi.index',
-            'icon' => 'cil-document',
+            'icon' => 'cil-description',
             'label' => 'Work Instruction'
         ])
 
