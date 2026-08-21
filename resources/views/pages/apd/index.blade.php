@@ -49,7 +49,7 @@
                         Export to Excel
                     </button>
                 </div>
-                <table id="table-apd" class="table table-striped table-hover" style="width:100%">
+                <table id="table-apd" class="table table-bordered table-hover">
                     <thead class="text-center">
                         <tr>
                             <th>No</th>

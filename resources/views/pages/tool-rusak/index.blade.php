@@ -58,7 +58,7 @@
                     </div>
 
                     <div class="table-responsive mt-3">
-                        <table class="table table-striped table-bordered" id="tool-rusak-table">
+                        <table class="table table-bordered table-hover" id="tool-rusak-table">
                             <thead>
                                 <tr>
                                     <th>No</th>
@@ -155,9 +155,6 @@
                 processing: true,
                 serverSide: true,
                 responsive: true,
-                dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
-                    '<"row"<"col-sm-12"tr>>' +
-                    '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
                 ajax: {
                     url: '{{ route('tool-rusak.datatable') }}',
                     data: function(d) {

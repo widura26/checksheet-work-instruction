@@ -86,7 +86,7 @@
             </div>
 
             <div class="table-responsive mt-3">
-                <table id="table-tindak-lanjut" class="table table-striped table-hover">
+                <table id="table-tindak-lanjut" class="table table-bordered table-hover">
                     <thead class="text-center">
                         <tr>
                             <th>No</th>
@@ -138,9 +138,6 @@
                 processing: true,
                 serverSide: true,
                 responsive: true,
-                dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
-                    '<"row"<"col-sm-12"tr>>' +
-                    '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
                 ajax: {
                     url: "{{ route('tindak-lanjut-tool-rusak.data') }}",
                     data: function(d) {

@@ -182,7 +182,7 @@
                 </div>
             @endif
             <div class="table-responsive">
-                <table class="table table-striped table-hover" id="distribusi-table" style="width:100%">
+                <table class="table table-bordered table-hover" id="distribusi-table">
                     <thead class="text-center">
                         <tr>
                             <th>No</th>

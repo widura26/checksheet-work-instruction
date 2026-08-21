@@ -38,7 +38,7 @@
             </div>
 
             <div class="table-responsive">
-                <table id="projects-table" class="table table-bordered table-hover" style="width:100%">
+                <table id="projects-table" class="table table-bordered table-hover">
                     <thead class="text-center">
                         <tr>
                             <th>No</th>
@@ -120,7 +120,6 @@
                     responsive: true,
                     scrollX: true,
                     scrollCollapse: true,
-                    dom: 'lfrtip',
                     ajax: function (data, callback, settings) {
                         $.get("{{ route('project-code.data') }}", {
                             page: (data.start / data.length) + 1,

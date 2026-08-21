@@ -40,7 +40,7 @@
 
             <div class="col">
                 <div class="table-responsive" style="max-height:750px; overflow-y:auto; padding-bottom:50px;">
-                    <table id="table-consumable" class="display">
+                    <table id="table-consumable" class="table table-bordered table-hover">
                         <thead class="text-center sticky-header">
                             <tr>
                                 <th>No</th>

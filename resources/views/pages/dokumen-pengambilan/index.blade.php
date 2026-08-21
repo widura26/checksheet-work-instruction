@@ -9,7 +9,7 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table id="table-dokumen-pengambilan" class="table table-striped table-hover">
+                <table id="table-dokumen-pengambilan" class="table table-bordered table-hover">
                     <thead class="text-center">
                         <tr>
                             <th>No</th>

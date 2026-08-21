@@ -30,7 +30,7 @@
                 <a href="{{ route('penggantian-tool.create') }}" class="btn btn-success text-white">Tambah Penggantian</a>
             </div>
             <div class="table-responsive">
-                <table class="table table-striped table-hover" id="penggantian-tool-table" style="width:100%">
+                <table class="table table-bordered table-hover" id="penggantian-tool-table">
                     <thead class="text-center">
                         <tr>
                             <th>No</th>

@@ -19,7 +19,7 @@
                 </div>
             @endif
             <div class="table-responsive">
-                <table class="table" id="pengurangan-tool-table" width="100%" cellspacing="0">
+                <table class="table table-bordered table-hover" id="pengurangan-tool-table" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             <th>No</th>

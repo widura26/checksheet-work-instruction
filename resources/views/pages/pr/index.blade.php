@@ -63,7 +63,7 @@
             </div>
 
             <div class="table-responsive">
-                <table class="table table-hover" id="pr-table">
+                <table class="table table-bordered table-hover" id="pr-table">
                     <thead class="table-light">
                         <tr>
                             <th>No</th>
@@ -135,9 +135,6 @@
                 processing: true,
                 serverSide: true,
                 responsive: true,
-                dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
-                    '<"row"<"col-sm-12"tr>>' +
-                    '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
                 ajax: {
                     url: '{{ route('pr.datatable') }}',
                     data: function(d) {

@@ -12,7 +12,7 @@
                 </div>
             </div>
             <div class="card-body">
-                <table class="table table-striped table-hover" id="departemen-table">
+                <table class="table table-bordered table-hover" id="departemen-table">
                     <thead>
                         <tr>
                             <th>No</th>

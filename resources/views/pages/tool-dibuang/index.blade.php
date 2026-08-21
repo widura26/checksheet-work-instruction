@@ -68,7 +68,7 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-striped" id="tool-dibuang-table" style="width: 100%">
+                            <table class="table table-bordered table-hover" id="tool-dibuang-table">
                                 <thead>
                                     <tr>
                                         <th width="50">No</th>

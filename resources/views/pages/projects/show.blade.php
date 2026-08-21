@@ -37,7 +37,7 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-striped table-hover" id="tools-table">
+                <table class="table table-bordered table-hover" id="tools-table">
                     <thead class="text-center">
                         <tr>
                             <th>No</th>
@@ -61,7 +61,6 @@
                 processing: true,
                 serverSide: true,
                 responsive: true,
-                dom: 'lfrtip',
                 ajax: '{{ route('projects.tools.data', $project) }}',
                 columns: [{
                         data: 'DT_RowIndex',

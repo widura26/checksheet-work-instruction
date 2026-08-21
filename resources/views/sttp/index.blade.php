@@ -23,7 +23,7 @@
             </div>
 
             <div class="table-responsive">
-                <table id="table-sttp" class="table table-bordered table-hover" style="width:100%">
+                <table id="table-sttp" class="table table-bordered table-hover">
                     <thead class="text-center">
                         <tr>
                             <th>No</th>
@@ -59,6 +59,7 @@
                 processing: true,
                 serverSide: true,
                 responsive: true,
+                info: false,
                 ajax: {
                     url: "{{ route('sttp.data') }}",
                     data: function(d) {

@@ -10,7 +10,7 @@
     <div class="card mb-4">
         <div class="card-body">
             <div class="table-responsive">
-                <table id="cp-table" class="table table-striped table-hover">
+                <table id="cp-table" class="table table-bordered table-hover">
                     <thead class="text-center">
                         <tr>
                             <th>No</th>
@@ -38,7 +38,6 @@
                 processing: true,
                 serverSide: true,
                 responsive: true,
-                dom: 'lfrtip',
                 ajax: function (data, callback, settings) {
                     $.get("{{ route('cp.data') }}", {
                         page: (data.start / data.length) + 1,

@@ -64,6 +64,7 @@
                 processing: true,
                 serverSide: true,
                 responsive: true,
+                info: false,
                 ajax: {
                     url: "{{ route('processes.data') }}",
                     data: function(d) {

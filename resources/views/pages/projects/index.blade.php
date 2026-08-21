@@ -38,7 +38,7 @@
             </div>
 
             <div class="table-responsive">
-                <table id="projects-table" class="table table-striped table-hover">
+                <table id="projects-table" class="table table-bordered table-hover">
                     <thead class="text-center">
                         <tr>
                             <th>No</th>
@@ -113,7 +113,6 @@
                 processing: true,
                 serverSide: true,
                 responsive: true,
-                dom: 'lfrtip',
                 ajax: '{{ route('projects.data') }}',
                 columns: [{
                         data: 'DT_RowIndex',

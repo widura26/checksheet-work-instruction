@@ -28,7 +28,7 @@
             @endif
 
             <div class="table-responsive">
-                <table id="md-table" class="table table-striped table-hover">
+                <table id="md-table" class="table table-bordered table-hover">
                     <thead class="text-center">
                         <tr>
                             <th>No</th>
@@ -55,7 +55,6 @@
                 processing: true,
                 serverSide: true,
                 responsive: true,
-                dom: 'lfrtip',
                 ajax: function (data, callback, settings) {
                     $.get("{{ route('md.data') }}", {
                         page: (data.start / data.length) + 1,

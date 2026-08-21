@@ -62,7 +62,7 @@
             </div>
 
             <div class="table-responsive">
-                <table id="table-spm" class="table table-striped table-hover">
+                <table id="table-spm" class="table table-bordered table-hover">
                     <thead class="text-center">
                         <tr>
                             <th>No</th>

@@ -36,7 +36,7 @@
             {{-- <a class="btn btn-primary mb-3" href="{{ route('bagian.create') }}">Input Bagian</a> --}}
 
             <div class="table-responsive">
-                <table id="table-bagian" class="table table-striped table-hover" style="width:100%">
+                <table id="table-bagian" class="table table-bordered table-hover">
                     <thead class="text-center">
                         <tr>
                             <th>No</th>

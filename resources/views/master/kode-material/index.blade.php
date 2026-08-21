@@ -40,7 +40,7 @@
             </div>
 
             <div class="table-responsive">
-                <table id="table-kode-material" class="table table-bordered table-hover" style="width:100%">
+                <table id="table-kode-material" class="table table-bordered table-hover">
                     <thead class="text-center">
                         <tr>
                             <th>No</th>
@@ -66,6 +66,7 @@
                 processing: true,
                 serverSide: true,
                 responsive: true,
+                info: false,
                 ajax: {
                     url: "{{ route('kode-material.data') }}",
                     data: function(d) {
