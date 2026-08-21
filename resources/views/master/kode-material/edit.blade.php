@@ -4,10 +4,6 @@
 
 @section('content')
     <div class="card mb-4">
-        <div class="card-header">
-            <h5 class="card-title mb-0">Edit Kode Material</h5>
-            <small class="text-body-secondary">Form untuk mengubah data kode material</small>
-        </div>
         <div class="card-body">
             @if (session('success'))
                 <div id="success-alert" class="alert alert-success alert-dismissible fade show" role="alert">

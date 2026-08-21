@@ -5,9 +5,6 @@
 @section('content')
 
     <div class="card mb-4">
-        <div class="card-header">
-            Menampilkan Seluruh Project
-        </div>
         <div class="card-body">
             @if (session('success'))
                 <div id="success-alert" class="alert alert-success alert-dismissible fade show" role="alert">

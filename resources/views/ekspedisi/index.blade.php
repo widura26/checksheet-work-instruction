@@ -8,9 +8,6 @@
     </div>
 
     <div class="card mb-4">
-        <div class="card-header">
-            Menampilkan Seluruh Ekspedisi
-        </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table id="ekspedisi-table" class="table table-striped table-hover">

@@ -4,10 +4,6 @@
 
 @section('content')
     <div class="card mb-4">
-        <div class="card-header">
-            <h5 class="card-title mb-0">Surat Tanda Terima Penyerahan Produk</h5>
-            <small class="text-body-secondary">Daftar data STTP (fabrication)</small>
-        </div>
         <div class="card-body">
             <div class="row mb-3">
                 <div class="col-md-6">
