@@ -33,7 +33,13 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/grafik', [GrafikController::class, 'index'])->name('grafik.index');
     Route::get('/oka', [OkaController::class, 'index'])->name('oka.index');
-    Route::get('/kode-material', [KodeMaterialController::class, 'index'])->name('kode-material.index');
+    Route::prefix('kode-material')->group(function () {
+        Route::get('/', [KodeMaterialController::class, 'index'])->name('kode-material.index');
+        Route::get('/data', [KodeMaterialController::class, 'data'])->name('kode-material.data');
+        Route::get('/{kodeMaterial}/edit', [KodeMaterialController::class, 'edit'])->name('kode-material.edit');
+        Route::put('/{kodeMaterial}', [KodeMaterialController::class, 'update'])->name('kode-material.update');
+        Route::delete('/{kodeMaterial}', [KodeMaterialController::class, 'destroy'])->name('kode-material.destroy');
+    });
     Route::get('/barcode', [BarcodeController::class, 'index'])->name('barcode.index');
 
     Route::prefix('project-code')->group(function(){
