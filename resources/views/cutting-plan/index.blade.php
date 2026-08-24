@@ -281,7 +281,6 @@
                 $('#formError').addClass('d-none').text('');
                 $('#_method').val('PUT');
                 $('#crudForm').attr('action', "{{ route('cutting-plan.update', '__ID__') }}".replace('__ID__', row.id));
-                $('#id_cp').val(row.id_cp);
                 $('#no_cp').val(row.no_cp);
                 $('#mat').empty();
                 if (row.mat) {
@@ -290,20 +289,12 @@
                 } else {
                     $('#mat').val(null).trigger('change');
                 }
-                $('#spec_mat').val(row.spec_mat);
-                $('#mat_sisa').val(row.mat_sisa);
                 $('#kode_proyek').val(row.kode_proyek);
                 $('#wbs').val(row.wbs);
                 $('#material_size').val(row.material_size);
                 $('#quantity').val(row.quantity);
                 $('#cutting_method').val(row.cutting_method);
                 $('#sketch').val(row.sketch);
-                $('#shop').val(row.shop);
-                $('#grup').val(row.grup);
-                $('#lot').val(row.lot);
-                $('#qty_lot').val(row.qty_lot);
-                $('#diterima').val(row.diterima);
-                $('#tgl_kirim').val((row.tgl_kirim || '').toString().substring(0, 10));
                 $('#special_instruction').val(row.special_instruction);
                 $('#date_issued').val((row.date_issued || '').toString().substring(0, 10));
                 $('#date_revised').val((row.date_revised || '').toString().substring(0, 10));
