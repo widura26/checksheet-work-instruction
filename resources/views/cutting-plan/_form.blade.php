@@ -14,6 +14,43 @@
         margin-bottom: .35rem;
     }
 
+    /* Samakan tampilan Select2 (Material) dengan .form-select Bootstrap */
+    .cp-form-grid .select2-container {
+        width: 100% !important;
+    }
+
+    .cp-form-grid .select2-container--default .select2-selection--single {
+        height: calc(1.5em + .75rem + 2px);
+        padding: .375rem .75rem;
+        font-size: .875rem;
+        line-height: 1.5;
+        border: 1px solid #d8dbe0;
+        border-radius: .375rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .cp-form-grid .select2-container--default .select2-selection--single .select2-selection__rendered {
+        padding-left: 0;
+        padding-right: 1.5rem;
+        line-height: 1.5;
+        color: #4b4b4b;
+    }
+
+    .cp-form-grid .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 100%;
+        right: .625rem;
+    }
+
+    .cp-form-grid .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        border-color: #879197 transparent transparent transparent;
+    }
+
+    .cp-form-grid .select2-container--default.select2-container--open .select2-selection--single {
+        border-color: #321fdb;
+        box-shadow: 0 0 0 .2rem rgba(50, 31, 219, .25);
+    }
+
     @media (max-width: 575.98px) {
         .cp-form-grid {
             grid-template-columns: 1fr;
