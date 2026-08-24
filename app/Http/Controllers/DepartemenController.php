@@ -8,7 +8,6 @@ use App\Models\Departemen;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Yajra\DataTables\Facades\DataTables;
 
 class DepartemenController extends Controller
 {
@@ -17,34 +16,48 @@ class DepartemenController extends Controller
         return view('pages.lokasi.departemen.index');
     }
 
-    public function data()
+    public function data(Request $request)
     {
-        $departemen = Departemen::withCount('distribusiTools');
+        if (! $request->ajax()) {
+            abort(404);
+        }
 
-        return DataTables::of($departemen)
-            ->addIndexColumn()
-            ->addColumn('action', function ($departemen) {
-                $buttons = '<div class="d-flex justify-content-center gap-2" role="group">';
-                if (Auth::user()->hasRole(['admin'])) {
-                    $buttons .= '
-                    <form action="' . route('lokasi.departemen.toggle', $departemen->id) . '" method="POST">
-                                        ' . csrf_field() . '
-                                        <div class="form-check form-switch">
-                                            <input type="checkbox" class="form-check-input" role="switch"
-                                                onchange="this.form.submit()" id="flexSwitchCheckChecked" ' . ($departemen->is_active == true ? 'checked' : '') . '>
-                                        </div>
-                                    </form>
-                ';
-                }
-                $buttons .= '<a href="' . route('lokasi.departemen.edit', $departemen->id) . '" class="btn btn-primary btn-sm">Edit</a>';
-                $buttons .= '<a href="' . route('lokasi.departemen.distribusi', $departemen->id) . '" class="btn btn-info btn-sm text-white" title="Lihat Distribusi">
-                    Lihat Distribusi
-                </a>';
-                $buttons .= '</div>';
-                return $buttons;
-            })
-            ->rawColumns(['action', 'jumlah_distribusi'])
-            ->make(true);
+        $query = Departemen::query();
+
+        if ($request->filled('search')) {
+            $query->where('nama_departemen', 'like', '%' . $request->search . '%');
+        }
+
+        $perPage = (int) $request->get('per_page', 10);
+        $departemens = $query->paginate($perPage);
+
+        $departemens->setCollection($departemens->getCollection()->map(function ($departemen) {
+            $buttons = '<div class="d-flex justify-content-center gap-2" role="group">';
+            if (Auth::user()->hasRole(['admin'])) {
+                $buttons .= '
+                <form action="' . route('lokasi.departemen.toggle', $departemen->id) . '" method="POST">
+                    ' . csrf_field() . '
+                    <div class="form-check form-switch">
+                        <input type="checkbox" class="form-check-input" role="switch"
+                            onchange="this.form.submit()" ' . ($departemen->is_active == true ? 'checked' : '') . '>
+                    </div>
+                </form>
+            ';
+            }
+            $buttons .= '<a href="' . route('lokasi.departemen.edit', $departemen->id) . '" class="btn btn-primary btn-sm">Edit</a>';
+            $buttons .= '<a href="' . route('lokasi.departemen.distribusi', $departemen->id) . '" class="btn btn-info btn-sm text-white" title="Lihat Distribusi">
+                Lihat Distribusi
+            </a>';
+            $buttons .= '</div>';
+
+            return [
+                'id' => $departemen->id,
+                'nama_departemen' => $departemen->nama_departemen,
+                'action' => $buttons,
+            ];
+        }));
+
+        return response()->json($departemens);
     }
 
     public function create()

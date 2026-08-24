@@ -108,6 +108,7 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
     // User Management
     Route::prefix('users')->name('staff.')->group(function () {
         Route::get('/', [StaffController::class, 'index'])->name('index');
+        Route::get('/data', [StaffController::class, 'data'])->name('data');
         Route::get('/create', [StaffController::class, 'create'])->name('create');
         Route::post('/', [StaffController::class, 'store'])->name('store');
         Route::get('/{id}/edit', [StaffController::class, 'edit'])->name('edit');
@@ -116,10 +117,13 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::delete('/{id}', [StaffController::class, 'destroy'])->name('destroy');
     });
 
+    Route::get('roles/data', [RoleController::class, 'data'])->name('roles.data');
     Route::resource('roles', RoleController::class)->names('roles');
 
     Route::prefix('karyawan')->name('karyawan.')->group(function () {
         Route::get('/', [DaftarKaryawanController::class, 'index'])->name('index');
+        Route::get('/data', [DaftarKaryawanController::class, 'data'])->name('data');
+        Route::get('/{karyawan}', [DaftarKaryawanController::class, 'show'])->name('show');
         Route::post('/', [DaftarKaryawanController::class, 'store'])->name('store');
         Route::put('/{karyawan}', [DaftarKaryawanController::class, 'update'])->name('update');
         Route::delete('/{karyawan}', [DaftarKaryawanController::class, 'destroy'])->name('destroy');

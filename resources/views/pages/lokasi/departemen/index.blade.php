@@ -26,7 +26,7 @@
             </div>
         </div>
     </div>
-@endsection
+@stop
 
 @push('js')
     <script type="module">
@@ -34,13 +34,32 @@
             $('#departemen-table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: '{{ route('lokasi.departemen.data') }}',
+                responsive: true,
+                scrollX: true,
+                scrollCollapse: true,
+                ajax: function(data, callback, settings) {
+                    $.get("{{ route('lokasi.departemen.data') }}", {
+                        page: (data.start / data.length) + 1,
+                        per_page: data.length,
+                        search: data.search.value
+                    }).done(function(json) {
+                        callback({
+                            draw: data.draw,
+                            recordsTotal: json.total,
+                            recordsFiltered: json.total,
+                            data: json.data
+                        });
+                    });
+                },
                 columns: [{
-                        data: 'DT_RowIndex',
+                        data: null,
                         name: 'DT_RowIndex',
                         orderable: false,
                         searchable: false,
-                        className: 'text-center'
+                        className: 'text-center',
+                        render: function(data, type, row, meta) {
+                            return meta.row + 1;
+                        }
                     },
                     {
                         data: 'nama_departemen',

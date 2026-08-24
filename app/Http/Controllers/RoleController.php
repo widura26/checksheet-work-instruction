@@ -15,9 +15,44 @@ class RoleController extends Controller
 
     public function index()
     {
-        $roles = Role::orderBy('name')->get();
+        return view('pages.roles.index');
+    }
 
-        return view('pages.roles.index', compact('roles'));
+    public function data(Request $request)
+    {
+        if (! $request->ajax()) {
+            abort(404);
+        }
+
+        $query = Role::orderBy('name');
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $perPage = (int) $request->get('per_page', 10);
+        $roles = $query->paginate($perPage);
+
+        $roles->setCollection($roles->getCollection()->map(function ($role) {
+            if ($role->name === 'admin') {
+                $action = '<span class="text-muted">-</span>';
+            } else {
+                $action = '<a href="' . route('roles.edit', $role) . '" class="btn btn-sm btn-warning me-1">Edit</a>';
+                $action .= '<form action="' . route('roles.destroy', $role) . '" method="POST" class="d-inline" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus role ini?\')">
+                        ' . csrf_field() . '
+                        ' . method_field('DELETE') . '
+                        <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+                    </form>';
+            }
+
+            return [
+                'id' => $role->id,
+                'name' => $role->name,
+                'action' => $action,
+            ];
+        }));
+
+        return response()->json($roles);
     }
 
     public function create()

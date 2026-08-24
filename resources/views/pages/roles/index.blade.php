@@ -23,24 +23,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($roles as $role)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ ucfirst($role->name) }}</td>
-                                <td class="text-center">
-                                    @if ($role->name !== 'admin')
-                                        <a href="{{ route('roles.edit', $role) }}" class="btn btn-sm btn-warning">Edit</a>
-                                        <form action="{{ route('roles.destroy', $role) }}" method="POST" class="d-inline delete-form">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger deleteButton">Hapus</button>
-                                        </form>
-                                    @else
-                                        <span class="text-muted">-</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -50,25 +32,49 @@
 
 @push('js')
     <script type="module">
-        $(document).ready(function () {
-            $(document).on('click', '.deleteButton', function (e) {
-                e.preventDefault();
-                const form = $(this).closest('form');
-
-                Swal.fire({
-                    title: 'Apakah Anda yakin?',
-                    text: "Role ini akan dihapus secara permanen!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Ya, Hapus!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
+        $(function() {
+            $('#table-roles').DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                scrollX: true,
+                scrollCollapse: true,
+                ajax: function(data, callback, settings) {
+                    $.get("{{ route('roles.data') }}", {
+                        page: (data.start / data.length) + 1,
+                        per_page: data.length,
+                        search: data.search.value
+                    }).done(function(json) {
+                        callback({
+                            draw: data.draw,
+                            recordsTotal: json.total,
+                            recordsFiltered: json.total,
+                            data: json.data
+                        });
+                    });
+                },
+                columns: [{
+                        data: null,
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center',
+                        render: function(data, type, row, meta) {
+                            return meta.row + 1;
+                        }
+                    },
+                    {
+                        data: 'name',
+                        name: 'name'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center'
+                    },
+                ]
             });
         });
     </script>

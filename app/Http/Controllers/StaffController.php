@@ -13,15 +13,66 @@ class StaffController extends Controller
     {
         $this->middleware('role:admin');
     }
-    public function index(Request $request)
+    public function index()
     {
-        $staffs = User::whereHas('roles', function ($query) {
-            $query->whereIn('name', ['staff', 'viewer', 'admin']);
-        })->with('roles')->get();
+        return view('pages.staff.index');
+    }
 
-        return view('pages.staff.index', [
-            'staffs' => $staffs,
-        ]);
+    public function data(Request $request)
+    {
+        if (! $request->ajax()) {
+            abort(404);
+        }
+
+        $query = User::whereHas('roles', function ($query) {
+            $query->whereIn('name', ['staff', 'viewer', 'admin']);
+        })->with('roles');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('nip', 'like', "%{$search}%");
+            });
+        }
+
+        $perPage = (int) $request->get('per_page', 10);
+        $staffs = $query->paginate($perPage);
+
+        $staffs->setCollection($staffs->getCollection()->map(function ($staff) {
+            if (auth()->user()->hasRole(['admin'])) {
+                $status = '<form action="' . route('staff.status', $staff->nip) . '" method="POST" class="d-inline">
+                        ' . csrf_field() . '
+                        <div class="form-check form-switch">
+                            <input type="checkbox" class="form-check-input" role="switch" onchange="this.form.submit()" ' . ($staff->is_active ? 'checked' : '') . '>
+                        </div>
+                    </form>';
+            } else {
+                $status = $staff->is_active
+                    ? '<span class="badge bg-success">Aktif</span>'
+                    : '<span class="badge bg-secondary">Nonaktif</span>';
+            }
+
+            $action = '<a href="' . route('staff.edit', $staff->id) . '" class="btn btn-sm btn-warning me-1">Edit</a>';
+            $action .= '<form action="' . route('staff.destroy', $staff->id) . '" method="POST" class="d-inline" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus user ini?\')">
+                    ' . csrf_field() . '
+                    ' . method_field('DELETE') . '
+                    <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+                </form>';
+
+            return [
+                'id' => $staff->id,
+                'name' => $staff->name,
+                'email' => $staff->email,
+                'nip' => $staff->nip,
+                'role' => ucfirst($staff->roles->first()->name ?? '-'),
+                'status' => $status,
+                'action' => $action,
+            ];
+        }));
+
+        return response()->json($staffs);
     }
 
     public function create()

@@ -27,29 +27,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($staffs as $staff)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $staff->name }}</td>
-                                <td>{{ $staff->email }}</td>
-                                <td>{{ $staff->nip ?? '-' }}</td>
-                                <td>{{ ucfirst($staff->roles->first()->name ?? '-') }}</td>
-                                <td class="text-center">
-                                    <form action="{{ route('staff.status', $staff->nip) }}" method="POST">
-                                        @csrf
-                                        <div class="form-check form-switch">
-                                            <input type="checkbox" class="form-check-input" role="switch"
-                                                onchange="this.form.submit()" @checked($staff->is_active)>
-                                        </div>
-                                    </form>
-                                </td>
-                                <td class="text-center">
-                                    <a href="{{ route('staff.edit', $staff->id) }}" class="btn btn-sm btn-warning">
-                                        Edit
-                                    </a>
-                                </td>
-                            </tr>
-                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -59,46 +36,68 @@
 
 @push('js')
     <script type="module">
-        $(document).ready(function() {
-
-            $(document).on('click', '.deleteButton', function() {
-                const id = $(this).data('id');
-
-                Swal.fire({
-                    title: 'Apakah Anda yakin?',
-                    text: "Data ini akan dihapus secara permanen!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Ya, Hapus!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: `/staff/${id}`,
-                            type: 'DELETE',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                            success: function(response) {
-                                Swal.fire(
-                                    'Terhapus!',
-                                    'Data berhasil dihapus.',
-                                    'success'
-                                );
-                                table.ajax.reload();
-                            },
-                            error: function(xhr, status, error) {
-                                Swal.fire(
-                                    'Gagal!',
-                                    'Terjadi kesalahan saat menghapus data.',
-                                    'error'
-                                );
-                            }
+        $(function() {
+            $('#table-staff').DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                scrollX: true,
+                scrollCollapse: true,
+                ajax: function(data, callback, settings) {
+                    $.get("{{ route('staff.data') }}", {
+                        page: (data.start / data.length) + 1,
+                        per_page: data.length,
+                        search: data.search.value
+                    }).done(function(json) {
+                        callback({
+                            draw: data.draw,
+                            recordsTotal: json.total,
+                            recordsFiltered: json.total,
+                            data: json.data
                         });
-                    }
-                });
+                    });
+                },
+                columns: [{
+                        data: null,
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center',
+                        render: function(data, type, row, meta) {
+                            return meta.row + 1;
+                        }
+                    },
+                    {
+                        data: 'name',
+                        name: 'name'
+                    },
+                    {
+                        data: 'email',
+                        name: 'email'
+                    },
+                    {
+                        data: 'nip',
+                        name: 'nip'
+                    },
+                    {
+                        data: 'role',
+                        name: 'role'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center'
+                    },
+                ]
             });
         });
     </script>
