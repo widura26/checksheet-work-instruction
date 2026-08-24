@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
-    <title>Login - Central Tools</title>
+    <title>Login - Worksheet</title>
     <link rel="apple-touch-icon" sizes="57x57" href="{{ asset('template/assets/favicon/apple-icon-57x57.png') }}" />
     <link rel="apple-touch-icon" sizes="60x60" href="{{ asset('template/assets/favicon/apple-icon-60x60.png') }}" />
     <link rel="apple-touch-icon" sizes="72x72" href="{{ asset('template/assets/favicon/apple-icon-72x72.png') }}" />
@@ -41,7 +41,7 @@
                     <div class="card-group d-block d-md-flex row">
                         <div class="card col-md-7 p-4 mb-0">
                             <div class="card-body">
-                                <h4 class="mb-3">Central Tool</h4>
+                                <h4 class="mb-3">Worksheet</h4>
                                 <form method="POST" action="{{ route('login') }}">
                                     @csrf
                                     <div class="input-group mb-3">

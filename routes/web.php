@@ -8,12 +8,19 @@ use App\Http\Controllers\ExpedisiController;
 use App\Http\Controllers\GrafikController;
 use App\Http\Controllers\KodeMaterialController;
 use App\Http\Controllers\MdController;
+use App\Http\Controllers\DaftarKaryawanController;
+use App\Http\Controllers\DepartemenController;
 use App\Http\Controllers\OkaController;
 use App\Http\Controllers\ProsesController;
 use App\Http\Controllers\ProjectCodeController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\StaffController;
 use App\Http\Controllers\SttpController;
 use App\Http\Controllers\WiController;
 use App\Http\Controllers\WiLapController;
+use App\Http\Controllers\DistribusiController;
+// use App\Http\Livewire\Distribusi\CreateForm;
+// use App\Http\Livewire\Distribusi\PenyerahanCreateForm;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -96,5 +103,63 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::get('/surat-permintaan-material', [WiLapController::class, 'index'])->name('laporan-surat-permintaan-material.index');
         Route::get('/cutting-plan', [WiLapController::class, 'index'])->name('laporan-cutting-plan.index');
         Route::get('/bon-permintaan-material', [WiLapController::class, 'index'])->name('laporan-bon-permintaan-material.index');
+    });
+
+    // User Management
+    Route::prefix('users')->name('staff.')->group(function () {
+        Route::get('/', [StaffController::class, 'index'])->name('index');
+        Route::get('/create', [StaffController::class, 'create'])->name('create');
+        Route::post('/', [StaffController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [StaffController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [StaffController::class, 'update'])->name('update');
+        Route::post('/{nip}/status', [StaffController::class, 'changeStatus'])->name('status');
+        Route::delete('/{id}', [StaffController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::resource('roles', RoleController::class)->names('roles');
+
+    Route::prefix('karyawan')->name('karyawan.')->group(function () {
+        Route::get('/', [DaftarKaryawanController::class, 'index'])->name('index');
+        Route::post('/', [DaftarKaryawanController::class, 'store'])->name('store');
+        Route::put('/{karyawan}', [DaftarKaryawanController::class, 'update'])->name('update');
+        Route::delete('/{karyawan}', [DaftarKaryawanController::class, 'destroy'])->name('destroy');
+        Route::post('/import', [DaftarKaryawanController::class, 'import'])->name('import');
+    });
+
+    Route::prefix('lokasi/departemen')->name('lokasi.departemen.')->group(function () {
+        Route::get('/', [DepartemenController::class, 'index'])->name('index');
+        Route::get('/data', [DepartemenController::class, 'data'])->name('data');
+        Route::get('/create', [DepartemenController::class, 'create'])->name('create');
+        Route::post('/', [DepartemenController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [DepartemenController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [DepartemenController::class, 'update'])->name('update');
+        Route::delete('/{id}', [DepartemenController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}/distribusi', [DepartemenController::class, 'distribusi'])->name('distribusi');
+        Route::get('/{id}/distribusi/data', [DepartemenController::class, 'getDistribusiData'])->name('distribusi.data');
+        Route::post('/{departemen}/toggle', [DepartemenController::class, 'toggleDepartemen'])->name('toggle');
+    });
+
+    Route::prefix('distribusi')->controller(DistribusiController::class)->group(function () {
+        Route::get('/', 'index')->name('distribusi.index');
+        Route::get('/datatable', 'datatable')->name('distribusi.datatable');
+        Route::get('/export', 'exportExcel')->name('distribusi.export');
+        Route::get('/{distribusiTool}', 'show')->name('distribusi.show');
+        // Penyerahan
+        // Route::get('/penyerahan/create', PenyerahanCreateForm::class)->name('distribusi.penyerahan.create');
+        Route::post('/batalkan/{distribusiTool}/penyerahan', 'batalkanPenyerahan')->name('distribusi.batalkan-penyerahan')->middleware('client.request.id');
+        // Peminjaman
+        // Route::get('/peminjaman/create', CreateForm::class)->name('distribusi.peminjaman.create');
+        Route::get('/peminjaman/{distribusiTool}/kembali', 'showPengembalian')->name('distribusi.peminjaman.kembali');
+        Route::post('/peminjaman/{distribusiTool}/kembali', 'storePengembalian')->name('distribusi.peminjaman.storeKembali')->middleware('client.request.id');
+
+        // API routes
+        Route::get('/api/bagian/{departemen_id}', 'getBagian')->name('distribusi.api.bagian');
+        Route::get('/api/unit/{bagian_id}', 'getUnit')->name('distribusi.api.unit');
+        // cetak berita acara
+        Route::get('/print/{distribusiTool}/berita-acara', 'beritaAcara')->name('distribusi.berita-acara');
+        // upload file bast
+        Route::post('/distribusi/upload-bast', [DistribusiController::class, 'uploadBast'])->name('distribusi.upload-bast')->middleware('client.request.id');
+        // unduh file bast ttd
+        Route::get('/distribusi/unduh-bast-ttd/{distribusiTool}', [DistribusiController::class, 'downloadBastFile'])->name('distribusi.unduh-bast-ttd');
     });
 });

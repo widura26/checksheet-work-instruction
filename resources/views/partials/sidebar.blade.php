@@ -7,7 +7,7 @@
     </div>
     <ul class="sidebar-nav" data-coreui="navigation" data-simplebar="">
 
-        <li class="nav-title">Menu Utama</li>
+        <li class="nav-title">Main Menu</li>
 
         @include('components.parts.sidebar-list-item', [
             'navtype' => 'nav-item',
@@ -123,6 +123,36 @@
                     'navtype' => 'nav-item',
                     'route' => 'laporan-bon-permintaan-material.index',
                     'label' => 'Bon Permintaan Material',
+                ],
+            ]
+        ])
+
+        <li class="nav-title">User Management</li>
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-group',
+            'icon' => 'cil-people',
+            'label' => 'User Management',
+            'subitems' => [
+                [
+                    'navtype' => 'nav-item',
+                    'route' => 'staff.index',
+                    'label' => 'Users',
+                ],
+                [
+                    'navtype' => 'nav-item',
+                    'route' => 'roles.index',
+                    'label' => 'Roles',
+                ],
+                [
+                    'navtype' => 'nav-item',
+                    'route' => 'karyawan.index',
+                    'label' => 'Daftar Karyawan',
+                ],
+                [
+                    'navtype' => 'nav-item',
+                    'route' => 'lokasi.departemen.index',
+                    'label' => 'Departemen',
                 ],
             ]
         ])
