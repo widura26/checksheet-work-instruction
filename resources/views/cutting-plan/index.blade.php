@@ -70,11 +70,8 @@
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label for="mat" class="form-label">Material</label>
-                                <select class="form-select" name="mat" id="mat">
-                                    <option value="">-- Pilih --</option>
-                                    {{-- @foreach ($materials as $material)
-                                        <option value="{{ $material->kode_material }}">{{ $material->kode_material }}</option>
-                                    @endforeach --}}
+                                <select class="form-select select2" name="mat" id="mat" style="width: 100%;">
+                                    <option value=""></option>
                                 </select>
                             </div>
                             <div class="col-md-4 mb-3">
@@ -239,6 +236,29 @@
 @push('js')
     <script type="module">
         $(function() {
+            $('#mat').select2({
+                placeholder: 'Cari Material...',
+                allowClear: true,
+                width: '100%',
+                dropdownParent: $('#formModal'),
+                ajax: {
+                    url: "{{ route('cutting-plan.materials') }}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return {
+                            q: params.term || ''
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.results
+                        };
+                    },
+                    cache: true
+                }
+            });
+
             var piecepartTemplate = function(index, data) {
                 data = data || {};
                 return '<tr>' +
@@ -432,6 +452,7 @@
                 $('#piecepartsList').empty();
                 addPiecepart();
                 $('#prepared_by, #approved_by, #date_operator').val('');
+                $('#mat').val(null).trigger('change');
             });
 
             $('#cutting-plan-table').on('click', '.btn-edit', function() {
@@ -442,7 +463,13 @@
                 $('#crudForm').attr('action', "{{ route('cutting-plan.update', '__ID__') }}".replace('__ID__', row.id));
                 $('#id_cp').val(row.id_cp);
                 $('#no_cp').val(row.no_cp);
-                $('#mat').val(row.mat);
+                $('#mat').empty();
+                if (row.mat) {
+                    var opt = new Option(row.mat, row.mat, true, true);
+                    $('#mat').append(opt).trigger('change');
+                } else {
+                    $('#mat').val(null).trigger('change');
+                }
                 $('#spec_mat').val(row.spec_mat);
                 $('#mat_sisa').val(row.mat_sisa);
                 $('#kode_proyek').val(row.kode_proyek);

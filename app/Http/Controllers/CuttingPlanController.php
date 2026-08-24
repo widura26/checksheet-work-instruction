@@ -15,8 +15,7 @@ class CuttingPlanController extends Controller
     {
         $projects = Project::all();
         $processes = Proses::all();
-        $materials = Material::all();
-        return view('cutting-plan.index', compact('projects', 'processes', 'materials'));
+        return view('cutting-plan.index', compact('projects', 'processes'));
     }
 
     private function normalizeEmpty(Request $request)
@@ -182,5 +181,33 @@ class CuttingPlanController extends Controller
         $users = \App\Models\User::select('id', 'name')->orderBy('name')->get();
 
         return response()->json($users);
+    }
+
+    public function materials(Request $request)
+    {
+        $search = $request->get('q', '');
+
+        $query = Material::query();
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('kode_material', 'LIKE', "%{$search}%")
+                    ->orWhere('deskripsi', 'LIKE', "%{$search}%")
+                    ->orWhere('spesifikasi', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $materials = $query->orderBy('kode_material')
+            ->limit(20)
+            ->get(['kode_material', 'deskripsi', 'spesifikasi']);
+
+        $results = $materials->map(function ($m) {
+            return [
+                'id' => $m->kode_material,
+                'text' => $m->kode_material . ' - ' . $m->deskripsi,
+            ];
+        });
+
+        return response()->json(['results' => $results]);
     }
 }
