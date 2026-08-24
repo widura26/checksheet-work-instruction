@@ -109,7 +109,6 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
     Route::prefix('users')->name('staff.')->group(function () {
         Route::get('/', [StaffController::class, 'index'])->name('index');
         Route::get('/data', [StaffController::class, 'data'])->name('data');
-        Route::get('/create', [StaffController::class, 'create'])->name('create');
         Route::post('/', [StaffController::class, 'store'])->name('store');
         Route::get('/{id}/edit', [StaffController::class, 'edit'])->name('edit');
         Route::put('/{id}', [StaffController::class, 'update'])->name('update');

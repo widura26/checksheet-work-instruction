@@ -15,7 +15,9 @@ class StaffController extends Controller
     }
     public function index()
     {
-        return view('pages.staff.index');
+        $roles = Role::where('name', '<>', 'admin')->get();
+
+        return view('pages.staff.index', compact('roles'));
     }
 
     public function data(Request $request)
@@ -73,13 +75,6 @@ class StaffController extends Controller
         }));
 
         return response()->json($staffs);
-    }
-
-    public function create()
-    {
-        $roles = Role::where('name', '<>', 'admin')->get();
-
-        return view('pages.staff.create', compact('roles'));
     }
 
     public function store(Request $request)
