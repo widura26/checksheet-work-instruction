@@ -18,6 +18,13 @@ class CuttingPlanController extends Controller
         return view('cutting-plan.index', compact('projects', 'processes'));
     }
 
+    public function create()
+    {
+        $projects = Project::all();
+        $processes = Proses::all();
+        return view('cutting-plan.create', compact('projects', 'processes'));
+    }
+
     private function normalizeEmpty(Request $request)
     {
         $data = $request->all();
