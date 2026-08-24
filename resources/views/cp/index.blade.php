@@ -20,15 +20,28 @@
                     <thead class="text-center">
                         <tr>
                             <th>No</th>
-                            <th>ID CP</th>
-                            <th>No CP</th>
+                            <th>Nomor Cutting Plan</th>
                             <th>Material</th>
-                            <th>Spec Material</th>
-                            <th>Qty</th>
-                            <th>Shop</th>
-                            <th>Grup</th>
-                            <th>Lot</th>
-                            <th>Qty Lot</th>
+                            <th>Kode Proyek</th>
+                            <th>WBS</th>
+                            <th>Material Size</th>
+                            <th>Quantity</th>
+                            <th>Cutting Method</th>
+                            <th>Sket</th>
+                            <th>Part No</th>
+                            <th>Cutting Size</th>
+                            <th>Qty / Car</th>
+                            <th>Qty / Lot</th>
+                            <th>Part Name</th>
+                            <th>Remark</th>
+                            <th>Special Instruction</th>
+                            <th>Date Issued</th>
+                            <th>Date Revised</th>
+                            <th>Prepared By</th>
+                            <th>Approve By</th>
+                            <th>BPM Number</th>
+                            <th>Date of BPM</th>
+                            <th>Date Operator</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -137,11 +150,6 @@
                         }
                     },
                     {
-                        data: 'id_cp',
-                        name: 'id_cp',
-                        className: 'text-center'
-                    },
-                    {
                         data: 'no_cp',
                         name: 'no_cp',
                         className: 'text-center'
@@ -151,8 +159,22 @@
                         name: 'mat'
                     },
                     {
-                        data: 'spec_mat',
-                        name: 'spec_mat'
+                        data: 'kode_proyek',
+                        name: 'kode_proyek',
+                        className: 'text-center',
+                        defaultContent: ''
+                    },
+                    {
+                        data: 'wbs',
+                        name: 'wbs',
+                        className: 'text-center',
+                        defaultContent: ''
+                    },
+                    {
+                        data: 'material_size',
+                        name: 'material_size',
+                        className: 'text-center',
+                        defaultContent: ''
                     },
                     {
                         data: 'qty',
@@ -160,24 +182,99 @@
                         className: 'text-center'
                     },
                     {
-                        data: 'shop',
-                        name: 'shop',
-                        className: 'text-center'
+                        data: 'cutting_method',
+                        name: 'cutting_method',
+                        className: 'text-center',
+                        defaultContent: ''
                     },
                     {
-                        data: 'grup',
-                        name: 'grup',
-                        className: 'text-center'
+                        data: 'sket',
+                        name: 'sket',
+                        className: 'text-center',
+                        defaultContent: ''
                     },
                     {
-                        data: 'lot',
-                        name: 'lot',
-                        className: 'text-center'
+                        data: 'part_no',
+                        name: 'part_no',
+                        className: 'text-center',
+                        defaultContent: ''
+                    },
+                    {
+                        data: 'cutting_size',
+                        name: 'cutting_size',
+                        className: 'text-center',
+                        defaultContent: ''
+                    },
+                    {
+                        data: 'qty_car',
+                        name: 'qty_car',
+                        className: 'text-center',
+                        defaultContent: ''
                     },
                     {
                         data: 'qty_lot',
                         name: 'qty_lot',
                         className: 'text-center'
+                    },
+                    {
+                        data: 'part_name',
+                        name: 'part_name',
+                        className: 'text-center',
+                        defaultContent: ''
+                    },
+                    {
+                        data: 'remark',
+                        name: 'remark',
+                        className: 'text-center',
+                        defaultContent: ''
+                    },
+                    {
+                        data: 'special_instruction',
+                        name: 'special_instruction',
+                        className: 'text-center',
+                        defaultContent: ''
+                    },
+                    {
+                        data: 'date_issued',
+                        name: 'date_issued',
+                        className: 'text-center',
+                        defaultContent: ''
+                    },
+                    {
+                        data: 'date_revised',
+                        name: 'date_revised',
+                        className: 'text-center',
+                        defaultContent: ''
+                    },
+                    {
+                        data: 'prepared_by',
+                        name: 'prepared_by',
+                        className: 'text-center',
+                        defaultContent: ''
+                    },
+                    {
+                        data: 'approve_by',
+                        name: 'approve_by',
+                        className: 'text-center',
+                        defaultContent: ''
+                    },
+                    {
+                        data: 'bpm_number',
+                        name: 'bpm_number',
+                        className: 'text-center',
+                        defaultContent: ''
+                    },
+                    {
+                        data: 'date_of_bpm',
+                        name: 'date_of_bpm',
+                        className: 'text-center',
+                        defaultContent: ''
+                    },
+                    {
+                        data: 'date_operator',
+                        name: 'date_operator',
+                        className: 'text-center',
+                        defaultContent: ''
                     },
                     {
                         data: 'id',
