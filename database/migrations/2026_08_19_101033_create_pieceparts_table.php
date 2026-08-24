@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('no_piecepart')->unique();
             $table->foreignUuid('piecepart_datang_id')->nullable()->index();
             $table->foreignUuid('md_header_id')->nullable()->index();
+            $table->foreignUuid('cutting_plan_id')->nullable()->index();
             $table->foreignUuid('project_id')->nullable()->index();
             $table->foreignUuid('oka_id')->nullable()->index();
             $table->string('group1')->nullable();
