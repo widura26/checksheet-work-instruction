@@ -42,15 +42,8 @@
                     <thead class="text-center">
                         <tr>
                             <th>No</th>
-                            <th>Oka</th>
                             <th>Kode Proyek</th>
-                            <th>Wbs</th>
                             <th>Nama</th>
-                            <th>Label Proyek</th>
-                            <th>Total Lot Car</th>
-                            <th>Total Lot Jig</th>
-                            <th>Total Lot Prototype</th>
-                            <th>Tgl</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -145,44 +138,12 @@
                             }
                         },
                         {
-                            data: 'oka',
-                            name: 'oka'
-                        },
-                        {
                             data: 'project_code',
                             name: 'project_code'
                         },
                         {
-                            data: 'wbs',
-                            name: 'wbs'
-                        },
-                        {
                             data: 'name',
                             name: 'name'
-                        },
-                        {
-                            data: 'label_proyek',
-                            name: 'label_proyek'
-                        },
-                        {
-                            data: 'total_car',
-                            name: 'total_car',
-                            className: 'text-center'
-                        },
-                        {
-                            data: 'jig',
-                            name: 'jig',
-                            className: 'text-center'
-                        },
-                        {
-                            data: 'prototype',
-                            name: 'prototype',
-                            className: 'text-center'
-                        },
-                        {
-                            data: 'tgl_oka',
-                            name: 'tgl_oka',
-                            className: 'text-center'
                         },
                         {
                             data: 'id',
