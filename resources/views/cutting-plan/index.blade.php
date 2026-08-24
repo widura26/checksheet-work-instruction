@@ -16,7 +16,7 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table id="cp-table" class="table table-bordered table-hover">
+                <table id="cutting-plan-table" class="table table-bordered table-hover">
                     <thead class="text-center">
                         <tr>
                             <th>No</th>
@@ -121,12 +121,12 @@
 @push('js')
     <script type="module">
         $(function() {
-            var table = $('#cp-table').DataTable({
+            var table = $('#cutting-plan-table').DataTable({
                 processing: true,
                 serverSide: true,
                 responsive: true,
                 ajax: function(data, callback, settings) {
-                    $.get("{{ route('cp.data') }}", {
+                    $.get("{{ route('cutting-plan.data') }}", {
                         page: (data.start / data.length) + 1,
                         per_page: data.length,
                         search: data.search.value
@@ -297,17 +297,17 @@
             $('#btnTambah').on('click', function() {
                 $('#crudForm')[0].reset();
                 $('#_method').val('POST');
-                $('#crudForm').attr('action', "{{ route('cp.store') }}");
+                $('#crudForm').attr('action', "{{ route('cutting-plan.store') }}");
                 $('#formModalLabel').text('Tambah Cutting Plan');
                 $('#formError').addClass('d-none').text('');
             });
 
-            $('#cp-table').on('click', '.btn-edit', function() {
+            $('#cutting-plan-table').on('click', '.btn-edit', function() {
                 var row = table.row($(this).closest('tr')).data();
                 $('#crudForm')[0].reset();
                 $('#formError').addClass('d-none').text('');
                 $('#_method').val('PUT');
-                $('#crudForm').attr('action', "{{ route('cp.update', '__ID__') }}".replace('__ID__', row.id));
+                $('#crudForm').attr('action', "{{ route('cutting-plan.update', '__ID__') }}".replace('__ID__', row.id));
                 $('#id_cp').val(row.id_cp);
                 $('#no_cp').val(row.no_cp);
                 $('#mat').val(row.mat);
@@ -321,7 +321,7 @@
                 modal.show();
             });
 
-            $('#cp-table').on('click', '.btn-delete', function() {
+            $('#cutting-plan-table').on('click', '.btn-delete', function() {
                 var id = $(this).data('id');
                 Swal.fire({
                     title: 'Apakah Anda yakin?',
@@ -335,7 +335,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: "{{ route('cp.destroy', '__ID__') }}".replace('__ID__', id),
+                            url: "{{ route('cutting-plan.destroy', '__ID__') }}".replace('__ID__', id),
                             type: 'DELETE',
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

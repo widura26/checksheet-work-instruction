@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cp;
+use App\Models\CuttingPlan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class CpController extends Controller
+class CuttingPlanController extends Controller
 {
     public function index()
     {
-        return view('cp.index');
+        return view('cutting-plan.index');
     }
 
     public function getData(Request $request)
@@ -19,7 +19,7 @@ class CpController extends Controller
             abort(404);
         }
 
-        $query = Cp::select([
+        $query = CuttingPlan::select([
             'id', 'id_cp', 'no_cp', 'mat', 'spec_mat',
             'qty', 'shop', 'grup', 'lot', 'qty_lot',
         ]);
@@ -47,7 +47,7 @@ class CpController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'id_cp' => 'nullable|string|max:255',
-            'no_cp' => 'required|string|max:255|unique:cps,no_cp',
+            'no_cp' => 'required|string|max:255|unique:cutting_plans,no_cp',
             'mat' => 'nullable|string|max:255',
             'spec_mat' => 'nullable|string|max:255',
             'qty' => 'nullable|integer',
@@ -66,16 +66,16 @@ class CpController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        Cp::create($validator->validated());
+        CuttingPlan::create($validator->validated());
 
         return response()->json(['success' => true, 'message' => 'Data berhasil ditambahkan.']);
     }
 
-    public function update(Request $request, Cp $cp)
+    public function update(Request $request, CuttingPlan $cuttingPlan)
     {
         $validator = Validator::make($request->all(), [
             'id_cp' => 'nullable|string|max:255',
-            'no_cp' => 'required|string|max:255|unique:cps,no_cp,' . $cp->id . ',id',
+            'no_cp' => 'required|string|max:255|unique:cutting_plans,no_cp,' . $cuttingPlan->id . ',id',
             'mat' => 'nullable|string|max:255',
             'spec_mat' => 'nullable|string|max:255',
             'qty' => 'nullable|integer',
@@ -94,14 +94,14 @@ class CpController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $cp->update($validator->validated());
+        $cuttingPlan->update($validator->validated());
 
         return response()->json(['success' => true, 'message' => 'Data berhasil diperbarui.']);
     }
 
-    public function destroy(Cp $cp)
+    public function destroy(CuttingPlan $cuttingPlan)
     {
-        $cp->delete();
+        $cuttingPlan->delete();
 
         return response()->json(['success' => true, 'message' => 'Data berhasil dihapus.']);
     }

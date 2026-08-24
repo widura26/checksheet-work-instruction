@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-class Cp extends Model
+class CuttingPlan extends Model
 {
     use HasFactory;
 
-    protected $table = 'cps';
+    protected $table = 'cutting_plans';
 
     protected $guarded = ['id'];
 

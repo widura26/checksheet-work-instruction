@@ -64,7 +64,7 @@
 
         @include('components.parts.sidebar-list-item', [
             'navtype' => 'nav-item',
-            'route' => 'cp.index',
+            'route' => 'cutting-plan.index',
             'icon' => 'cil-calculator',
             'label' => 'Cutting Plan'
         ])
