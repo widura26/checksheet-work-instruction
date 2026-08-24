@@ -44,17 +44,18 @@ class CuttingPlanController extends Controller
         }
 
         $query = CuttingPlan::query()
-            ->leftJoin('projects', 'cutting_plans.project_id', '=', 'projects.id')
+            ->leftJoin('projects', 'cutting_plans.project_id', '=', 'projects.project_id')
             ->leftJoin('processes', 'cutting_plans.process_id', '=', 'processes.id')
             ->leftJoin('bpms', 'cutting_plans.bpm_id', '=', 'bpms.id')
+            ->with('pieceparts')
             ->select(
                 'cutting_plans.*',
                 'projects.project_id as kode_proyek',
                 'processes.nama as cutting_method',
                 'bpms.no_bpm as bpm_number',
-                \DB::raw('NULL as date_of_bpm'),
-                \DB::raw('NULL as pieceparts')
-            );
+                \DB::raw('NULL as date_of_bpm')
+            )
+            ->addSelect('cutting_plans.process_id');
 
         if ($request->filled('search')) {
             $search = $request->search;

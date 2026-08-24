@@ -325,7 +325,7 @@
                 $('#wbs').val(row.wbs);
                 $('#material_size').val(row.material_size);
                 $('#quantity').val(row.quantity);
-                $('#cutting_method').val(row.cutting_method);
+                $('#cutting_method').val(row.process_id);
                 $('#sketch').val(row.sketch);
                 $('#special_instruction').val(row.special_instruction);
                 $('#date_issued').val((row.date_issued || '').toString().substring(0, 10));
