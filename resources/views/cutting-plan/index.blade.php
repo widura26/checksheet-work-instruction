@@ -2,6 +2,20 @@
 
 @section('title', 'Cutting Plan')
 
+@push('css')
+    <style>
+        .dataTables_wrapper {
+            overflow-x: auto;
+        }
+        .dataTables_scrollBody {
+            overflow-x: auto !important;
+        }
+        #cutting-plan-table {
+            width: 100% !important;
+        }
+    </style>
+@endpush
+
 @section('content')
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
@@ -14,8 +28,7 @@
             </a>
         </div>
         <div class="card-body">
-            <div class="table-responsive">
-                <table id="cutting-plan-table" class="table table-bordered table-hover">
+            <table id="cutting-plan-table" class="table table-bordered table-hover" style="width: 100%;">
                     <thead class="text-center">
                         <tr>
                             <th>No</th>
@@ -27,7 +40,7 @@
                             <th>Quantity</th>
                             <th>Cutting Method</th>
                             <th>Sket</th>
-                            <th>Pieceparts</th>
+                            <th>Parts</th>
                             <th>Special Instruction</th>
                             <th>Date Issued</th>
                             <th>Date Revised</th>
@@ -37,7 +50,6 @@
                         </tr>
                     </thead>
                 </table>
-            </div>
         </div>
     </div>
 
@@ -142,7 +154,27 @@
             var table = $('#cutting-plan-table').DataTable({
                 processing: true,
                 serverSide: true,
-                responsive: true,
+                scrollX: true,
+                deferRender: true,
+                responsive: false,
+                columnDefs: [
+                    { targets: 0,  width: '40px',  minWidth: '40px'  },
+                    { targets: 1,  width: '100px', minWidth: '100px' },
+                    { targets: 2,  width: '120px', minWidth: '120px' },
+                    { targets: 3,  width: '130px', minWidth: '130px' },
+                    { targets: 4,  width: '100px', minWidth: '100px' },
+                    { targets: 5,  width: '110px', minWidth: '110px' },
+                    { targets: 6,  width: '80px',  minWidth: '80px'  },
+                    { targets: 7,  width: '120px', minWidth: '120px' },
+                    { targets: 8,  width: '100px', minWidth: '100px' },
+                    { targets: 9,  width: '80px',  minWidth: '80px'  },
+                    { targets: 10, width: '160px', minWidth: '160px' },
+                    { targets: 11, width: '110px', minWidth: '110px' },
+                    { targets: 12, width: '110px', minWidth: '110px' },
+                    { targets: 13, width: '110px', minWidth: '110px' },
+                    { targets: 14, width: '110px', minWidth: '110px' },
+                    { targets: 15, width: '80px',  minWidth: '80px'  },
+                ],
                 ajax: function(data, callback, settings) {
                     $.get("{{ route('cutting-plan.data') }}", {
                         page: (data.start / data.length) + 1,

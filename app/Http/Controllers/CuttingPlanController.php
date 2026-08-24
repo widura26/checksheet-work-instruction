@@ -8,6 +8,7 @@ use App\Models\Project;
 use App\Models\Proses;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class CuttingPlanController extends Controller
 {
@@ -42,14 +43,18 @@ class CuttingPlanController extends Controller
             abort(404);
         }
 
-        $query = CuttingPlan::select([
-            'id', 'id_cp', 'no_cp', 'mat', 'spec_mat', 'mat_sisa',
-            'shop', 'diterima', 'tgl_kirim', 'grup', 'lot', 'qty_lot',
-            'material_size', 'quantity', 'wbs', 'sketch', 'cutting_method',
-            'special_instruction', 'date_issued', 'date_revised', 'kode_proyek',
-            'prepared_by', 'approved_by', 'date_operator', 'bpm_number', 'date_of_bpm',
-            'pieceparts',
-        ]);
+        $query = CuttingPlan::query()
+            ->leftJoin('projects', 'cutting_plans.project_id', '=', 'projects.id')
+            ->leftJoin('processes', 'cutting_plans.process_id', '=', 'processes.id')
+            ->leftJoin('bpms', 'cutting_plans.bpm_id', '=', 'bpms.id')
+            ->select(
+                'cutting_plans.*',
+                'projects.project_id as kode_proyek',
+                'processes.nama as cutting_method',
+                'bpms.no_bpm as bpm_number',
+                \DB::raw('NULL as date_of_bpm'),
+                \DB::raw('NULL as pieceparts')
+            );
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -60,12 +65,15 @@ class CuttingPlanController extends Controller
                     ->orWhere('spec_mat', 'LIKE', "%{$search}%")
                     ->orWhere('shop', 'LIKE', "%{$search}%")
                     ->orWhere('grup', 'LIKE', "%{$search}%")
-                    ->orWhere('lot', 'LIKE', "%{$search}%");
+                    ->orWhere('lot', 'LIKE', "%{$search}%")
+                    ->orWhere('projects.project_id', 'LIKE', "%{$search}%")
+                    ->orWhere('processes.nama', 'LIKE', "%{$search}%")
+                    ->orWhere('bpms.no_bpm', 'LIKE', "%{$search}%");
             });
         }
 
         $perPage = (int) $request->get('per_page', 10);
-        $cps = $query->orderBy('created_at', 'desc')->paginate($perPage);
+        $cps = $query->orderBy('cutting_plans.created_at', 'desc')->paginate($perPage);
 
         return response()->json($cps);
     }
