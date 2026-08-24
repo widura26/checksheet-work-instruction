@@ -37,7 +37,7 @@
                             <form action="{{ route('karyawan.import') }}" method="post" enctype="multipart/form-data">
                                 @csrf
                                 <div class="input-group">
-                                    <input type="file" name="file" class="form-control" accept=".xlsx,.xls">
+                                    <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv">
                                     <button type="submit" class="btn btn-success text-white">Import Data</button>
                                 </div>
                             </form>

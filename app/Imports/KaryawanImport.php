@@ -14,9 +14,19 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithSkipDuplicates;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
+use Maatwebsite\Excel\Concerns\WithCustomCsvSettings;
 
-class KaryawanImport implements ToCollection, WithHeadingRow, WithChunkReading, WithValidation, WithBatchInserts, WithSkipDuplicates, SkipsEmptyRows
+class KaryawanImport implements ToCollection, WithHeadingRow, WithChunkReading, WithValidation, WithBatchInserts, WithSkipDuplicates, SkipsEmptyRows, WithCustomCsvSettings
 {
+    public function getCsvSettings(): array
+    {
+        return [
+            'delimiter' => null,
+            'test_auto_detect' => true,
+            'input_encoding' => 'UTF-8',
+        ];
+    }
+
     /**
      * @param array $row
      *
@@ -25,16 +35,31 @@ class KaryawanImport implements ToCollection, WithHeadingRow, WithChunkReading, 
     public function collection(Collection $rows)
     {
         foreach ($rows as $row) {
-            if (empty($row['unit'])) {
+            $nip = $row['nip'] ?? null;
+            $nama = $row['nama'] ?? null;
+
+            if (empty($nip) || empty($nama)) {
                 continue;
             }
-            $departemenId = Departemen::where('nama_departemen', 'LIKE', '%' . strtolower($row['departemen']) . '%')->first()->id ?? null;
-            $bagianId = Bagian::where('nama_bagian', 'LIKE', '%' . strtolower($row['bagian']) . '%')->where('departemen_id', $departemenId)->first()->id ?? null;
-            $unitId = Unit::where('nama_unit', 'LIKE', '%' . strtolower($row['unit']) . '%')->where('bagian_id', $bagianId)->first()->id ?? null;
+
+            $departemen = $row['departemen'] ?? null;
+            $bagian = $row['bagian'] ?? null;
+            $unit = $row['unit'] ?? null;
+
+            $departemenId = $departemen
+                ? Departemen::where('nama_departemen', 'LIKE', '%' . strtolower($departemen) . '%')->first()->id ?? null
+                : null;
+            $bagianId = ($bagian && $departemenId)
+                ? Bagian::where('nama_bagian', 'LIKE', '%' . strtolower($bagian) . '%')->where('departemen_id', $departemenId)->first()->id ?? null
+                : null;
+            $unitId = ($unit && $bagianId)
+                ? Unit::where('nama_unit', 'LIKE', '%' . strtolower($unit) . '%')->where('bagian_id', $bagianId)->first()->id ?? null
+                : null;
+
             Karyawan::firstOrCreate(
-                ['nip' => $row['nip']],
+                ['nip' => $nip],
                 [
-                    'nama' => $row['nama'],
+                    'nama' => $nama,
                     'departemen_id' => $departemenId,
                     'bagian_id' => $bagianId,
                     'unit_id' => $unitId,
@@ -54,9 +79,6 @@ class KaryawanImport implements ToCollection, WithHeadingRow, WithChunkReading, 
                 'required',
             ],
             'nama' => [
-                'required',
-            ],
-            'departemen' => [
                 'required',
             ],
         ];

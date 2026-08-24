@@ -129,6 +129,11 @@ class DaftarKaryawanController extends Controller
         if (!auth()->user()->hasRole(['admin'])) {
             abort(403);
         }
+
+        $request->validate([
+            'file' => 'required|file|extensions:xlsx,xls,csv',
+        ]);
+
         try {
             Excel::import(new KaryawanImport(), $request->file('file'));
             return redirect()->route('karyawan.index')->with('success', 'Data karyawan berhasil diimpor.');
