@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\CuttingPlan;
+use App\Models\Project;
+use App\Models\Proses;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -10,7 +12,20 @@ class CuttingPlanController extends Controller
 {
     public function index()
     {
-        return view('cutting-plan.index');
+        $projects = Project::all();
+        $processes = Proses::all();
+        return view('cutting-plan.index', compact('projects', 'processes'));
+    }
+
+    private function normalizeEmpty(Request $request)
+    {
+        $data = $request->all();
+        array_walk_recursive($data, function (&$value) {
+            if ($value === '') {
+                $value = null;
+            }
+        });
+        $request->merge($data);
     }
 
     public function getData(Request $request)
@@ -20,8 +35,12 @@ class CuttingPlanController extends Controller
         }
 
         $query = CuttingPlan::select([
-            'id', 'id_cp', 'no_cp', 'mat', 'spec_mat',
-            'qty', 'shop', 'grup', 'lot', 'qty_lot',
+            'id', 'id_cp', 'no_cp', 'mat', 'spec_mat', 'mat_sisa',
+            'shop', 'diterima', 'tgl_kirim', 'grup', 'lot', 'qty_lot',
+            'material_size', 'quantity', 'wbs', 'sketch', 'cutting_method',
+            'special_instruction', 'date_issued', 'date_revised', 'kode_proyek',
+            'prepared_by', 'approved_by', 'date_operator', 'bpm_number', 'date_of_bpm',
+            'pieceparts',
         ]);
 
         if ($request->filled('search')) {
@@ -45,20 +64,45 @@ class CuttingPlanController extends Controller
 
     public function store(Request $request)
     {
+        $this->normalizeEmpty($request);
+
         $validator = Validator::make($request->all(), [
             'id_cp' => 'nullable|string|max:255',
             'no_cp' => 'required|string|max:255|unique:cutting_plans,no_cp',
             'mat' => 'nullable|string|max:255',
             'spec_mat' => 'nullable|string|max:255',
-            'qty' => 'nullable|integer',
+            'mat_sisa' => 'nullable|string|max:255',
             'shop' => 'nullable|string|max:255',
+            'diterima' => 'nullable|string|max:255',
+            'tgl_kirim' => 'nullable|date',
             'grup' => 'nullable|string|max:255',
             'lot' => 'nullable|string|max:255',
             'qty_lot' => 'nullable|integer',
+            'material_size' => 'nullable|string|max:255',
+            'quantity' => 'nullable|integer',
+            'wbs' => 'nullable|string|max:255',
+            'sketch' => 'nullable|string|max:255',
+            'cutting_method' => 'nullable|string|max:255',
+            'special_instruction' => 'nullable|string',
+            'date_issued' => 'nullable|date',
+            'date_revised' => 'nullable|date',
+            'kode_proyek' => 'nullable|string|max:255',
+            'prepared_by' => 'nullable|string|max:255',
+            'approved_by' => 'nullable|string|max:255',
+            'date_operator' => 'nullable|string|max:255',
+            'bpm_number' => 'nullable|string|max:255',
+            'date_of_bpm' => 'nullable|date',
+            'pieceparts' => 'nullable|array',
+            'pieceparts.*.part_no' => 'nullable|string|max:255',
+            'pieceparts.*.cutting_size' => 'nullable|string|max:255',
+            'pieceparts.*.qty_car' => 'nullable|string|max:255',
+            'pieceparts.*.qty_lot' => 'nullable|string|max:255',
+            'pieceparts.*.part_name' => 'nullable|string|max:255',
+            'pieceparts.*.remark' => 'nullable|string|max:255',
         ], [
             'no_cp.required' => 'No CP wajib diisi.',
             'no_cp.unique' => 'No CP sudah digunakan.',
-            'qty.integer' => 'Qty harus berupa angka.',
+            'quantity.integer' => 'Quantity harus berupa angka.',
             'qty_lot.integer' => 'Qty Lot harus berupa angka.',
         ]);
 
@@ -73,20 +117,45 @@ class CuttingPlanController extends Controller
 
     public function update(Request $request, CuttingPlan $cuttingPlan)
     {
+        $this->normalizeEmpty($request);
+
         $validator = Validator::make($request->all(), [
             'id_cp' => 'nullable|string|max:255',
             'no_cp' => 'required|string|max:255|unique:cutting_plans,no_cp,' . $cuttingPlan->id . ',id',
             'mat' => 'nullable|string|max:255',
             'spec_mat' => 'nullable|string|max:255',
-            'qty' => 'nullable|integer',
+            'mat_sisa' => 'nullable|string|max:255',
             'shop' => 'nullable|string|max:255',
+            'diterima' => 'nullable|string|max:255',
+            'tgl_kirim' => 'nullable|date',
             'grup' => 'nullable|string|max:255',
             'lot' => 'nullable|string|max:255',
             'qty_lot' => 'nullable|integer',
+            'material_size' => 'nullable|string|max:255',
+            'quantity' => 'nullable|integer',
+            'wbs' => 'nullable|string|max:255',
+            'sketch' => 'nullable|string|max:255',
+            'cutting_method' => 'nullable|string|max:255',
+            'special_instruction' => 'nullable|string',
+            'date_issued' => 'nullable|date',
+            'date_revised' => 'nullable|date',
+            'kode_proyek' => 'nullable|string|max:255',
+            'prepared_by' => 'nullable|string|max:255',
+            'approved_by' => 'nullable|string|max:255',
+            'date_operator' => 'nullable|string|max:255',
+            'bpm_number' => 'nullable|string|max:255',
+            'date_of_bpm' => 'nullable|date',
+            'pieceparts' => 'nullable|array',
+            'pieceparts.*.part_no' => 'nullable|string|max:255',
+            'pieceparts.*.cutting_size' => 'nullable|string|max:255',
+            'pieceparts.*.qty_car' => 'nullable|string|max:255',
+            'pieceparts.*.qty_lot' => 'nullable|string|max:255',
+            'pieceparts.*.part_name' => 'nullable|string|max:255',
+            'pieceparts.*.remark' => 'nullable|string|max:255',
         ], [
             'no_cp.required' => 'No CP wajib diisi.',
             'no_cp.unique' => 'No CP sudah digunakan.',
-            'qty.integer' => 'Qty harus berupa angka.',
+            'quantity.integer' => 'Quantity harus berupa angka.',
             'qty_lot.integer' => 'Qty Lot harus berupa angka.',
         ]);
 
@@ -104,5 +173,12 @@ class CuttingPlanController extends Controller
         $cuttingPlan->delete();
 
         return response()->json(['success' => true, 'message' => 'Data berhasil dihapus.']);
+    }
+
+    public function users()
+    {
+        $users = \App\Models\User::select('id', 'name')->orderBy('name')->get();
+
+        return response()->json($users);
     }
 }

@@ -18,6 +18,15 @@ class CuttingPlan extends Model
 
     protected $keyType = 'string';
 
+    protected $casts = [
+        'pieceparts' => 'array',
+        'date_issued' => 'date',
+        'date_revised' => 'date',
+        'date_of_bpm' => 'date',
+        'quantity' => 'integer',
+        'qty_lot' => 'integer',
+    ];
+
     protected static function boot()
     {
         parent::boot();
@@ -57,5 +66,9 @@ class CuttingPlan extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function process(){
+        return $this->belongsTo(Proses::class, 'process_id');
     }
 }

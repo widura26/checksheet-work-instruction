@@ -76,6 +76,7 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::post('/', [CuttingPlanController::class, 'store'])->name('cutting-plan.store');
         Route::put('/{cuttingPlan}', [CuttingPlanController::class, 'update'])->name('cutting-plan.update');
         Route::delete('/{cuttingPlan}', [CuttingPlanController::class, 'destroy'])->name('cutting-plan.destroy');
+        Route::get('/users', [CuttingPlanController::class, 'users'])->name('cutting-plan.users');
     });
 
     Route::prefix('work-instruction')->group(function () {
