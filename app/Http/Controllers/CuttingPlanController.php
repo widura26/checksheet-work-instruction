@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CuttingPlan;
+use App\Models\Material;
 use App\Models\Project;
 use App\Models\Proses;
 use Illuminate\Http\Request;
@@ -14,7 +15,8 @@ class CuttingPlanController extends Controller
     {
         $projects = Project::all();
         $processes = Proses::all();
-        return view('cutting-plan.index', compact('projects', 'processes'));
+        $materials = Material::all();
+        return view('cutting-plan.index', compact('projects', 'processes', 'materials'));
     }
 
     private function normalizeEmpty(Request $request)

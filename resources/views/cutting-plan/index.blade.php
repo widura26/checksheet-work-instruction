@@ -70,7 +70,12 @@
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label for="mat" class="form-label">Material</label>
-                                <input type="text" class="form-control" name="mat" id="mat">
+                                <select class="form-select" name="mat" id="mat">
+                                    <option value="">-- Pilih --</option>
+                                    {{-- @foreach ($materials as $material)
+                                        <option value="{{ $material->kode_material }}">{{ $material->kode_material }}</option>
+                                    @endforeach --}}
+                                </select>
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label for="spec_mat" class="form-label">Spec Material</label>
