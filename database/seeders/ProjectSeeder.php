@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Project;
 use Illuminate\Database\Seeder;
 
 class ProjectSeeder extends Seeder
@@ -12,14 +11,6 @@ class ProjectSeeder extends Seeder
      */
     public function run(): void
     {
-
-        Project::create([
-            'project_id' => 'PROJ-123',
-            'nama_project' => 'KCI-01',
-        ]);
-        Project::create([
-            'project_id' => 'PROJ-007',
-            'nama_project' => 'GD',
-        ]);
+        SqlDumpImporter::import('projects', 'projects.sql');
     }
 }

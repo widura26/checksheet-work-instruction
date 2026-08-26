@@ -49,15 +49,6 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
         });
 
-        Schema::table('cutting_plans', function (Blueprint $table) {
-            $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('md_header_id')->references('id')->on('md_headers')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('exp_id')->references('id')->on('exps')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('bpm_cp_id')->references('id')->on('bpm_cps')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('exp_cp_id')->references('id')->on('exp_cps')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
-        });
-
         Schema::table('exp_cps', function (Blueprint $table) {
             $table->foreign('cp_detail_id')->references('id')->on('cp_details')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
