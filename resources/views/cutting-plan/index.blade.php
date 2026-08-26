@@ -336,12 +336,18 @@
                         data: 'date_issued',
                         name: 'date_issued',
                         className: 'text-center',
-                        defaultContent: ''
+                        render: function(data) {
+                            return data ? data.substring(0, 10) : '';
+                        },
+                        defaultContent: '-'
                     },
                     {
                         data: 'date_revised',
                         name: 'date_revised',
                         className: 'text-center',
+                        render: function(data) {
+                            return data ? data.substring(0, 10) : '';
+                        },
                         defaultContent: ''
                     },
                     {
