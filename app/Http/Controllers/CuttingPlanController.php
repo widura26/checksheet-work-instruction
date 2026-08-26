@@ -308,7 +308,7 @@ class CuttingPlanController extends Controller
 
         $materials = $query->orderBy('kode_material')
             ->limit(20)
-            ->get(['kode_material', 'deskripsi', 'spesifikasi']);
+            ->get(['id', 'kode_material', 'deskripsi', 'spesifikasi']);
 
         $results = $materials->map(function ($m) {
             return [
