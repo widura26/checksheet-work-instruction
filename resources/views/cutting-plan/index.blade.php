@@ -21,10 +21,9 @@
 
 @section('content')
     <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="p-3 d-flex justify-content-between align-items-center">
             <div>
-                <h5 class="card-title mb-0">Data Cutting Plan</h5>
-                <small class="text-body-secondary">Kelola data Cutting Plan (CP)</small>
+                <h5 class="card-title mb-0">Cutting Plan</h5>
             </div>
             <a href="{{ route('cutting-plan.create') }}" class="btn btn-primary">
                 <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"></path></svg> Tambah
@@ -218,6 +217,19 @@
                 reindexPieceparts();
             });
 
+            const convertDate = (timestamp) => {
+                const date = new Date(timestamp);
+                const formatted = date.toLocaleDateString('id-ID', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                    // hour: '2-digit',
+                    // minute: '2-digit'
+                });
+
+                return formatted;
+            }
+
             var table = $('#cutting-plan-table').DataTable({
                 processing: true,
                 serverSide: true,
@@ -337,7 +349,7 @@
                         name: 'date_issued',
                         className: 'text-center',
                         render: function(data) {
-                            return data ? data.substring(0, 10) : '';
+                            return data ? convertDate(data) : '';
                         },
                         defaultContent: '-'
                     },
@@ -346,7 +358,7 @@
                         name: 'date_revised',
                         className: 'text-center',
                         render: function(data) {
-                            return data ? data.substring(0, 10) : '';
+                            return data ? convertDate(data) : '';
                         },
                         defaultContent: ''
                     },
