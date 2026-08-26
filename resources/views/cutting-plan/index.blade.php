@@ -315,8 +315,8 @@
                 $('#crudForm').attr('action', "{{ route('cutting-plan.update', '__ID__') }}".replace('__ID__', row.id));
                 $('#no_cp').val(row.no_cp);
                 $('#mat').empty();
-                if (row.mat) {
-                    var opt = new Option(row.mat, row.mat, true, true);
+                if (row.material_id) {
+                    var opt = new Option(row.mat, row.material_id, true, true);
                     $('#mat').append(opt).trigger('change');
                 } else {
                     $('#mat').val(null).trigger('change');
@@ -410,7 +410,7 @@
                             $('#formError').removeClass('d-none').html(msg);
                         } else {
                             $('#formError').removeClass('d-none').text(
-                                'Terjadi kesalahan saat menyimpan data.');
+                                `Terjadi kesalahan saat menyimpan data. ${xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : ''}`);
                         }
                     }
                 });

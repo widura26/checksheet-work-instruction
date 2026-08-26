@@ -132,7 +132,7 @@
                             $('#formError').removeClass('d-none').html(msg);
                         } else {
                             $('#formError').removeClass('d-none').text(
-                                'Terjadi kesalahan saat menyimpan data.');
+                                `Terjadi kesalahan saat menyimpan data. ${xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : ''}`);
                         }
                     }
                 });

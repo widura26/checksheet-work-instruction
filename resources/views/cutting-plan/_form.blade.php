@@ -69,13 +69,13 @@
     </div>
     <div>
         <label for="mat" class="form-label">Material</label>
-        <select class="form-select select2" name="mat" id="mat" style="width: 100%;">
+        <select class="form-select select2" name="material_id" id="mat" style="width: 100%;">
             <option value=""></option>
         </select>
     </div>
     <div>
         <label for="kode_proyek" class="form-label">Kode Proyek</label>
-        <select class="form-select" name="kode_proyek" id="kode_proyek">
+        <select class="form-select" name="project_id" id="kode_proyek">
             <option value="">-- Pilih --</option>
             @foreach ($projects as $project)
                 <option value="{{ $project->project_id }}">{{ $project->name_project }}</option>
@@ -96,7 +96,7 @@
     </div>
     <div>
         <label for="cutting_method" class="form-label">Cutting Method</label>
-        <select class="form-select" name="cutting_method" id="cutting_method">
+        <select class="form-select" name="process_id" id="cutting_method">
             <option value="">-- Pilih --</option>
             @foreach ($processes as $item)
                 <option value="{{ $item->id }}">{{ $item->nama }}</option>

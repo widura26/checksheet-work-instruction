@@ -76,4 +76,8 @@ class CuttingPlan extends Model
     {
         return $this->hasMany(Piecepart::class, 'cutting_plan_id');
     }
+
+    public function material(){
+        return $this->belongsTo(Material::class, 'material_id');
+    }
 }

@@ -46,6 +46,7 @@ class CuttingPlanController extends Controller
         $query = CuttingPlan::query()
             ->leftJoin('projects', 'cutting_plans.project_id', '=', 'projects.project_id')
             ->leftJoin('processes', 'cutting_plans.process_id', '=', 'processes.id')
+            ->leftJoin('materials', 'cutting_plans.material_id', '=', 'materials.id')
             ->leftJoin('bpms', 'cutting_plans.bpm_id', '=', 'bpms.id')
             ->with('pieceparts')
             ->select(
@@ -53,7 +54,8 @@ class CuttingPlanController extends Controller
                 'projects.project_id as kode_proyek',
                 'processes.nama as cutting_method',
                 'bpms.no_bpm as bpm_number',
-                \DB::raw('NULL as date_of_bpm')
+                'materials.kode_material as mat',
+                DB::raw('NULL as date_of_bpm')
             )
             ->addSelect('cutting_plans.process_id');
 
@@ -84,26 +86,18 @@ class CuttingPlanController extends Controller
         $this->normalizeEmpty($request);
 
         $validator = Validator::make($request->all(), [
-            'id_cp' => 'nullable|string|max:255',
             'no_cp' => 'required|string|max:255|unique:cutting_plans,no_cp',
-            'mat' => 'nullable|string|max:255',
-            'spec_mat' => 'nullable|string|max:255',
-            'mat_sisa' => 'nullable|string|max:255',
-            'shop' => 'nullable|string|max:255',
-            'diterima' => 'nullable|string|max:255',
-            'tgl_kirim' => 'nullable|date',
-            'grup' => 'nullable|string|max:255',
-            'lot' => 'nullable|string|max:255',
+            'material_id' => 'nullable|string|max:255',
             'qty_lot' => 'nullable|integer',
             'material_size' => 'nullable|string|max:255',
             'quantity' => 'nullable|integer',
             'wbs' => 'nullable|string|max:255',
             'sketch' => 'nullable|string|max:255',
-            'cutting_method' => 'nullable|string|max:255',
+            'process_id' => 'nullable|string|max:255',
             'special_instruction' => 'nullable|string',
             'date_issued' => 'nullable|date',
             'date_revised' => 'nullable|date',
-            'kode_proyek' => 'nullable|string|max:255',
+            'project_id' => 'nullable|string|max:255',
             'prepared_by' => 'nullable|string|max:255',
             'approved_by' => 'nullable|string|max:255',
             'date_operator' => 'nullable|string|max:255',
@@ -137,26 +131,18 @@ class CuttingPlanController extends Controller
         $this->normalizeEmpty($request);
 
         $validator = Validator::make($request->all(), [
-            'id_cp' => 'nullable|string|max:255',
             'no_cp' => 'required|string|max:255|unique:cutting_plans,no_cp,' . $cuttingPlan->id . ',id',
-            'mat' => 'nullable|string|max:255',
-            'spec_mat' => 'nullable|string|max:255',
-            'mat_sisa' => 'nullable|string|max:255',
-            'shop' => 'nullable|string|max:255',
-            'diterima' => 'nullable|string|max:255',
-            'tgl_kirim' => 'nullable|date',
-            'grup' => 'nullable|string|max:255',
-            'lot' => 'nullable|string|max:255',
+            'material_id' => 'nullable|string|max:255',
             'qty_lot' => 'nullable|integer',
             'material_size' => 'nullable|string|max:255',
             'quantity' => 'nullable|integer',
             'wbs' => 'nullable|string|max:255',
             'sketch' => 'nullable|string|max:255',
-            'cutting_method' => 'nullable|string|max:255',
+            'process_id' => 'nullable|string|max:255',
             'special_instruction' => 'nullable|string',
             'date_issued' => 'nullable|date',
             'date_revised' => 'nullable|date',
-            'kode_proyek' => 'nullable|string|max:255',
+            'project_id' => 'nullable|string|max:255',
             'prepared_by' => 'nullable|string|max:255',
             'approved_by' => 'nullable|string|max:255',
             'date_operator' => 'nullable|string|max:255',
@@ -219,7 +205,7 @@ class CuttingPlanController extends Controller
 
         $results = $materials->map(function ($m) {
             return [
-                'id' => $m->kode_material,
+                'id' => $m->id,
                 'text' => $m->kode_material . ' - ' . $m->deskripsi,
             ];
         });
