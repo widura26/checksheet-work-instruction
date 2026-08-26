@@ -13,7 +13,7 @@ class MdController extends Controller
 {
     public function index()
     {
-        $projects = Project::orderBy('project_code')->get(['id', 'project_code']);
+        $projects = Project::orderBy('project_id')->get(['id', 'project_id']);
         $okas = Oka::orderBy('oka')->get(['id', 'oka']);
 
         return view('md.index', compact('projects', 'okas'));

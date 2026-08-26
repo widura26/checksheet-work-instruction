@@ -61,7 +61,7 @@ class WiTrn extends Model
 
     public function cp()
     {
-        return $this->belongsTo(Cp::class);
+        return $this->belongsTo(CuttingPlan::class);
     }
 
     public function memo()

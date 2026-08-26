@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\CheckSheetController;
-use App\Http\Controllers\CpController;
+use App\Http\Controllers\CuttingPlanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpedisiController;
 use App\Http\Controllers\GrafikController;
@@ -71,11 +71,18 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
     });
 
     Route::prefix('cutting-plan')->group(function () {
-        Route::get('/', [CpController::class, 'index'])->name('cp.index');
-        Route::get('/data', [CpController::class, 'getData'])->name('cp.data');
-        Route::post('/', [CpController::class, 'store'])->name('cp.store');
-        Route::put('/{cp}', [CpController::class, 'update'])->name('cp.update');
-        Route::delete('/{cp}', [CpController::class, 'destroy'])->name('cp.destroy');
+        Route::get('/', [CuttingPlanController::class, 'index'])->name('cutting-plan.index');
+        Route::get('/create', [CuttingPlanController::class, 'create'])->name('cutting-plan.create');
+        Route::get('/data', [CuttingPlanController::class, 'getData'])->name('cutting-plan.data');
+        Route::get('/export', [CuttingPlanController::class, 'export'])->name('cutting-plan.export');
+        Route::post('/', [CuttingPlanController::class, 'store'])->name('cutting-plan.store');
+        Route::put('/{cuttingPlan}', [CuttingPlanController::class, 'update'])->name('cutting-plan.update');
+        Route::delete('/bulk-destroy', [CuttingPlanController::class, 'bulkDestroy'])->name('cutting-plan.bulk-destroy');
+        Route::delete('/{cuttingPlan}', [CuttingPlanController::class, 'destroy'])->name('cutting-plan.destroy');
+        Route::get('/users', [CuttingPlanController::class, 'users'])->name('cutting-plan.users');
+        Route::get('/materials', [CuttingPlanController::class, 'materials'])->name('cutting-plan.materials');
+        Route::get('/projects', [CuttingPlanController::class, 'projects'])->name('cutting-plan.projects');
+        Route::get('/processes', [CuttingPlanController::class, 'processes'])->name('cutting-plan.processes');
     });
 
     Route::prefix('work-instruction')->group(function () {

@@ -17,7 +17,9 @@ class DatabaseSeeder extends Seeder
         Activity::disableLogging();
         $this->call([
             UserSeeder::class,
+            ProjectSeeder::class,
             ProsesSeeder::class,
+            MaterialSeeder::class,
             DepartemenSeeder::class,
         ]);
         DB::table('kode_bagian_spm')->insert([

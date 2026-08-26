@@ -17,28 +17,37 @@
                 @method('PUT')
 
                 <div class="mb-3">
-                    <label for="id_wi_trn_bpm" class="form-label">Kode Material</label>
-                    <input type="text" class="form-control @error('id_wi_trn_bpm') is-invalid @enderror" id="id_wi_trn_bpm"
-                        name="id_wi_trn_bpm" value="{{ old('id_wi_trn_bpm', $kodeMaterial->id_wi_trn_bpm) }}" required>
-                    @error('id_wi_trn_bpm')
+                    <label for="kode_material" class="form-label">Kode Material</label>
+                    <input type="text" class="form-control @error('kode_material') is-invalid @enderror" id="kode_material"
+                        name="kode_material" value="{{ old('kode_material', $kodeMaterial->kode_material) }}" required>
+                    @error('kode_material')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
                 <div class="mb-3">
-                    <label for="spec" class="form-label">Spesifikasi</label>
-                    <input type="text" class="form-control @error('spec') is-invalid @enderror" id="spec"
-                        name="spec" value="{{ old('spec', $kodeMaterial->spec) }}">
-                    @error('spec')
+                    <label for="deskripsi" class="form-label">Deskripsi</label>
+                    <input type="text" class="form-control @error('deskripsi') is-invalid @enderror" id="deskripsi"
+                        name="deskripsi" value="{{ old('deskripsi', $kodeMaterial->deskripsi) }}">
+                    @error('deskripsi')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
 
                 <div class="mb-3">
-                    <label for="ket" class="form-label">Keterangan</label>
-                    <textarea class="form-control @error('ket') is-invalid @enderror" id="ket" name="ket"
-                        rows="3">{{ old('ket', $kodeMaterial->ket) }}</textarea>
-                    @error('ket')
+                    <label for="spesifikasi" class="form-label">Spesifikasi</label>
+                    <input type="text" class="form-control @error('spesifikasi') is-invalid @enderror" id="spesifikasi"
+                        name="spesifikasi" value="{{ old('spesifikasi', $kodeMaterial->spesifikasi) }}">
+                    @error('spesifikasi')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label for="satuan" class="form-label">Satuan</label>
+                    <input type="text" class="form-control @error('satuan') is-invalid @enderror" id="satuan"
+                        name="satuan" value="{{ old('satuan', $kodeMaterial->satuan) }}">
+                    @error('satuan')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
