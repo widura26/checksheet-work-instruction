@@ -14,41 +14,17 @@
         margin-bottom: .35rem;
     }
 
-    /* Samakan tampilan Select2 (Material) dengan .form-select Bootstrap */
-    .cp-form-grid .select2-container {
-        width: 100% !important;
+    /* Combobox Material: potong teks dengan ellipsis, tanpa scroll horizontal */
+    .mat-combobox .dropdown-menu {
+        overflow-x: hidden;
     }
 
-    .cp-form-grid .select2-container--default .select2-selection--single {
-        height: calc(1.5em + .75rem + 2px);
-        padding: .375rem .75rem;
-        font-size: .875rem;
-        line-height: 1.5;
-        border: 1px solid #d8dbe0;
-        border-radius: .375rem;
-        display: flex;
-        align-items: center;
-    }
-
-    .cp-form-grid .select2-container--default .select2-selection--single .select2-selection__rendered {
-        padding-left: 0;
-        padding-right: 1.5rem;
-        line-height: 1.5;
-        color: #4b4b4b;
-    }
-
-    .cp-form-grid .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 100%;
-        right: .625rem;
-    }
-
-    .cp-form-grid .select2-container--default .select2-selection--single .select2-selection__arrow b {
-        border-color: #879197 transparent transparent transparent;
-    }
-
-    .cp-form-grid .select2-container--default.select2-container--open .select2-selection--single {
-        border-color: #321fdb;
-        box-shadow: 0 0 0 .2rem rgba(50, 31, 219, .25);
+    .mat-combobox .dropdown-item {
+        display: block;
+        width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     @media (max-width: 575.98px) {
@@ -68,10 +44,12 @@
         <input type="text" class="form-control" name="no_cp" id="no_cp" required>
     </div>
     <div>
-        <label for="mat" class="form-label">Material</label>
-        <select class="form-select select2" name="material_id" id="mat" style="width: 100%;">
-            <option value=""></option>
-        </select>
+        <label for="mat_search" class="form-label">Material</label>
+        <div class="position-relative mat-combobox">
+            <input type="text" class="form-control" id="mat_search" name="mat_search" placeholder="Cari Material..." autocomplete="off">
+            <input type="hidden" name="material_id" id="mat">
+            <div class="dropdown-menu w-100" id="mat_dropdown" style="max-height: 240px; overflow-y: auto;"></div>
+        </div>
     </div>
     <div>
         <label for="kode_proyek" class="form-label">Kode Proyek</label>

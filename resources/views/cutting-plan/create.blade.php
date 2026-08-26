@@ -30,26 +30,58 @@
 @push('js')
     <script type="module">
         $(function() {
-            $('#mat').select2({
-                placeholder: 'Cari Material...',
-                allowClear: true,
-                width: '100%',
-                dropdownParent: $('#crudForm'),
-                ajax: {
-                    url: "{{ route('cutting-plan.materials') }}",
-                    dataType: 'json',
-                    delay: 250,
-                    data: function(params) {
-                        return {
-                            q: params.term || ''
-                        };
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data.results
-                        };
-                    },
-                    cache: true
+            var materialResults = [];
+
+            function renderMaterialDropdown(results) {
+                materialResults = results || [];
+                var html = '';
+                if (!materialResults.length) {
+                    html = '<div class="dropdown-item text-muted disabled">Tidak ada hasil</div>';
+                } else {
+                    $.each(materialResults, function(i, m) {
+                        html += '<button type="button" class="dropdown-item" data-id="' + m.id +
+                            '">' + m.text + '</button>';
+                    });
+                }
+                $('#mat_dropdown').html(html).addClass('show');
+            }
+
+            function searchMaterials(q) {
+                $.get("{{ route('cutting-plan.materials') }}", {
+                    q: q || ''
+                }, function(data) {
+                    renderMaterialDropdown(data.results || []);
+                });
+            }
+
+            var matSearchTimer;
+            $('#mat_search').on('input', function() {
+                $('#mat').val('');
+                clearTimeout(matSearchTimer);
+                var val = $(this).val();
+                matSearchTimer = setTimeout(function() {
+                    searchMaterials(val);
+                }, 250);
+            }).on('focus', function() {
+                if (!$('#mat_dropdown').hasClass('show')) {
+                    searchMaterials($(this).val());
+                }
+            });
+
+            $('#mat_dropdown').on('click', '.dropdown-item', function() {
+                if ($(this).hasClass('disabled')) return;
+                var id = $(this).data('id');
+                var found = materialResults.find(function(m) {
+                    return String(m.id) === String(id);
+                });
+                $('#mat_search').val(found ? found.text : '');
+                $('#mat').val(id);
+                $('#mat_dropdown').removeClass('show');
+            });
+
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('.mat-combobox').length) {
+                    $('#mat_dropdown').removeClass('show');
                 }
             });
 
