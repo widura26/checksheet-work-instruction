@@ -444,6 +444,7 @@ $(function() {
 
     $('#cutting-plan-table').on('click', '.btn-edit', function() {
         var row = table.row($(this).closest('tr')).data();
+        $('#btnSubmit').prop('disabled', false).text('Simpan');
         $('#crudForm')[0].reset();
         $('#formError').addClass('d-none').text('');
         $('#_method').val('PUT');
@@ -555,6 +556,7 @@ $(function() {
             },
             success: function(res) {
                 modal.hide();
+                btn.prop('disabled', false).text('Simpan');
                 Swal.fire('Berhasil', res.message, 'success');
                 table.ajax.reload();
             },
