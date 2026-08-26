@@ -18,7 +18,7 @@ class ProjectCodeController extends Controller
             abort(404);
         }
 
-        $query = Project::with('okas')->select(['id', 'project_code', 'name']);
+        $query = Project::with('okas')->select(['id', 'project_id', 'name_project']);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -37,8 +37,8 @@ class ProjectCodeController extends Controller
 
                 return [
                     'id' => $project->id,
-                    'project_code' => $project->project_code,
-                    'name' => $project->name,
+                    'project_code' => $project->project_id,
+                    'name' => $project->name_project,
                     'oka' => $oka?->oka,
                     'wbs' => $oka?->wbs,
                     'label_proyek' => $oka?->label_proyek,
@@ -113,7 +113,7 @@ class ProjectCodeController extends Controller
                 'name' => $validated['name'],
                 'status' => true,
             ]);
-    
+
             return response()->json(['message' => 'Project created successfully', 'project' => $project], 201);
         } catch (\Throwable $th) {
             return response()->json(['message' => 'Failed to create project', 'error' => $th->getMessage()], 500);
