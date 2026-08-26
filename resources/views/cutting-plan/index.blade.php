@@ -25,7 +25,10 @@
             <div>
                 <h5 class="card-title mb-0">Cutting Plan</h5>
             </div>
-            <div class="d-flex gap-2">
+                <div class="d-flex gap-2">
+                    <button class="btn btn-success" type="button" id="btnExportExcel">
+                        <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M13 2v9h7l-8 11v-9h-7z"></path></svg> Export Excel
+                    </button>
                 <div class="dropdown">
                     <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="columnToggleBtn" data-coreui-toggle="dropdown" aria-expanded="false">
                         <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 5h18v2H3zM3 11h18v2H3zM3 17h18v2H3z"></path></svg> Kolom
@@ -98,6 +101,7 @@
                 processes: "{{ route('cutting-plan.processes') }}",
                 users: "{{ route('cutting-plan.users') }}",
                 data: "{{ route('cutting-plan.data') }}",
+                export: "{{ route('cutting-plan.export') }}",
                 update: "{{ route('cutting-plan.update', '__ID__') }}",
                 destroy: "{{ route('cutting-plan.destroy', '__ID__') }}"
             }

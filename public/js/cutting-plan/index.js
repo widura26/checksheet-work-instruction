@@ -336,6 +336,33 @@ $(function() {
         });
     })();
 
+    /* Export Excel: hanya kolom yang sedang tampil (kecuali No & Aksi) */
+    $('#btnExportExcel').on('click', function() {
+        var keys = [];
+        var initCols = table.settings().init().columns;
+        table.columns().every(function(idx) {
+            if (!this.visible()) return;
+            var name = initCols[idx] ? initCols[idx].name : null;
+            if (name === 'DT_RowIndex' || name === 'aksi') return;
+            if (name) keys.push(name);
+        });
+
+        if (!keys.length) {
+            Swal.fire('Info', 'Tidak ada kolom yang dipilih untuk diekspor.', 'info');
+            return;
+        }
+
+        var $form = $('<form method="GET" action="' + CP.routes.export + '"></form>');
+        keys.forEach(function(k) {
+            $form.append($('<input type="hidden" name="columns[]">').val(k));
+        });
+        var searchVal = table.search();
+        if (searchVal) {
+            $form.append($('<input type="hidden" name="search">').val(searchVal));
+        }
+        $form.appendTo('body').trigger('submit').remove();
+    });
+
     var modal = new coreui.Modal(document.getElementById('formModal'));
 
     $('#cutting-plan-table').on('click', '.btn-edit', function() {

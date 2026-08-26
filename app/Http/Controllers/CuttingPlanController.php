@@ -10,6 +10,7 @@ use App\Models\Proses;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CuttingPlanController extends Controller
 {
@@ -44,6 +45,16 @@ class CuttingPlanController extends Controller
             abort(404);
         }
 
+        $perPage = (int) $request->get('per_page', 10);
+        $cps = $this->baseQuery($request)
+            ->orderBy('cutting_plans.created_at', 'desc')
+            ->paginate($perPage);
+
+        return response()->json($cps);
+    }
+
+    private function baseQuery(Request $request)
+    {
         $query = CuttingPlan::query()
             ->with('parts')
             ->leftJoin('projects', 'cutting_plans.project_id', '=', 'projects.project_id')
@@ -83,10 +94,73 @@ class CuttingPlanController extends Controller
             });
         }
 
-        $perPage = (int) $request->get('per_page', 10);
-        $cps = $query->orderBy('cutting_plans.created_at', 'desc')->paginate($perPage);
+        return $query;
+    }
 
-        return response()->json($cps);
+    private function exportColumns()
+    {
+        return [
+            'no_cp'               => 'No CP',
+            'mat'                 => 'Material',
+            'kode_proyek'         => 'Kode Proyek',
+            'wbs'                 => 'WBS',
+            'material_size'       => 'Material Size',
+            'quantity'            => 'Quantity',
+            'cutting_method'      => 'Cutting Method',
+            'sketch'              => 'Sket',
+            'pieceparts'          => 'Parts',
+            'special_instruction' => 'Special Instruction',
+            'date_issued'         => 'Date Issued',
+            'date_revised'        => 'Date Revised',
+            'bpm_number'          => 'BPM Number',
+            'date_of_bpm'         => 'Date of BPM',
+        ];
+    }
+
+    private function formatExportValue($cp, $key)
+    {
+        switch ($key) {
+            case 'date_issued':
+            case 'date_revised':
+            case 'date_of_bpm':
+                return $cp->$key
+                    ? \Carbon\Carbon::parse($cp->$key)->translatedFormat('d F Y')
+                    : '';
+            case 'pieceparts':
+                return $cp->parts->count();
+            default:
+                return $cp->$key ?? '';
+        }
+    }
+
+    public function export(Request $request)
+    {
+        $allowed = $this->exportColumns();
+        $columns = array_values(array_filter(
+            (array) $request->input('columns', []),
+            fn ($c) => isset($allowed[$c])
+        ));
+
+        if (empty($columns)) {
+            $columns = array_keys($allowed);
+        }
+
+        $rows = $this->baseQuery($request)
+            ->orderBy('cutting_plans.created_at', 'desc')
+            ->get()
+            ->map(function ($cp) use ($columns) {
+                $row = [];
+                foreach ($columns as $key) {
+                    $row[$key] = $this->formatExportValue($cp, $key);
+                }
+                return $row;
+            });
+
+        $headings = array_map(fn ($c) => $allowed[$c], $columns);
+
+        $export = new \App\Exports\CuttingPlanExport($headings, $rows);
+
+        return Excel::download($export, 'cutting-plan.xlsx');
     }
 
     public function store(Request $request)
