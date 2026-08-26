@@ -301,10 +301,10 @@ $(function() {
 
                     return `
                         <div class="btn-group" style="display:flex; gap:10px; align-items:center;" role="group" aria-label="Aksi">
-                            <button class="btn btn-warning btn-sm btn-edit" title="Edit">
+                            <button class="w-fit btn btn-warning btn-sm btn-edit" title="Edit">
                                 ${iconEdit}
                             </button>
-                            <button class="btn btn-danger btn-sm btn-delete" data-id="${data}" title="Hapus">
+                            <button class="w-fit btn btn-danger btn-sm btn-delete" data-id="${data}" title="Hapus">
                                 ${iconTrash}
                             </button>
                         </div>
@@ -313,6 +313,28 @@ $(function() {
             }
         ]
     });
+
+    /* Kolom: tampilkan / sembunyikan */
+    (function() {
+        var $menu = $('#columnToggleMenu');
+        var fixedTitles = ['No', 'Aksi'];
+        table.columns().every(function(idx) {
+            var title = $(this.header()).text().trim();
+            if (fixedTitles.indexOf(title) !== -1) return;
+            var $li = $(
+                '<li class="form-check mb-1">' +
+                '<input class="form-check-input col-toggle" type="checkbox" checked ' +
+                'data-column="' + idx + '" id="coltoggle-' + idx + '">' +
+                '<label class="form-check-label ps-1" for="coltoggle-' + idx + '">' + title + '</label>' +
+                '</li>'
+            );
+            $menu.append($li);
+        });
+        $menu.on('change', '.col-toggle', function() {
+            var idx = $(this).data('column');
+            table.column(idx).visible(this.checked);
+        });
+    })();
 
     var modal = new coreui.Modal(document.getElementById('formModal'));
 

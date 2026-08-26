@@ -21,13 +21,23 @@
 
 @section('content')
     <div class="card mb-4">
-        <div class="p-3 d-flex justify-content-between align-items-center">
+        <div class="p-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
             <div>
                 <h5 class="card-title mb-0">Cutting Plan</h5>
             </div>
-            <a href="{{ route('cutting-plan.create') }}" class="btn btn-primary">
-                <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"></path></svg> Tambah
-            </a>
+            <div class="d-flex gap-2">
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="columnToggleBtn" data-coreui-toggle="dropdown" aria-expanded="false">
+                        <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 5h18v2H3zM3 11h18v2H3zM3 17h18v2H3z"></path></svg> Kolom
+                    </button>
+                    <ul class="dropdown-menu p-2" id="columnToggleMenu" style="min-width: 220px; max-height: 320px; overflow-y: auto;">
+                        <li class="text-muted small px-2 pb-1">Tampilkan / sembunyikan kolom</li>
+                    </ul>
+                </div>
+                <a href="{{ route('cutting-plan.create') }}" class="btn btn-primary">
+                    <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"></path></svg> Tambah
+                </a>
+            </div>
         </div>
         <div class="card-body">
             <table id="cutting-plan-table" class="table table-bordered table-hover" style="width: 100%;">
