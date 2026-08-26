@@ -48,7 +48,6 @@ class CuttingPlanController extends Controller
             ->leftJoin('processes', 'cutting_plans.process_id', '=', 'processes.id')
             ->leftJoin('materials', 'cutting_plans.material_id', '=', 'materials.id')
             ->leftJoin('bpms', 'cutting_plans.bpm_id', '=', 'bpms.id')
-            ->with('pieceparts')
             ->select(
                 'cutting_plans.*',
                 'projects.project_id as kode_proyek',
@@ -103,13 +102,13 @@ class CuttingPlanController extends Controller
             'date_operator' => 'nullable|string|max:255',
             'bpm_number' => 'nullable|string|max:255',
             'date_of_bpm' => 'nullable|date',
-            'pieceparts' => 'nullable|array',
-            'pieceparts.*.part_no' => 'nullable|string|max:255',
-            'pieceparts.*.cutting_size' => 'nullable|string|max:255',
-            'pieceparts.*.qty_car' => 'nullable|string|max:255',
-            'pieceparts.*.qty_lot' => 'nullable|string|max:255',
-            'pieceparts.*.part_name' => 'nullable|string|max:255',
-            'pieceparts.*.remark' => 'nullable|string|max:255',
+            'parts' => 'nullable|array',
+            'parts.*.part_number' => 'nullable|string|max:255',
+            'parts.*.cutting_size' => 'nullable|string|max:255',
+            'parts.*.quantity_per_car' => 'nullable|string|max:255',
+            'parts.*.quantity_per_lot' => 'nullable|string|max:255',
+            'parts.*.part_name' => 'nullable|string|max:255',
+            'parts.*.remark' => 'nullable|string|max:255',
         ], [
             'no_cp.required' => 'No CP wajib diisi.',
             'no_cp.unique' => 'No CP sudah digunakan.',
@@ -148,13 +147,13 @@ class CuttingPlanController extends Controller
             'date_operator' => 'nullable|string|max:255',
             'bpm_number' => 'nullable|string|max:255',
             'date_of_bpm' => 'nullable|date',
-            'pieceparts' => 'nullable|array',
-            'pieceparts.*.part_no' => 'nullable|string|max:255',
-            'pieceparts.*.cutting_size' => 'nullable|string|max:255',
-            'pieceparts.*.qty_car' => 'nullable|string|max:255',
-            'pieceparts.*.qty_lot' => 'nullable|string|max:255',
-            'pieceparts.*.part_name' => 'nullable|string|max:255',
-            'pieceparts.*.remark' => 'nullable|string|max:255',
+            'parts' => 'nullable|array',
+            'parts.*.part_number' => 'nullable|string|max:255',
+            'parts.*.cutting_size' => 'nullable|string|max:255',
+            'parts.*.quantity_per_car' => 'nullable|integer',
+            'parts.*.quantity_per_lot' => 'nullable|integer',
+            'parts.*.part_name' => 'nullable|string|max:255',
+            'parts.*.remark' => 'nullable|string|max:255',
         ], [
             'no_cp.required' => 'No CP wajib diisi.',
             'no_cp.unique' => 'No CP sudah digunakan.',

@@ -72,9 +72,9 @@ class CuttingPlan extends Model
         return $this->belongsTo(Proses::class, 'process_id');
     }
 
-    public function pieceparts()
+    public function parts()
     {
-        return $this->hasMany(Piecepart::class, 'cutting_plan_id');
+        return $this->hasMany(Part::class, 'cutting_plan_id');
     }
 
     public function material(){
