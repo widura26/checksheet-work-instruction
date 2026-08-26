@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CuttingPlan;
 use App\Models\Material;
+use App\Models\Part;
 use App\Models\Project;
 use App\Models\Proses;
 use Illuminate\Http\Request;
@@ -44,6 +45,7 @@ class CuttingPlanController extends Controller
         }
 
         $query = CuttingPlan::query()
+            ->with('parts')
             ->leftJoin('projects', 'cutting_plans.project_id', '=', 'projects.project_id')
             ->leftJoin('processes', 'cutting_plans.process_id', '=', 'processes.id')
             ->leftJoin('materials', 'cutting_plans.material_id', '=', 'materials.id')
@@ -120,7 +122,9 @@ class CuttingPlanController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        CuttingPlan::create($validator->validated());
+        $cuttingPlan = CuttingPlan::create($validator->validated());
+
+        $this->syncParts($cuttingPlan, $request->input('pieceparts', []), $request);
 
         return response()->json(['success' => true, 'message' => 'Data berhasil ditambahkan.']);
     }
@@ -167,7 +171,42 @@ class CuttingPlanController extends Controller
 
         $cuttingPlan->update($validator->validated());
 
+        $this->syncParts($cuttingPlan, $request->input('pieceparts', []), $request);
+
         return response()->json(['success' => true, 'message' => 'Data berhasil diperbarui.']);
+    }
+
+    private function syncParts(CuttingPlan $cuttingPlan, array $pieceparts, Request $request)
+    {
+        $cuttingPlan->parts()->delete();
+
+        $materialId = $request->input('material_id');
+        $projectId = Project::where('project_id', $request->input('project_id'))->value('id')
+            ?? $request->input('project_id');
+
+        foreach ($pieceparts as $pp) {
+            if (! is_array($pp)) {
+                continue;
+            }
+
+            $filled = collect($pp)->filter(fn ($v) => $v !== null && $v !== '')->count();
+
+            if ($filled === 0) {
+                continue;
+            }
+
+            Part::create([
+                'cutting_plan_id' => $cuttingPlan->id,
+                'project_id' => $projectId,
+                'material_id' => $materialId,
+                'part_number' => $pp['part_no'] ?? null,
+                'cutting_size' => $pp['cutting_size'] ?? null,
+                'quantity_per_car' => isset($pp['qty_car']) && $pp['qty_car'] !== '' ? (int) $pp['qty_car'] : null,
+                'quantity_per_lot' => isset($pp['qty_lot']) && $pp['qty_lot'] !== '' ? (int) $pp['qty_lot'] : null,
+                'part_name' => $pp['part_name'] ?? null,
+                'remark' => $pp['remark'] ?? null,
+            ]);
+        }
     }
 
     public function destroy(CuttingPlan $cuttingPlan)

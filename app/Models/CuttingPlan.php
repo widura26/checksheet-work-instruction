@@ -19,13 +19,32 @@ class CuttingPlan extends Model
     protected $keyType = 'string';
 
     protected $casts = [
-        'pieceparts' => 'array',
         'date_issued' => 'date',
         'date_revised' => 'date',
         'date_of_bpm' => 'date',
         'quantity' => 'integer',
         'qty_lot' => 'integer',
     ];
+
+    protected $appends = ['pieceparts'];
+
+    public function getPiecepartsAttribute()
+    {
+        if (! $this->relationLoaded('parts')) {
+            $this->load('parts');
+        }
+
+        return $this->parts->map(function ($p) {
+            return [
+                'part_no' => $p->part_number,
+                'cutting_size' => $p->cutting_size,
+                'qty_car' => $p->quantity_per_car,
+                'qty_lot' => $p->quantity_per_lot,
+                'part_name' => $p->part_name,
+                'remark' => $p->remark,
+            ];
+        })->values()->all();
+    }
 
     protected static function boot()
     {

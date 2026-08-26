@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('parts', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('cutting_plan_id');
-            $table->string('project_id');
-            $table->string('material_id');
+            $table->string('project_id')->nullable();
+            $table->string('material_id')->nullable();
             $table->string('part_number');
             $table->string('cutting_size');
             $table->integer('quantity_per_car');

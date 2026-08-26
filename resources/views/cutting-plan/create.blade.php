@@ -34,6 +34,7 @@
                 placeholder: 'Cari Material...',
                 allowClear: true,
                 width: '100%',
+                dropdownParent: $('#crudForm'),
                 ajax: {
                     url: "{{ route('cutting-plan.materials') }}",
                     dataType: 'json',
