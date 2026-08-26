@@ -26,6 +26,9 @@
                 <h5 class="card-title mb-0">Cutting Plan</h5>
             </div>
                 <div class="d-flex gap-2">
+                    <button class="btn btn-danger d-none" type="button" id="btnBulkDelete">
+                        <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M4.5 22.125c-0 0.003-0 0.006-0 0.008 0 0.613 0.494 1.11 1.105 1.116h12.79c0.612-0.006 1.105-0.504 1.105-1.117 0-0.003-0-0.006-0-0.009v0-15h-15zM6 8.625h12v13.125h-12z"></path><path d="M7.875 10.125h1.5v9.375h-1.5v-9.375z"></path><path d="M11.25 10.125h1.5v9.375h-1.5v-9.375z"></path><path d="M14.625 10.125h1.5v9.375h-1.5v-9.375z"></path><path d="M15.375 4.125v-2.25c0-0.631-0.445-1.125-1.013-1.125h-4.725c-0.568 0-1.013 0.494-1.013 1.125v2.25h-5.625v1.5h18v-1.5zM10.125 2.25h3.75v1.875h-3.75z"></path></svg> Hapus Terpilih (<span id="selectedCount">0</span>)
+                    </button>
                     <button class="btn btn-success" type="button" id="btnExportExcel">
                         <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M13 2v9h7l-8 11v-9h-7z"></path></svg> Export Excel
                     </button>
@@ -46,6 +49,7 @@
             <table id="cutting-plan-table" class="table table-bordered table-hover" style="width: 100%;">
                     <thead class="text-center">
                         <tr>
+                            <th class="text-center" style="width: 40px;"><input type="checkbox" id="selectAll" title="Pilih semua"></th>
                             <th>No</th>
                             <th>No CP</th>
                             <th>Material</th>
@@ -102,6 +106,7 @@
                 users: "{{ route('cutting-plan.users') }}",
                 data: "{{ route('cutting-plan.data') }}",
                 export: "{{ route('cutting-plan.export') }}",
+                bulkDestroy: "{{ route('cutting-plan.bulk-destroy') }}",
                 update: "{{ route('cutting-plan.update', '__ID__') }}",
                 destroy: "{{ route('cutting-plan.destroy', '__ID__') }}"
             }

@@ -77,6 +77,7 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::get('/export', [CuttingPlanController::class, 'export'])->name('cutting-plan.export');
         Route::post('/', [CuttingPlanController::class, 'store'])->name('cutting-plan.store');
         Route::put('/{cuttingPlan}', [CuttingPlanController::class, 'update'])->name('cutting-plan.update');
+        Route::delete('/bulk-destroy', [CuttingPlanController::class, 'bulkDestroy'])->name('cutting-plan.bulk-destroy');
         Route::delete('/{cuttingPlan}', [CuttingPlanController::class, 'destroy'])->name('cutting-plan.destroy');
         Route::get('/users', [CuttingPlanController::class, 'users'])->name('cutting-plan.users');
         Route::get('/materials', [CuttingPlanController::class, 'materials'])->name('cutting-plan.materials');

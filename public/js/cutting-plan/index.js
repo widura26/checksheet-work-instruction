@@ -153,21 +153,22 @@ $(function() {
         responsive: false,
         columnDefs: [
             { targets: 0,  width: '40px',  minWidth: '40px'  },
-            { targets: 1,  width: '100px', minWidth: '100px' },
-            { targets: 2,  width: '120px', minWidth: '120px' },
-            { targets: 3,  width: '130px', minWidth: '130px' },
-            { targets: 4,  width: '100px', minWidth: '100px' },
-            { targets: 5,  width: '110px', minWidth: '110px' },
-            { targets: 6,  width: '80px',  minWidth: '80px'  },
-            { targets: 7,  width: '120px', minWidth: '120px' },
-            { targets: 8,  width: '100px', minWidth: '100px' },
-            { targets: 9,  width: '80px',  minWidth: '80px'  },
-            { targets: 10, width: '160px', minWidth: '160px' },
-            { targets: 11, width: '110px', minWidth: '110px' },
+            { targets: 1,  width: '40px',  minWidth: '40px'  },
+            { targets: 2,  width: '100px', minWidth: '100px' },
+            { targets: 3,  width: '120px', minWidth: '120px' },
+            { targets: 4,  width: '130px', minWidth: '130px' },
+            { targets: 5,  width: '100px', minWidth: '100px' },
+            { targets: 6,  width: '110px', minWidth: '110px' },
+            { targets: 7,  width: '80px',  minWidth: '80px'  },
+            { targets: 8,  width: '120px', minWidth: '120px' },
+            { targets: 9,  width: '100px', minWidth: '100px' },
+            { targets: 10, width: '80px',  minWidth: '80px'  },
+            { targets: 11, width: '160px', minWidth: '160px' },
             { targets: 12, width: '110px', minWidth: '110px' },
             { targets: 13, width: '110px', minWidth: '110px' },
             { targets: 14, width: '110px', minWidth: '110px' },
-            { targets: 15, width: '80px',  minWidth: '80px'  },
+            { targets: 15, width: '110px', minWidth: '110px' },
+            { targets: 16, width: '80px',  minWidth: '80px'  },
         ],
         ajax: function(data, callback, settings) {
             $.get(CP.routes.data, {
@@ -184,6 +185,16 @@ $(function() {
             });
         },
         columns: [{
+                data: null,
+                name: 'checkbox',
+                orderable: false,
+                searchable: false,
+                className: 'text-center',
+                render: function(data, type, row) {
+                    return '<input type="checkbox" class="row-select" value="' + row.id + '">';
+                }
+            },
+            {
                 data: null,
                 name: 'DT_RowIndex',
                 orderable: false,
@@ -318,7 +329,10 @@ $(function() {
     (function() {
         var $menu = $('#columnToggleMenu');
         var fixedTitles = ['No', 'Aksi'];
+        var initCols = table.settings().init().columns;
         table.columns().every(function(idx) {
+            var name = initCols[idx] ? initCols[idx].name : null;
+            if (name === 'DT_RowIndex' || name === 'aksi' || name === 'checkbox') return;
             var title = $(this.header()).text().trim();
             if (fixedTitles.indexOf(title) !== -1) return;
             var $li = $(
@@ -343,7 +357,7 @@ $(function() {
         table.columns().every(function(idx) {
             if (!this.visible()) return;
             var name = initCols[idx] ? initCols[idx].name : null;
-            if (name === 'DT_RowIndex' || name === 'aksi') return;
+            if (name === 'DT_RowIndex' || name === 'aksi' || name === 'checkbox') return;
             if (name) keys.push(name);
         });
 
@@ -361,6 +375,69 @@ $(function() {
             $form.append($('<input type="hidden" name="search">').val(searchVal));
         }
         $form.appendTo('body').trigger('submit').remove();
+    });
+
+    /* Checklist: pilih semua / individual (kolom untuk hapus massal) */
+    function updateBulkDeleteButton() {
+        var count = $('.row-select:checked').length;
+        $('#selectedCount').text(count);
+        if (count >= 2) {
+            $('#btnBulkDelete').removeClass('d-none');
+        } else {
+            $('#btnBulkDelete').addClass('d-none');
+        }
+    }
+
+    $(document).on('change', '#selectAll', function() {
+        $('.row-select').prop('checked', this.checked);
+        updateBulkDeleteButton();
+    });
+    $('#cutting-plan-table').on('change', '.row-select', function() {
+        var total = $('.row-select').length;
+        var checked = $('.row-select:checked').length;
+        $('#selectAll').prop('checked', total > 0 && total === checked);
+        updateBulkDeleteButton();
+    });
+
+    /* Hapus massal */
+    $('#btnBulkDelete').on('click', function() {
+        var ids = $('.row-select:checked').map(function() {
+            return this.value;
+        }).get();
+
+        if (ids.length < 2) return;
+
+        Swal.fire({
+            title: 'Hapus ' + ids.length + ' data?',
+            text: 'Data terpilih akan dihapus secara permanen!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then(function(result) {
+            if (!result.isConfirmed) return;
+            $.ajax({
+                url: CP.routes.bulkDestroy,
+                type: 'DELETE',
+                data: {
+                    ids: ids
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function() {
+                    Swal.fire('Terhapus!', 'Data terpilih berhasil dihapus.', 'success');
+                    $('#selectAll').prop('checked', false);
+                    $('#btnBulkDelete').addClass('d-none');
+                    table.ajax.reload();
+                },
+                error: function() {
+                    Swal.fire('Gagal!', 'Terjadi kesalahan saat menghapus data.', 'error');
+                }
+            });
+        });
     });
 
     var modal = new coreui.Modal(document.getElementById('formModal'));

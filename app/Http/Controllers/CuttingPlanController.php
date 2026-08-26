@@ -297,6 +297,19 @@ class CuttingPlanController extends Controller
         return response()->json(['success' => true, 'message' => 'Data berhasil dihapus.']);
     }
 
+    public function bulkDestroy(Request $request)
+    {
+        $ids = array_values(array_filter((array) $request->input('ids', []), fn ($id) => is_numeric($id)));
+
+        if (empty($ids)) {
+            return response()->json(['success' => false, 'message' => 'Tidak ada data yang dipilih.'], 422);
+        }
+
+        CuttingPlan::whereIn('id', $ids)->delete();
+
+        return response()->json(['success' => true, 'message' => 'Data terpilih berhasil dihapus.']);
+    }
+
     public function users(Request $request)
     {
         $search = $request->get('q', '');
