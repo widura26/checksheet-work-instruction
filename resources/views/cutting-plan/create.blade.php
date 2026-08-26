@@ -10,7 +10,7 @@
                 <small class="text-body-secondary">Form input data Cutting Plan (CP)</small>
             </div>
             <a href="{{ route('cutting-plan.index') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left me-1"></i> Kembali
+                <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M23.312 11.25h-19.558l4.5-4.5-1.061-1.061-6.31 6.31 6.31 6.31 1.061-1.061-4.5-4.5h19.558v-1.5z"></path></svg> Kembali
             </a>
         </div>
         <div class="card-body">
@@ -137,7 +137,7 @@
                     '<td><input type="text" class="form-control form-control-sm" name="pieceparts[' + index + '][qty_lot]" value="' + (data.qty_lot ?? '') + '"></td>' +
                     '<td><input type="text" class="form-control form-control-sm" name="pieceparts[' + index + '][part_name]" value="' + (data.part_name ?? '') + '"></td>' +
                     '<td><input type="text" class="form-control form-control-sm" name="pieceparts[' + index + '][remark]" value="' + (data.remark ?? '') + '"></td>' +
-                    '<td class="text-center"><button type="button" class="btn btn-danger btn-sm btn-remove-piecepart"><i class="fas fa-trash"></i></button></td>' +
+                    '<td class="text-center"><button type="button" class="btn btn-danger btn-sm btn-remove-piecepart"><svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M4.5 22.125c-0 0.003-0 0.006-0 0.008 0 0.613 0.494 1.11 1.105 1.116h12.79c0.612-0.006 1.105-0.504 1.105-1.117 0-0.003-0-0.006-0-0.009v0-15h-15zM6 8.625h12v13.125h-12z"></path><path d="M7.875 10.125h1.5v9.375h-1.5v-9.375z"></path><path d="M11.25 10.125h1.5v9.375h-1.5v-9.375z"></path><path d="M14.625 10.125h1.5v9.375h-1.5v-9.375z"></path><path d="M15.375 4.125v-2.25c0-0.631-0.445-1.125-1.013-1.125h-4.725c-0.568 0-1.013 0.494-1.013 1.125v2.25h-5.625v1.5h18v-1.5zM10.125 2.25h3.75v1.875h-3.75z"></path></svg></button></td>' +
                     '</tr>';
             };
 

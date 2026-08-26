@@ -89,7 +89,7 @@
     <div class="grid-full d-flex justify-content-between align-items-center mb-2">
         <h6 class="text-primary fw-bold mb-0">Pieceparts</h6>
         <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddPiecepart">
-            <i class="fas fa-plus me-1"></i> Tambah Piecepart
+            <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"></path></svg> Tambah Piecepart
         </button>
     </div>
     <div class="grid-full table-responsive mb-1">
