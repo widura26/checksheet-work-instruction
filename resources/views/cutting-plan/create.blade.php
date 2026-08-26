@@ -30,59 +30,102 @@
 @push('js')
     <script type="module">
         $(function() {
-            var materialResults = [];
+            function initCombobox(opts) {
+                var $input = $(opts.input);
+                var $hidden = $(opts.hidden);
+                var $dropdown = $(opts.dropdown);
+                var $wrapper = $hidden.closest('.mat-combobox');
+                var results = [];
 
-            function renderMaterialDropdown(results) {
-                materialResults = results || [];
-                var html = '';
-                if (!materialResults.length) {
-                    html = '<div class="dropdown-item text-muted disabled">Tidak ada hasil</div>';
-                } else {
-                    $.each(materialResults, function(i, m) {
-                        html += '<button type="button" class="dropdown-item" data-id="' + m.id +
-                            '">' + m.text + '</button>';
+                function render(rs) {
+                    results = rs || [];
+                    var html = '';
+                    if (!results.length) {
+                        html = '<div class="dropdown-item text-muted disabled">Tidak ada hasil</div>';
+                    } else {
+                        $.each(results, function(i, m) {
+                            html += '<button type="button" class="dropdown-item" data-id="' + m.id +
+                                '">' + m.text + '</button>';
+                        });
+                    }
+                    $dropdown.html(html).addClass('show');
+                }
+
+                function search(q) {
+                    $.get(opts.url, {
+                        q: q || ''
+                    }, function(data) {
+                        render(data.results || []);
                     });
                 }
-                $('#mat_dropdown').html(html).addClass('show');
-            }
 
-            function searchMaterials(q) {
-                $.get("{{ route('cutting-plan.materials') }}", {
-                    q: q || ''
-                }, function(data) {
-                    renderMaterialDropdown(data.results || []);
+                var timer;
+                $input.on('input', function() {
+                    $hidden.val('');
+                    clearTimeout(timer);
+                    var val = $(this).val();
+                    timer = setTimeout(function() {
+                        search(val);
+                    }, 250);
+                }).on('focus', function() {
+                    if (!$dropdown.hasClass('show')) {
+                        search($input.val());
+                    }
+                });
+
+                $dropdown.on('click', '.dropdown-item', function() {
+                    if ($(this).hasClass('disabled')) return;
+                    var id = $(this).data('id');
+                    var found = results.find(function(m) {
+                        return String(m.id) === String(id);
+                    });
+                    $input.val(found ? found.text : '');
+                    $hidden.val(id);
+                    $dropdown.removeClass('show');
+                });
+
+                $(document).on('click', function(e) {
+                    if (!$(e.target).closest($wrapper).length) {
+                        $dropdown.removeClass('show');
+                    }
                 });
             }
 
-            var matSearchTimer;
-            $('#mat_search').on('input', function() {
-                $('#mat').val('');
-                clearTimeout(matSearchTimer);
-                var val = $(this).val();
-                matSearchTimer = setTimeout(function() {
-                    searchMaterials(val);
-                }, 250);
-            }).on('focus', function() {
-                if (!$('#mat_dropdown').hasClass('show')) {
-                    searchMaterials($(this).val());
-                }
+            initCombobox({
+                input: '#mat_search',
+                hidden: '#mat',
+                dropdown: '#mat_dropdown',
+                url: "{{ route('cutting-plan.materials') }}"
             });
-
-            $('#mat_dropdown').on('click', '.dropdown-item', function() {
-                if ($(this).hasClass('disabled')) return;
-                var id = $(this).data('id');
-                var found = materialResults.find(function(m) {
-                    return String(m.id) === String(id);
-                });
-                $('#mat_search').val(found ? found.text : '');
-                $('#mat').val(id);
-                $('#mat_dropdown').removeClass('show');
+            initCombobox({
+                input: '#kode_proyek_search',
+                hidden: '#kode_proyek',
+                dropdown: '#kode_proyek_dropdown',
+                url: "{{ route('cutting-plan.projects') }}"
             });
-
-            $(document).on('click', function(e) {
-                if (!$(e.target).closest('.mat-combobox').length) {
-                    $('#mat_dropdown').removeClass('show');
-                }
+            initCombobox({
+                input: '#cutting_method_search',
+                hidden: '#cutting_method',
+                dropdown: '#cutting_method_dropdown',
+                url: "{{ route('cutting-plan.processes') }}"
+            });
+            initCombobox({
+                input: '#prepared_by_search',
+                hidden: '#prepared_by',
+                dropdown: '#prepared_by_dropdown',
+                url: "{{ route('cutting-plan.users') }}"
+            });
+            initCombobox({
+                input: '#approved_by_search',
+                hidden: '#approved_by',
+                dropdown: '#approved_by_dropdown',
+                url: "{{ route('cutting-plan.users') }}"
+            });
+            initCombobox({
+                input: '#date_operator_search',
+                hidden: '#date_operator',
+                dropdown: '#date_operator_dropdown',
+                url: "{{ route('cutting-plan.users') }}"
             });
 
             var piecepartTemplate = function(index, data) {
@@ -121,17 +164,6 @@
                 $(this).closest('tr').remove();
                 reindexPieceparts();
             });
-
-            function loadUsers() {
-                $.get("{{ route('cutting-plan.users') }}", function(users) {
-                    var opts = '<option value="">-- Pilih --</option>';
-                    $.each(users, function(i, u) {
-                        opts += '<option value="' + u.id + '">' + u.name + '</option>';
-                    });
-                    $('#prepared_by, #approved_by, #date_operator').html(opts);
-                });
-            }
-            loadUsers();
 
             addPiecepart();
 

@@ -50,12 +50,19 @@ class CuttingPlanController extends Controller
             ->leftJoin('processes', 'cutting_plans.process_id', '=', 'processes.id')
             ->leftJoin('materials', 'cutting_plans.material_id', '=', 'materials.id')
             ->leftJoin('bpms', 'cutting_plans.bpm_id', '=', 'bpms.id')
+            ->leftJoin('users as u_prepared', 'cutting_plans.prepared_by', '=', 'u_prepared.id')
+            ->leftJoin('users as u_approved', 'cutting_plans.approved_by', '=', 'u_approved.id')
+            ->leftJoin('users as u_operator', 'cutting_plans.date_operator', '=', 'u_operator.id')
             ->select(
                 'cutting_plans.*',
                 'projects.project_id as kode_proyek',
+                'projects.name_project as project_name',
                 'processes.nama as cutting_method',
                 'bpms.no_bpm as bpm_number',
                 'materials.kode_material as mat',
+                'u_prepared.name as prepared_by_name',
+                'u_approved.name as approved_by_name',
+                'u_operator.name as date_operator_name',
                 DB::raw('NULL as date_of_bpm')
             )
             ->addSelect('cutting_plans.process_id');
@@ -216,11 +223,73 @@ class CuttingPlanController extends Controller
         return response()->json(['success' => true, 'message' => 'Data berhasil dihapus.']);
     }
 
-    public function users()
+    public function users(Request $request)
     {
-        $users = \App\Models\User::select('id', 'name')->orderBy('name')->get();
+        $search = $request->get('q', '');
 
-        return response()->json($users);
+        $query = \App\Models\User::query();
+
+        if ($search !== '') {
+            $query->where('name', 'LIKE', "%{$search}%");
+        }
+
+        $users = $query->select('id', 'name')->orderBy('name')->limit(50)->get();
+
+        $results = $users->map(function ($u) {
+            return [
+                'id' => $u->id,
+                'text' => $u->name,
+            ];
+        });
+
+        return response()->json(['results' => $results]);
+    }
+
+    public function projects(Request $request)
+    {
+        $search = $request->get('q', '');
+
+        $query = Project::query();
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('project_id', 'LIKE', "%{$search}%")
+                    ->orWhere('name_project', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $items = $query->orderBy('project_id')->limit(20)->get(['project_id', 'name_project']);
+
+        $results = $items->map(function ($p) {
+            return [
+                'id' => $p->project_id,
+                'text' => $p->project_id . ' - ' . $p->name_project,
+            ];
+        });
+
+        return response()->json(['results' => $results]);
+    }
+
+    public function processes(Request $request)
+    {
+        $search = $request->get('q', '');
+
+        $query = Proses::query();
+
+        if ($search !== '') {
+            $query->where('nama', 'LIKE', "%{$search}%");
+        }
+
+        $items = $query->orderBy('nama')->limit(20)->get(['id', 'nama']);
+
+        $results = $items->map(function ($p) {
+            return [
+                'id' => $p->id,
+                'text' => $p->nama,
+            ];
+        });
+
+        return response()->json(['results' => $results]);
     }
 
     public function materials(Request $request)

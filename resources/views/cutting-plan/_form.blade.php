@@ -52,13 +52,12 @@
         </div>
     </div>
     <div>
-        <label for="kode_proyek" class="form-label">Kode Proyek</label>
-        <select class="form-select" name="project_id" id="kode_proyek">
-            <option value="">-- Pilih --</option>
-            @foreach ($projects as $project)
-                <option value="{{ $project->project_id }}">{{ $project->name_project }}</option>
-            @endforeach
-        </select>
+        <label for="kode_proyek_search" class="form-label">Kode Proyek</label>
+        <div class="position-relative mat-combobox">
+            <input type="text" class="form-control" id="kode_proyek_search" name="kode_proyek_search" placeholder="Cari Kode Proyek..." autocomplete="off">
+            <input type="hidden" name="project_id" id="kode_proyek">
+            <div class="dropdown-menu w-100" id="kode_proyek_dropdown" style="max-height: 240px; overflow-y: auto;"></div>
+        </div>
     </div>
     <div>
         <label for="wbs" class="form-label">WBS</label>
@@ -73,13 +72,12 @@
         <input type="number" class="form-control" name="quantity" id="quantity">
     </div>
     <div>
-        <label for="cutting_method" class="form-label">Cutting Method</label>
-        <select class="form-select" name="process_id" id="cutting_method">
-            <option value="">-- Pilih --</option>
-            @foreach ($processes as $item)
-                <option value="{{ $item->id }}">{{ $item->nama }}</option>
-            @endforeach
-        </select>
+        <label for="cutting_method_search" class="form-label">Cutting Method</label>
+        <div class="position-relative mat-combobox">
+            <input type="text" class="form-control" id="cutting_method_search" name="cutting_method_search" placeholder="Cari Cutting Method..." autocomplete="off">
+            <input type="hidden" name="process_id" id="cutting_method">
+            <div class="dropdown-menu w-100" id="cutting_method_dropdown" style="max-height: 240px; overflow-y: auto;"></div>
+        </div>
     </div>
     <div>
         <label for="sketch" class="form-label">Sket</label>
@@ -136,21 +134,27 @@
         <input type="date" class="form-control" name="date_of_bpm" id="date_of_bpm">
     </div>
     <div>
-        <label for="prepared_by" class="form-label">Prepared By</label>
-        <select class="form-select" name="prepared_by" id="prepared_by">
-            <option value="">-- Pilih --</option>
-        </select>
+        <label for="prepared_by_search" class="form-label">Prepared By</label>
+        <div class="position-relative mat-combobox">
+            <input type="text" class="form-control" id="prepared_by_search" name="prepared_by_search" placeholder="Cari User..." autocomplete="off">
+            <input type="hidden" name="prepared_by" id="prepared_by">
+            <div class="dropdown-menu w-100" id="prepared_by_dropdown" style="max-height: 240px; overflow-y: auto;"></div>
+        </div>
     </div>
     <div>
-        <label for="approved_by" class="form-label">Approve By</label>
-        <select class="form-select" name="approved_by" id="approved_by">
-            <option value="">-- Pilih --</option>
-        </select>
+        <label for="approved_by_search" class="form-label">Approve By</label>
+        <div class="position-relative mat-combobox">
+            <input type="text" class="form-control" id="approved_by_search" name="approved_by_search" placeholder="Cari User..." autocomplete="off">
+            <input type="hidden" name="approved_by" id="approved_by">
+            <div class="dropdown-menu w-100" id="approved_by_dropdown" style="max-height: 240px; overflow-y: auto;"></div>
+        </div>
     </div>
     <div>
-        <label for="date_operator" class="form-label">Date Operator</label>
-        <select class="form-select" name="date_operator" id="date_operator">
-            <option value="">-- Pilih --</option>
-        </select>
+        <label for="date_operator_search" class="form-label">Date Operator</label>
+        <div class="position-relative mat-combobox">
+            <input type="text" class="form-control" id="date_operator_search" name="date_operator_search" placeholder="Cari User..." autocomplete="off">
+            <input type="hidden" name="date_operator" id="date_operator">
+            <div class="dropdown-menu w-100" id="date_operator_dropdown" style="max-height: 240px; overflow-y: auto;"></div>
+        </div>
     </div>
 </div>

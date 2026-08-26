@@ -80,59 +80,102 @@
 @push('js')
     <script type="module">
         $(function() {
-            var materialResults = [];
+            function initCombobox(opts) {
+                var $input = $(opts.input);
+                var $hidden = $(opts.hidden);
+                var $dropdown = $(opts.dropdown);
+                var $wrapper = $hidden.closest('.mat-combobox');
+                var results = [];
 
-            function renderMaterialDropdown(results) {
-                materialResults = results || [];
-                var html = '';
-                if (!materialResults.length) {
-                    html = '<div class="dropdown-item text-muted disabled">Tidak ada hasil</div>';
-                } else {
-                    $.each(materialResults, function(i, m) {
-                        html += '<button type="button" class="dropdown-item" data-id="' + m.id +
-                            '">' + m.text + '</button>';
+                function render(rs) {
+                    results = rs || [];
+                    var html = '';
+                    if (!results.length) {
+                        html = '<div class="dropdown-item text-muted disabled">Tidak ada hasil</div>';
+                    } else {
+                        $.each(results, function(i, m) {
+                            html += '<button type="button" class="dropdown-item" data-id="' + m.id +
+                                '">' + m.text + '</button>';
+                        });
+                    }
+                    $dropdown.html(html).addClass('show');
+                }
+
+                function search(q) {
+                    $.get(opts.url, {
+                        q: q || ''
+                    }, function(data) {
+                        render(data.results || []);
                     });
                 }
-                $('#mat_dropdown').html(html).addClass('show');
-            }
 
-            function searchMaterials(q) {
-                $.get("{{ route('cutting-plan.materials') }}", {
-                    q: q || ''
-                }, function(data) {
-                    renderMaterialDropdown(data.results || []);
+                var timer;
+                $input.on('input', function() {
+                    $hidden.val('');
+                    clearTimeout(timer);
+                    var val = $(this).val();
+                    timer = setTimeout(function() {
+                        search(val);
+                    }, 250);
+                }).on('focus', function() {
+                    if (!$dropdown.hasClass('show')) {
+                        search($input.val());
+                    }
+                });
+
+                $dropdown.on('click', '.dropdown-item', function() {
+                    if ($(this).hasClass('disabled')) return;
+                    var id = $(this).data('id');
+                    var found = results.find(function(m) {
+                        return String(m.id) === String(id);
+                    });
+                    $input.val(found ? found.text : '');
+                    $hidden.val(id);
+                    $dropdown.removeClass('show');
+                });
+
+                $(document).on('click', function(e) {
+                    if (!$(e.target).closest($wrapper).length) {
+                        $dropdown.removeClass('show');
+                    }
                 });
             }
 
-            var matSearchTimer;
-            $('#mat_search').on('input', function() {
-                $('#mat').val('');
-                clearTimeout(matSearchTimer);
-                var val = $(this).val();
-                matSearchTimer = setTimeout(function() {
-                    searchMaterials(val);
-                }, 250);
-            }).on('focus', function() {
-                if (!$('#mat_dropdown').hasClass('show')) {
-                    searchMaterials($(this).val());
-                }
+            initCombobox({
+                input: '#mat_search',
+                hidden: '#mat',
+                dropdown: '#mat_dropdown',
+                url: "{{ route('cutting-plan.materials') }}"
             });
-
-            $('#mat_dropdown').on('click', '.dropdown-item', function() {
-                if ($(this).hasClass('disabled')) return;
-                var id = $(this).data('id');
-                var found = materialResults.find(function(m) {
-                    return String(m.id) === String(id);
-                });
-                $('#mat_search').val(found ? found.text : '');
-                $('#mat').val(id);
-                $('#mat_dropdown').removeClass('show');
+            initCombobox({
+                input: '#kode_proyek_search',
+                hidden: '#kode_proyek',
+                dropdown: '#kode_proyek_dropdown',
+                url: "{{ route('cutting-plan.projects') }}"
             });
-
-            $(document).on('click', function(e) {
-                if (!$(e.target).closest('.mat-combobox').length) {
-                    $('#mat_dropdown').removeClass('show');
-                }
+            initCombobox({
+                input: '#cutting_method_search',
+                hidden: '#cutting_method',
+                dropdown: '#cutting_method_dropdown',
+                url: "{{ route('cutting-plan.processes') }}"
+            });
+            initCombobox({
+                input: '#prepared_by_search',
+                hidden: '#prepared_by',
+                dropdown: '#prepared_by_dropdown',
+                url: "{{ route('cutting-plan.users') }}"
+            });
+            initCombobox({
+                input: '#approved_by_search',
+                hidden: '#approved_by',
+                dropdown: '#approved_by_dropdown',
+                url: "{{ route('cutting-plan.users') }}"
+            });
+            initCombobox({
+                input: '#date_operator_search',
+                hidden: '#date_operator',
+                dropdown: '#date_operator_dropdown',
+                url: "{{ route('cutting-plan.users') }}"
             });
 
             var piecepartTemplate = function(index, data) {
@@ -171,17 +214,6 @@
                 $(this).closest('tr').remove();
                 reindexPieceparts();
             });
-
-            function loadUsers() {
-                $.get("{{ route('cutting-plan.users') }}", function(users) {
-                    var opts = '<option value="">-- Pilih --</option>';
-                    $.each(users, function(i, u) {
-                        opts += '<option value="' + u.id + '">' + u.name + '</option>';
-                    });
-                    $('#prepared_by, #approved_by, #date_operator').html(opts);
-                });
-            }
-            loadUsers();
 
             var table = $('#cutting-plan-table').DataTable({
                 processing: true,
@@ -352,20 +384,45 @@
                     $('#mat').val(row.material_id);
                     $('#mat_search').val(row.mat);
                 }
-                $('#kode_proyek').val(row.kode_proyek);
+                $('#kode_proyek').val('');
+                $('#kode_proyek_search').val('');
+                if (row.kode_proyek) {
+                    $('#kode_proyek').val(row.kode_proyek);
+                    $('#kode_proyek_search').val(row.project_name || row.kode_proyek);
+                }
                 $('#wbs').val(row.wbs);
                 $('#material_size').val(row.material_size);
                 $('#quantity').val(row.quantity);
-                $('#cutting_method').val(row.process_id);
+                $('#cutting_method').val('');
+                $('#cutting_method_search').val('');
+                if (row.process_id) {
+                    $('#cutting_method').val(row.process_id);
+                    $('#cutting_method_search').val(row.cutting_method);
+                }
                 $('#sketch').val(row.sketch);
                 $('#special_instruction').val(row.special_instruction);
                 $('#date_issued').val((row.date_issued || '').toString().substring(0, 10));
                 $('#date_revised').val((row.date_revised || '').toString().substring(0, 10));
                 $('#bpm_number').val(row.bpm_number);
                 $('#date_of_bpm').val((row.date_of_bpm || '').toString().substring(0, 10));
-                $('#prepared_by').val(row.prepared_by);
-                $('#approved_by').val(row.approved_by);
-                $('#date_operator').val(row.date_operator);
+                $('#prepared_by').val('');
+                $('#prepared_by_search').val('');
+                if (row.prepared_by) {
+                    $('#prepared_by').val(row.prepared_by);
+                    $('#prepared_by_search').val(row.prepared_by_name || '');
+                }
+                $('#approved_by').val('');
+                $('#approved_by_search').val('');
+                if (row.approved_by) {
+                    $('#approved_by').val(row.approved_by);
+                    $('#approved_by_search').val(row.approved_by_name || '');
+                }
+                $('#date_operator').val('');
+                $('#date_operator_search').val('');
+                if (row.date_operator) {
+                    $('#date_operator').val(row.date_operator);
+                    $('#date_operator_search').val(row.date_operator_name || '');
+                }
 
                 $('#piecepartsList').empty();
                 if (Array.isArray(row.pieceparts) && row.pieceparts.length) {

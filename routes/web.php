@@ -79,6 +79,8 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::delete('/{cuttingPlan}', [CuttingPlanController::class, 'destroy'])->name('cutting-plan.destroy');
         Route::get('/users', [CuttingPlanController::class, 'users'])->name('cutting-plan.users');
         Route::get('/materials', [CuttingPlanController::class, 'materials'])->name('cutting-plan.materials');
+        Route::get('/projects', [CuttingPlanController::class, 'projects'])->name('cutting-plan.projects');
+        Route::get('/processes', [CuttingPlanController::class, 'processes'])->name('cutting-plan.processes');
     });
 
     Route::prefix('work-instruction')->group(function () {
