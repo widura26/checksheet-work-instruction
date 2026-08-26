@@ -20,20 +20,20 @@
 
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <input type="text" id="id_wi_trn_bpm_filter" class="form-control" placeholder="Filter Kode Material">
+                    <input type="text" id="kode_material_filter" class="form-control" placeholder="Filter Kode Material">
                 </div>
                 <div class="col-md-6">
-                    <input type="text" id="spec_filter" class="form-control" placeholder="Filter Spesifikasi">
+                    <input type="text" id="deskripsi_filter" class="form-control" placeholder="Filter Deskripsi">
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col-12">
                     <button id="filter-button" class="btn btn-primary">
-                        <i class="fas fa-filter me-1"></i>
+                        <svg class="icon me-1"><use xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-filter') }}"></use></svg>
                         Filter
                     </button>
                     <button id="reset-filter-button" class="btn btn-secondary">
-                        <i class="fas fa-undo me-1"></i>
+                        <svg class="icon me-1"><use xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-sync') }}"></use></svg>
                         Reset
                     </button>
                 </div>
@@ -45,9 +45,9 @@
                         <tr>
                             <th>No</th>
                             <th>Kode Material</th>
+                            <th>Deskripsi</th>
                             <th>Spesifikasi</th>
-                            <th>Keterangan</th>
-                            <th>User</th>
+                            <th>Satuan</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -70,8 +70,8 @@
                 ajax: {
                     url: "{{ route('kode-material.data') }}",
                     data: function(d) {
-                        d.id_wi_trn_bpm = $('#id_wi_trn_bpm_filter').val();
-                        d.spec = $('#spec_filter').val();
+                        d.kode_material = $('#kode_material_filter').val();
+                        d.deskripsi = $('#deskripsi_filter').val();
                     }
                 },
                 columns: [{
@@ -82,20 +82,20 @@
                         className: 'text-center'
                     },
                     {
-                        data: 'id_wi_trn_bpm',
-                        name: 'id_wi_trn_bpm'
+                        data: 'kode_material',
+                        name: 'kode_material'
                     },
                     {
-                        data: 'spec',
-                        name: 'spec'
+                        data: 'deskripsi',
+                        name: 'deskripsi'
                     },
                     {
-                        data: 'ket',
-                        name: 'ket'
+                        data: 'spesifikasi',
+                        name: 'spesifikasi'
                     },
                     {
-                        data: 'user',
-                        name: 'user',
+                        data: 'satuan',
+                        name: 'satuan',
                         className: 'text-center'
                     },
                     {
@@ -116,8 +116,8 @@
             });
 
             $('#reset-filter-button').click(function() {
-                $('#id_wi_trn_bpm_filter').val('');
-                $('#spec_filter').val('');
+                $('#kode_material_filter').val('');
+                $('#deskripsi_filter').val('');
                 table.ajax.reload();
             });
 

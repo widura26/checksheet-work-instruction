@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\WiTrnBpm;
+use App\Models\Material;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -19,23 +19,18 @@ class KodeMaterialController extends Controller
             abort(404);
         }
 
-        $query = WiTrnBpm::with('user')->select([
-            'id', 'id_wi_trn_bpm', 'spec', 'ket', 'user_id',
-        ]);
+        $query = Material::query();
 
-        if ($request->filled('id_wi_trn_bpm')) {
-            $query->where('id_wi_trn_bpm', 'LIKE', '%' . $request->id_wi_trn_bpm . '%');
+        if ($request->filled('kode_material')) {
+            $query->where('kode_material', 'LIKE', '%' . $request->kode_material . '%');
         }
 
-        if ($request->filled('spec')) {
-            $query->where('spec', 'LIKE', '%' . $request->spec . '%');
+        if ($request->filled('deskripsi')) {
+            $query->where('deskripsi', 'LIKE', '%' . $request->deskripsi . '%');
         }
 
         return DataTables::of($query)
             ->addIndexColumn()
-            ->addColumn('user', function ($row) {
-                return $row->user?->name ?? '-';
-            })
             ->addColumn('action', function ($row) {
                 $edit = '<a href="' . route('kode-material.edit', $row->id) . '" '
                     . 'class="btn btn-warning btn-sm text-white" title="Edit">'
@@ -55,19 +50,20 @@ class KodeMaterialController extends Controller
 
     public function edit($id)
     {
-        $kodeMaterial = WiTrnBpm::findOrFail($id);
+        $kodeMaterial = Material::findOrFail($id);
 
         return view('master.kode-material.edit', compact('kodeMaterial'));
     }
 
     public function update(Request $request, $id)
     {
-        $kodeMaterial = WiTrnBpm::findOrFail($id);
+        $kodeMaterial = Material::findOrFail($id);
 
         $validated = $request->validate([
-            'id_wi_trn_bpm' => 'required|string|max:255',
-            'spec' => 'nullable|string',
-            'ket' => 'nullable|string',
+            'kode_material' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'spesifikasi' => 'nullable|string',
+            'satuan' => 'nullable|string',
         ]);
 
         $kodeMaterial->update($validated);
@@ -78,7 +74,7 @@ class KodeMaterialController extends Controller
 
     public function destroy($id)
     {
-        $kodeMaterial = WiTrnBpm::findOrFail($id);
+        $kodeMaterial = Material::findOrFail($id);
         $kodeMaterial->delete();
 
         return response()->json([
