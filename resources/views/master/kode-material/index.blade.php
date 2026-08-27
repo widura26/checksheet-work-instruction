@@ -84,7 +84,7 @@
     <script type="module">
         $(document).ready(function() {
             var table = $('#table-kode-material').DataTable({
-                processing: true,
+                processing: false,
                 serverSide: true,
                 responsive: true,
                 info: false,

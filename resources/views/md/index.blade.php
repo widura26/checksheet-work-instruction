@@ -4,10 +4,9 @@
 
 @section('content')
     <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="p-3 d-flex justify-content-between align-items-center">
             <div>
                 <h5 class="card-title mb-0">Data Manufacture Drawing</h5>
-                <small class="text-body-secondary">Kelola data Manufacture Drawing (MDR)</small>
             </div>
             <button type="button" class="btn btn-primary" id="btnTambah" data-coreui-toggle="modal"
                 data-coreui-target="#formModal">
@@ -121,7 +120,7 @@
     <script type="module">
         $(function() {
             var table = $('#md-table').DataTable({
-                processing: true,
+                processing: false,
                 serverSide: true,
                 responsive: true,
                 ajax: function(data, callback, settings) {

@@ -110,7 +110,7 @@
         });
         $(function() {
             $('#projects-table').DataTable({
-                processing: true,
+                processing: false,
                 serverSide: true,
                 responsive: true,
                 ajax: '{{ route('projects.data') }}',
