@@ -91,17 +91,20 @@
                             @enderror
                         </div>
                         <div class="mb-3">
-                            <label for="role" class="form-label">Role</label>
-                            <select class="form-select @error('role') is-invalid @enderror" id="role" name="role"
-                                required>
-                                <option value="" disabled selected>Pilih Role</option>
+                            <label class="form-label">Role</label>
+                            <div id="create_roles_list">
                                 @foreach ($roles as $role)
-                                    <option value="{{ $role->name }}" {{ old('role') == $role->name ? 'selected' : '' }}>
-                                        {{ $role->name }}</option>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="role[]"
+                                            value="{{ $role->name }}" id="create_role_{{ $role->id }}"
+                                            {{ (is_array(old('role')) && in_array($role->name, old('role'))) ? 'checked' : '' }}>
+                                        <label class="form-check-label"
+                                            for="create_role_{{ $role->id }}">{{ $role->name }}</label>
+                                    </div>
                                 @endforeach
-                            </select>
+                            </div>
                             @error('role')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
                     </div>

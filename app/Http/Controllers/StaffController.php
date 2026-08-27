@@ -15,7 +15,7 @@ class StaffController extends Controller
     }
     public function index()
     {
-        $roles = Role::where('name', '<>', 'admin')->get();
+        $roles = Role::all();
 
         return view('pages.staff.index', compact('roles'));
     }
@@ -86,7 +86,8 @@ class StaffController extends Controller
             'email' => 'required|email|unique:users',
             'nip' => 'required|unique:users|min:9',
             'password' => 'required|string|min:6',
-            'role' => 'required|exists:roles,name',
+            'role' => 'required|array',
+            'role.*' => 'exists:roles,name',
         ]);
 
         $user = User::create([
@@ -96,7 +97,7 @@ class StaffController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        $user->assignRole($request->role);
+        $user->syncRoles($request->role);
 
         return redirect()->route('staff.index')->with('success', 'Staff berhasil dibuat.');
     }
