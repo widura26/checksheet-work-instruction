@@ -1,9 +1,30 @@
 @extends('layouts.app')
 
-@section('title', 'Proses')
+@section('title', 'Kode Proses')
+
+@push('css')
+    <style>
+        .dataTables_wrapper {
+            overflow-x: auto;
+        }
+
+        #table-proses {
+            width: 100% !important;
+        }
+
+        .icon {
+            vertical-align: middle;
+        }
+    </style>
+@endpush
 
 @section('content')
     <div class="card mb-4">
+        <div class="p-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h5 class="card-title mb-0">Kode Proses</h5>
+            </div>
+        </div>
         <div class="card-body">
             @if (session('success'))
                 <div id="success-alert" class="alert alert-success alert-dismissible fade show" role="alert">
@@ -31,16 +52,16 @@
             </div>
             <div class="mt-3 mb-3">
                 <button id="filter-button" class="btn btn-primary">
-                    <i class="fas fa-filter me-1"></i>
+                    <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 5h18v2H3zM3 11h18v2H3zM3 17h18v2H3z"></path></svg>
                     Filter
                 </button>
                 <button id="reset-filter-button" class="btn btn-secondary">
-                    <i class="fas fa-undo me-1"></i>
+                    <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 5V1L7 6l5 5V7a5 5 0 11-5 5H5a7 7 0 107-7z"></path></svg>
                     Reset
                 </button>
             </div>
             <div class="table-responsive">
-                <table id="table-proses" class="table table-bordered table-hover">
+                <table id="table-proses" class="table table-bordered table-hover" style="width: 100%;">
                     <thead class="text-center">
                         <tr>
                             <th>No</th>

@@ -2,9 +2,39 @@
 
 @section('title', 'Daftar Proyek')
 
+@push('css')
+    <style>
+        .dataTables_wrapper {
+            overflow-x: auto;
+        }
+
+        #projects-table {
+            width: 100% !important;
+        }
+
+        .icon {
+            vertical-align: middle;
+        }
+    </style>
+@endpush
+
 @section('content')
 
     <div class="card mb-4">
+        <div class="p-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h5 class="card-title mb-0">Daftar Proyek</h5>
+            </div>
+            @if (Auth::user()->hasRole('admin'))
+                <div class="d-flex gap-2 flex-wrap">
+                    <button type="button" class="btn btn-success text-white" data-coreui-toggle="modal"
+                        data-coreui-target="#importExcelModal">
+                        <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"></path></svg>
+                        Import Excel
+                    </button>
+                </div>
+            @endif
+        </div>
         <div class="card-body">
             @if (session('success'))
                 <div id="success-alert" class="alert alert-success alert-dismissible fade show" role="alert">
@@ -27,18 +57,9 @@
                     </ul>
                 </div>
             @endif
-            <div class="d-flex justify-content-end mb-3 gap-2">
-                @if (Auth::user()->hasRole('admin'))
-                    <button type="button" class="btn btn-success text-white" data-coreui-toggle="modal"
-                        data-coreui-target="#importExcelModal">
-                        <i class="fas fa-plus me-1"></i>
-                        Import Excel
-                    </button>
-                @endif
-            </div>
 
             <div class="table-responsive">
-                <table id="projects-table" class="table table-bordered table-hover">
+                <table id="projects-table" class="table table-bordered table-hover" style="width: 100%;">
                     <thead class="text-center">
                         <tr>
                             <th>No</th>
