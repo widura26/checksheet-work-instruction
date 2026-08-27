@@ -22,6 +22,7 @@ class DepartemenSeeder extends Seeder
         $ppc = Departemen::create(['nama_departemen' => 'Perencanaan dan Pengendalian Produksi Banyuwangi']);
         $fabrikasi = Departemen::create(['nama_departemen' => 'Fabrikasi Banyuwangi']);
         $finishing = Departemen::create(['nama_departemen' => 'Finishing Banyuwangi']);
+        $distribusi = Departemen::create(['nama_departemen' => 'Distribusi Banyuwangi']);
 
         // tambah bagian
         // ppc
