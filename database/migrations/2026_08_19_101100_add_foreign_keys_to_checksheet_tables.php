@@ -62,14 +62,14 @@ return new class extends Migration
 
         Schema::table('barcodes', function (Blueprint $table) {
             $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('wi_trn_id')->references('id')->on('wi_trns')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('wi_trn_id')->references('id')->on('work_instructions')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
         });
 
         Schema::table('bpms', function (Blueprint $table) {
             $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('material_id')->references('id')->on('wi_trn_bpms')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('wi_trn_id')->references('id')->on('wi_trns')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('wi_trn_id')->references('id')->on('work_instructions')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
         });
 
@@ -84,7 +84,7 @@ return new class extends Migration
         Schema::table('bpm_ims', function (Blueprint $table) {
             $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('material_id')->references('id')->on('wi_trn_bpms')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('wi_trn_id')->references('id')->on('wi_trns')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('wi_trn_id')->references('id')->on('work_instructions')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
         });
 
@@ -109,7 +109,7 @@ return new class extends Migration
         Schema::table('ims_bpms', function (Blueprint $table) {
             $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('material_id')->references('id')->on('wi_trn_bpms')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('wi_trn_id')->references('id')->on('wi_trns')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('wi_trn_id')->references('id')->on('work_instructions')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
         });
 
@@ -117,7 +117,7 @@ return new class extends Migration
             $table->foreign('bpm_id')->references('id')->on('bpms')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('material_id')->references('id')->on('wi_trn_bpms')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('wi_trn_id')->references('id')->on('wi_trns')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('wi_trn_id')->references('id')->on('work_instructions')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
         });
 
@@ -192,7 +192,7 @@ return new class extends Migration
             $table->foreign('bpm_id')->references('id')->on('bpms')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('material_id')->references('id')->on('wi_trn_bpms')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('cp_detail_id')->references('id')->on('cp_details')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('wi_trn_id')->references('id')->on('wi_trns')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('wi_trn_id')->references('id')->on('work_instructions')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
         });
 
@@ -278,7 +278,7 @@ return new class extends Migration
         Schema::table('wi_finishes', function (Blueprint $table) {
             $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('wi_trn_id')->references('id')->on('wi_trns')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('wi_trn_id')->references('id')->on('work_instructions')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('jenis_kereta_id')->references('id')->on('jenis_keretas')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('sttpp_id')->references('id')->on('sttpps')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('pengirim_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
@@ -314,28 +314,18 @@ return new class extends Migration
             $table->foreign('jenis_kereta_id')->references('id')->on('jenis_keretas')->cascadeOnUpdate()->restrictOnDelete();
         });
 
-        Schema::table('wi_trns', function (Blueprint $table) {
-            $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
+        Schema::table('work_instructions', function (Blueprint $table) {
             $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('material_id')->references('id')->on('wi_trn_bpms')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('md_header_id')->references('id')->on('md_headers')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('jenis_kereta_id')->references('id')->on('jenis_keretas')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('bpm_cp_id')->references('id')->on('bpm_cps')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('cp_id')->references('id')->on('cutting_plans')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('memo_id')->references('id')->on('memos')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('spm_ims_id')->references('id')->on('spm_ims')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('cutting_plan_id')->references('id')->on('cutting_plans')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('bpm_id')->references('id')->on('bpms')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('barcode_id')->references('id')->on('barcodes')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('exp_id')->references('id')->on('exps')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('user_cp_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('user_print_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('parent_id')->references('id')->on('wi_trns')->cascadeOnUpdate()->restrictOnDelete();
         });
     }
 
     public function down(): void
     {
-        Schema::table('wi_trns', function (Blueprint $table) {
+        Schema::table('work_instructions', function (Blueprint $table) {
             $table->dropForeign(['oka_id']);
             $table->dropForeign(['project_id']);
             $table->dropForeign(['material_id']);
