@@ -10,8 +10,6 @@ return new class extends Migration
     {
         Schema::create('work_instructions', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('project_id')->nullable()->index();
-            $table->foreignUuid('material_id')->nullable()->index();
             $table->foreignUuid('cutting_plan_id')->nullable()->index();
             $table->foreignUuid('bpm_id')->nullable()->index();
             $table->foreignUuid('barcode_id')->nullable()->index();

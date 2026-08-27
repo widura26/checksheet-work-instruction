@@ -315,8 +315,6 @@ return new class extends Migration
         });
 
         Schema::table('work_instructions', function (Blueprint $table) {
-            $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('material_id')->references('id')->on('wi_trn_bpms')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('cutting_plan_id')->references('id')->on('cutting_plans')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('bpm_id')->references('id')->on('bpms')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('barcode_id')->references('id')->on('barcodes')->cascadeOnUpdate()->restrictOnDelete();
