@@ -2,9 +2,39 @@
 
 @section('title', 'Manajemen Pengguna')
 
+@push('css')
+    <style>
+        .dataTables_wrapper {
+            overflow-x: auto;
+        }
+
+        #table-staff {
+            width: 100% !important;
+        }
+
+        .icon {
+            vertical-align: middle;
+        }
+    </style>
+@endpush
+
 @section('content')
 
     <div class="card mb-4">
+        <div class="p-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h5 class="card-title mb-0">Data Pengguna</h5>
+            </div>
+            @if (Auth::user()->hasRole(['admin']))
+                <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn btn-primary" type="button" data-coreui-toggle="modal"
+                        data-coreui-target="#createStaffModal">
+                        <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"></path></svg>
+                        Tambah Pengguna
+                    </button>
+                </div>
+            @endif
+        </div>
         <div class="card-body">
             @if (session('success'))
                 <div id="success-alert" class="alert alert-success alert-dismissible fade show" role="alert">
@@ -18,17 +48,24 @@
                     <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
-            <div class="d-flex justify-content-end mb-3">
-                <button type="button" class="btn btn-primary" data-coreui-toggle="modal"
-                    data-coreui-target="#createStaffModal">
-                    <i class="fas fa-plus me-1"></i>
-                    Tambah Pengguna
-                </button>
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="search_input"
+                            placeholder="Cari Nama, Email, NIP...">
+                        <button class="btn btn-primary" type="button" id="btnSearch">
+                            <i class="fas fa-search me-1"></i> Cari
+                        </button>
+                        <button class="btn btn-secondary" type="button" id="btnReset">
+                            <i class="fas fa-undo me-1"></i> Reset
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div class="table-responsive">
-                <table id="table-staff" class="table table-striped table-hover">
-                    <thead>
+                <table id="table-staff" class="table table-bordered table-hover" style="width: 100%;">
+                    <thead class="text-center">
                         <tr>
                             <th>No</th>
                             <th>Nama</th>
@@ -236,91 +273,104 @@
                 ]
             });
 
-            function showAlert(message, type) {
-                const body = document.querySelector('#table-staff').closest('.card-body');
-                const div = document.createElement('div');
-                div.className = 'alert alert-' + type + ' alert-dismissible fade show';
-                div.innerHTML = message +
-                    '<button type="button" class="btn-close" data-coreui-dismiss="alert"></button>';
-                body.prepend(div);
-            }
+            $('#btnSearch').on('click', function() {
+                staffTable.search($('#search_input').val()).draw();
+            });
+            $('#search_input').on('keypress', function(e) {
+                if (e.which === 13) {
+                    staffTable.search(this.value).draw();
+                }
+            });
+            $('#btnReset').on('click', function() {
+                $('#search_input').val('');
+                staffTable.search('').ajax.reload();
+            });
+        });
 
-            function getModal() {
-                return window.coreui ? coreui.Modal : (window.bootstrap ? bootstrap.Modal : null);
-            }
+        function showAlert(message, type) {
+            const body = document.querySelector('#table-staff').closest('.card-body');
+            const div = document.createElement('div');
+            div.className = 'alert alert-' + type + ' alert-dismissible fade show';
+            div.innerHTML = message +
+                '<button type="button" class="btn-close" data-coreui-dismiss="alert"></button>';
+            body.prepend(div);
+        }
 
-            window.openEditModal = function(id) {
-                const url = "{{ route('staff.edit', '__ID__') }}".replace('__ID__', id);
-                fetch(url, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(r => r.json())
-                .then(res => {
-                    const s = res.staff;
-                    document.getElementById('edit_name').value = s.name;
-                    document.getElementById('edit_email').value = s.email;
-                    document.getElementById('edit_nip').value = s.nip;
-                    document.getElementById('edit_password').value = '';
-                    const assigned = res.assigned || [];
-                    document.querySelectorAll('#edit_roles_list input[type=checkbox]').forEach(cb => {
-                        cb.checked = assigned.includes(cb.value);
-                    });
-                    document.getElementById('editStaffForm').action =
-                        "{{ route('staff.update', '__ID__') }}".replace('__ID__', id);
+        function getModal() {
+            return window.coreui ? coreui.Modal : (window.bootstrap ? bootstrap.Modal : null);
+        }
+
+        window.openEditModal = function(id) {
+            const url = "{{ route('staff.edit', '__ID__') }}".replace('__ID__', id);
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(r => r.json())
+            .then(res => {
+                const s = res.staff;
+                document.getElementById('edit_name').value = s.name;
+                document.getElementById('edit_email').value = s.email;
+                document.getElementById('edit_nip').value = s.nip;
+                document.getElementById('edit_password').value = '';
+                const assigned = res.assigned || [];
+                document.querySelectorAll('#edit_roles_list input[type=checkbox]').forEach(cb => {
+                    cb.checked = assigned.includes(cb.value);
+                });
+                document.getElementById('editStaffForm').action =
+                    "{{ route('staff.update', '__ID__') }}".replace('__ID__', id);
+                const Modal = getModal();
+                if (Modal) {
+                    new Modal(document.getElementById('editStaffModal')).show();
+                } else {
+                    const el = document.getElementById('editStaffModal');
+                    el.classList.add('show');
+                    el.style.display = 'block';
+                }
+            });
+        };
+
+        $('#editStaffForm').on('submit', function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(r => {
+                if (!r.ok) {
+                    return r.json().then(err => { throw err; });
+                }
+                return r.json();
+            })
+            .then(res => {
+                if (res.success) {
                     const Modal = getModal();
+                    const el = document.getElementById('editStaffModal');
                     if (Modal) {
-                        new Modal(document.getElementById('editStaffModal')).show();
+                        const inst = Modal.getInstance(el);
+                        if (inst) inst.hide();
                     } else {
-                        const el = document.getElementById('editStaffModal');
-                        el.classList.add('show');
-                        el.style.display = 'block';
+                        el.classList.remove('show');
+                        el.style.display = 'none';
                     }
-                });
-            };
-
-            $('#editStaffForm').on('submit', function(e) {
-                e.preventDefault();
-                const form = e.target;
-                const formData = new FormData(form);
-                fetch(form.action, {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    },
-                    body: formData
-                })
-                .then(r => {
-                    if (!r.ok) {
-                        return r.json().then(err => { throw err; });
-                    }
-                    return r.json();
-                })
-                .then(res => {
-                    if (res.success) {
-                        const Modal = getModal();
-                        const el = document.getElementById('editStaffModal');
-                        if (Modal) {
-                            const inst = Modal.getInstance(el);
-                            if (inst) inst.hide();
-                        } else {
-                            el.classList.remove('show');
-                            el.style.display = 'none';
-                        }
-                        staffTable.ajax.reload();
-                        showAlert(res.success, 'success');
-                    }
-                })
-                .catch(err => {
-                    let msg = 'Terjadi kesalahan.';
-                    if (err && err.errors) {
-                        msg = Object.values(err.errors).flat().join(' ');
-                    }
-                    showAlert(msg, 'danger');
-                });
+                    staffTable.ajax.reload();
+                    showAlert(res.success, 'success');
+                }
+            })
+            .catch(err => {
+                let msg = 'Terjadi kesalahan.';
+                if (err && err.errors) {
+                    msg = Object.values(err.errors).flat().join(' ');
+                }
+                showAlert(msg, 'danger');
             });
         });
     </script>
