@@ -4,10 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\DaftarKaryawanRequest;
 use App\Imports\KaryawanImport;
-use App\Models\Bagian;
 use App\Models\Departemen;
 use App\Models\Karyawan;
-use App\Models\Unit;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -21,10 +19,8 @@ class DaftarKaryawanController extends Controller
     public function index()
     {
         $departemens = Departemen::all();
-        $bagians = Bagian::all();
-        $units = Unit::all();
 
-        return view('pages.karyawan.index', compact('departemens', 'bagians', 'units'));
+        return view('pages.karyawan.index', compact('departemens'));
     }
 
     public function data(Request $request)
@@ -63,13 +59,6 @@ class DaftarKaryawanController extends Controller
         $karyawans = $query->paginate($perPage);
 
         $karyawans->setCollection($karyawans->getCollection()->map(function ($karyawan) {
-            $action = '<button type="button" class="btn btn-sm btn-warning me-1" onclick="openEditKaryawan(\'' . $karyawan->nip . '\')">Edit</button>';
-            $action .= '<form action="' . route('karyawan.destroy', $karyawan->nip) . '" method="POST" class="d-inline" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus data karyawan ini?\')">
-                    ' . csrf_field() . '
-                    ' . method_field('DELETE') . '
-                    <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
-                </form>';
-
             return [
                 'nip' => $karyawan->nip,
                 'nama' => $karyawan->nama,
@@ -77,7 +66,6 @@ class DaftarKaryawanController extends Controller
                 'bagian' => $karyawan->bagian->nama_bagian ?? '-',
                 'unit' => $karyawan->unit->nama_unit ?? '-',
                 'jabatan' => $karyawan->jabatan,
-                'action' => $action,
             ];
         }));
 
@@ -100,10 +88,16 @@ class DaftarKaryawanController extends Controller
         $validated = $request->validated();
         try {
             Karyawan::create($validated);
-            return redirect()->route('karyawan.index')->with('success', 'Data karyawan berhasil ditambahkan.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Data karyawan berhasil ditambahkan.',
+            ]);
         } catch (\Throwable $e) {
             Log::error('Error creating karyawan: ' . $e->getMessage());
-            return redirect()->route('karyawan.index')->with('error', 'Gagal menambahkan data karyawan');
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menambahkan data karyawan.',
+            ], 500);
         }
     }
 
@@ -118,10 +112,16 @@ class DaftarKaryawanController extends Controller
         $validated = $request->validated();
         try {
             $karyawan->update($validated);
-            return redirect()->route('karyawan.index')->with('success', 'Data karyawan berhasil diperbarui.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Data karyawan berhasil diperbarui.',
+            ]);
         } catch (\Throwable $e) {
             Log::error('Error updating karyawan: ' . $e->getMessage());
-            return redirect()->route('karyawan.index')->with('error', 'Gagal memperbarui data karyawan');
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memperbarui data karyawan.',
+            ], 500);
         }
     }
     public function import(Request $request)
@@ -132,14 +132,23 @@ class DaftarKaryawanController extends Controller
 
         $request->validate([
             'file' => 'required|file|extensions:xlsx,xls,csv',
+        ], [
+            'file.required' => 'File wajib dipilih.',
+            'file.extensions' => 'File harus berformat xlsx, xls, atau csv.',
         ]);
 
         try {
             Excel::import(new KaryawanImport(), $request->file('file'));
-            return redirect()->route('karyawan.index')->with('success', 'Data karyawan berhasil diimpor.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Data karyawan berhasil diimpor.',
+            ]);
         } catch (\Throwable $e) {
             Log::error('Error importing karyawan: ' . $e->getMessage());
-            return redirect()->route('karyawan.index')->with('error', 'Gagal mengimpor data karyawan');
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengimpor data karyawan.',
+            ], 500);
         }
     }
     public function destroy(Karyawan $karyawan)
@@ -149,10 +158,16 @@ class DaftarKaryawanController extends Controller
         }
         try {
             $karyawan->delete();
-            return redirect()->route('karyawan.index')->with('success', 'Data karyawan berhasil dihapus.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Data karyawan berhasil dihapus.',
+            ]);
         } catch (\Throwable $e) {
             Log::error('Error deleting karyawan: ' . $e->getMessage());
-            return redirect()->route('karyawan.index')->with('error', 'Gagal menghapus data karyawan');
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus data karyawan.',
+            ], 500);
         }
     }
 }
