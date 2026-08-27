@@ -154,6 +154,16 @@
                     'route' => 'lokasi.departemen.index',
                     'label' => 'Departemen',
                 ],
+                [
+                    'navtype' => 'nav-item',
+                    'route' => 'lokasi.bagian.index',
+                    'label' => 'Bagian',
+                ],
+                [
+                    'navtype' => 'nav-item',
+                    'route' => 'lokasi.unit.index',
+                    'label' => 'Unit',
+                ],
             ]
         ])
 

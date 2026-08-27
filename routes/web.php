@@ -10,6 +10,8 @@ use App\Http\Controllers\KodeMaterialController;
 use App\Http\Controllers\MdController;
 use App\Http\Controllers\DaftarKaryawanController;
 use App\Http\Controllers\DepartemenController;
+use App\Http\Controllers\BagianController;
+use App\Http\Controllers\UnitController;
 use App\Http\Controllers\OkaController;
 use App\Http\Controllers\ProsesController;
 use App\Http\Controllers\ProjectCodeController;
@@ -147,6 +149,32 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::get('/{id}/distribusi', [DepartemenController::class, 'distribusi'])->name('distribusi');
         Route::get('/{id}/distribusi/data', [DepartemenController::class, 'getDistribusiData'])->name('distribusi.data');
         Route::post('/{departemen}/toggle', [DepartemenController::class, 'toggleDepartemen'])->name('toggle');
+    });
+
+    Route::prefix('lokasi/bagian')->name('lokasi.bagian.')->group(function () {
+        Route::get('/', [BagianController::class, 'index'])->name('index');
+        Route::get('/data', [BagianController::class, 'getData'])->name('data');
+        Route::get('/create', [BagianController::class, 'create'])->name('create');
+        Route::post('/', [BagianController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [BagianController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [BagianController::class, 'update'])->name('update');
+        Route::delete('/{id}', [BagianController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}/distribusi', [BagianController::class, 'distribusi'])->name('distribusi');
+        Route::get('/{id}/distribusi/data', [BagianController::class, 'getDistribusiData'])->name('distribusi.data');
+        Route::post('/{bagian}/toggle', [BagianController::class, 'toggleBagian'])->name('toggle');
+    });
+
+    Route::prefix('lokasi/unit')->name('lokasi.unit.')->group(function () {
+        Route::get('/', [UnitController::class, 'index'])->name('index');
+        Route::get('/data', [UnitController::class, 'data'])->name('data');
+        Route::get('/create', [UnitController::class, 'create'])->name('create');
+        Route::post('/', [UnitController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [UnitController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [UnitController::class, 'update'])->name('update');
+        Route::delete('/{id}', [UnitController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}/distribusi', [UnitController::class, 'distribusi'])->name('distribusi');
+        Route::get('/{id}/distribusi/data', [UnitController::class, 'getDistribusiData'])->name('distribusi.data');
+        Route::post('/{unit}/toggle', [UnitController::class, 'toggleUnit'])->name('toggle');
     });
 
     Route::prefix('distribusi')->controller(DistribusiController::class)->group(function () {
