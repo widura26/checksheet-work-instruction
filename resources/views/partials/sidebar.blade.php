@@ -167,15 +167,6 @@
             ]
         ])
 
-        <li class="nav-title">Akun</li>
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'logout',
-            'icon' => 'cil-account-logout',
-            'label' => 'Log out'
-        ])
-
     </ul>
     <div class="sidebar-footer border-top d-none d-md-flex">
         <button class="sidebar-toggler" type="button" data-coreui-toggle="unfoldable"></button>
