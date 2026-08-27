@@ -346,7 +346,17 @@
             })
             .then(r => {
                 if (!r.ok) {
-                    return r.json().then(err => { throw err; });
+                    return r.text().then(text => {
+                        let msg = 'Terjadi kesalahan.';
+                        try {
+                            const j = JSON.parse(text);
+                            msg = j.message ||
+                                (j.errors ? Object.values(j.errors).flat().join(' ') : msg);
+                        } catch (e) {
+                            if (text) msg = text;
+                        }
+                        throw new Error(msg);
+                    });
                 }
                 return r.json();
             })
@@ -361,16 +371,12 @@
                         el.classList.remove('show');
                         el.style.display = 'none';
                     }
-                    staffTable.ajax.reload();
+                    $('#table-staff').DataTable().ajax.reload();
                     showAlert(res.success, 'success');
                 }
             })
             .catch(err => {
-                let msg = 'Terjadi kesalahan.';
-                if (err && err.errors) {
-                    msg = Object.values(err.errors).flat().join(' ');
-                }
-                showAlert(msg, 'danger');
+                showAlert(err.message || 'Terjadi kesalahan.', 'danger');
             });
         });
     </script>
