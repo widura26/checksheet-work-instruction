@@ -87,7 +87,7 @@
             'navtype' => 'nav-item',
             'route' => 'sttp.index',
             'icon' => 'cil-file',
-            'label' => 'STTPP'
+            'label' => 'Surat Tanda Terima Penyerahan Produk'
         ])
 
         @include('components.parts.sidebar-list-item', [
