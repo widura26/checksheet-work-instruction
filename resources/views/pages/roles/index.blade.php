@@ -71,7 +71,7 @@
     <script type="module">
         $(function() {
             let tableRoles = $('#table-roles').DataTable({
-                processing: true,
+                processing: false,
                 serverSide: true,
                 responsive: true,
                 scrollX: true,

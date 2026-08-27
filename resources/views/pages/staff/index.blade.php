@@ -211,7 +211,7 @@
     <script type="module">
         $(function() {
             let staffTable = $('#table-staff').DataTable({
-                processing: true,
+                processing: false,
                 serverSide: true,
                 responsive: true,
                 scrollX: true,

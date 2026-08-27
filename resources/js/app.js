@@ -14,13 +14,15 @@ $.fn.DataTable.defaults.scrollX = true;
 $.fn.DataTable.defaults.scrollCollapse = true;
 $.fn.DataTable.defaults.responsive = true;
 
-// Loading indicator: tampilkan spinner (bukan teks "Processing...")
+// Loading indicator: tampilkan spinner (bukan teks "Processing..." / "Loading...")
 if (!$.fn.DataTable.defaults.language) {
     $.fn.DataTable.defaults.language = {};
 }
-$.fn.DataTable.defaults.language.processing =
+const dataTableSpinner =
     '<div class="spinner-border text-primary" role="status">' +
     '<span class="visually-hidden">Memuat...</span></div>';
+$.fn.DataTable.defaults.language.processing = dataTableSpinner;
+$.fn.DataTable.defaults.language.loadingRecords = dataTableSpinner;
 
 // Select2
 import select2 from "select2/dist/js/select2.full";

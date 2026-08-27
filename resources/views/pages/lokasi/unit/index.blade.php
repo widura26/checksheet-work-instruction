@@ -32,7 +32,7 @@
     <script type="module">
         $(function() {
             $('#unit-table').DataTable({
-                processing: true,
+                processing: false,
                 serverSide: true,
                 ajax: '{{ route('lokasi.unit.data') }}',
                 columns: [{

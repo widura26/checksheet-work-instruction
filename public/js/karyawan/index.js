@@ -32,7 +32,7 @@ $(function() {
     }
 
     var table = $('#karyawan-table').DataTable({
-        processing: true,
+        processing: false,
         serverSide: true,
         scrollX: true,
         deferRender: true,

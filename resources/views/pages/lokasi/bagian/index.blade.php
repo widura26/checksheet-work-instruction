@@ -32,7 +32,7 @@
     <script type="module">
         $(function() {
             $('#bagian-table').DataTable({
-                processing: true,
+                processing: false,
                 serverSide: true,
                 ajax: '{{ route('lokasi.bagian.data') }}',
                 columns: [{
