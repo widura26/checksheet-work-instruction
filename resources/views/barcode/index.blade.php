@@ -40,9 +40,6 @@
                         <li class="text-muted small px-2 pb-1">Tampilkan / sembunyikan kolom</li>
                     </ul>
                 </div>
-                <a href="{{ route('barcode.create') }}" class="btn btn-primary">
-                    <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"></path></svg> Tambah
-                </a>
             </div>
         </div>
         <div class="card-body">
@@ -51,15 +48,11 @@
                     <tr>
                         <th class="text-center" style="width: 40px;"><input type="checkbox" id="selectAll" title="Pilih semua"></th>
                         <th>No</th>
-                        <th>No Konv</th>
-                        <th>Part No</th>
-                        <th>Part No1</th>
+                        <th>Cutting Plan</th>
+                        <th>Part</th>
                         <th>WBS</th>
                         <th>Lot</th>
-                        <th>PR</th>
-                        <th>Oka</th>
-                        <th>Status</th>
-                        <th>Bil</th>
+                        <th>No Part</th>
                         <th>Tanggal</th>
                         <th>Tanggal Print</th>
                         <th>Aksi</th>

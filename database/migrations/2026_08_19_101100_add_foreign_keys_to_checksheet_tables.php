@@ -61,7 +61,7 @@ return new class extends Migration
         });
 
         Schema::table('barcodes', function (Blueprint $table) {
-            $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('cutting_plan_id')->references('id')->on('cutting_plans')->nullOnDelete();
             $table->foreign('wi_trn_id')->references('id')->on('work_instructions')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
         });
@@ -588,9 +588,10 @@ return new class extends Migration
         });
 
         Schema::table('barcodes', function (Blueprint $table) {
-            $table->dropForeign(['oka_id']);
+            $table->dropForeign(['cutting_plan_id']);
             $table->dropForeign(['wi_trn_id']);
             $table->dropForeign(['user_id']);
+            $table->dropForeign(['part_id']);
         });
 
         Schema::table('exp_orgs', function (Blueprint $table) {

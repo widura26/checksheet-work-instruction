@@ -53,20 +53,14 @@ $(function() {
                 }
             },
             {
-                data: 'no_konv',
-                name: 'no_konv',
+                data: 'cp_no',
+                name: 'cp_no',
                 className: 'text-center',
                 defaultContent: ''
             },
             {
-                data: 'part_no',
-                name: 'part_no',
-                className: 'text-center',
-                defaultContent: ''
-            },
-            {
-                data: 'partno1',
-                name: 'partno1',
+                data: 'part_number',
+                name: 'part_number',
                 className: 'text-center',
                 defaultContent: ''
             },
@@ -83,26 +77,8 @@ $(function() {
                 defaultContent: ''
             },
             {
-                data: 'PR',
-                name: 'PR',
-                className: 'text-center',
-                defaultContent: ''
-            },
-            {
-                data: 'oka_no',
-                name: 'oka_no',
-                className: 'text-center',
-                defaultContent: ''
-            },
-            {
-                data: 'status',
-                name: 'status',
-                className: 'text-center',
-                defaultContent: ''
-            },
-            {
-                data: 'bil',
-                name: 'bil',
+                data: 'part_no',
+                name: 'part_no',
                 className: 'text-center',
                 defaultContent: ''
             },
@@ -273,16 +249,11 @@ $(function() {
         $('#formError').addClass('d-none').text('');
         $('#_method').val('PUT');
         $('#crudForm').attr('action', BC.routes.update.replace('__ID__', row.id));
-        $('#no_konv').val(row.no_konv);
-        $('#part_no').val(row.part_no);
-        $('#partno1').val(row.partno1);
+        $('#cp_no').val(row.cp_no);
+        $('#part_number').val(row.part_number);
         $('#wbs').val(row.wbs);
         $('#lot').val(row.lot);
-        $('#PR').val(row.PR);
-        $('#oka_id').val(row.oka_id || '');
-        $('#wi_trn_id').val(row.wi_trn_id || '');
-        $('#status').val(row.status);
-        $('#bil').val(row.bil);
+        $('#part_no').val(row.part_no);
         $('#tgl').val((row.tgl || '').toString().substring(0, 10));
         $('#tgl_print').val((row.tgl_print || '').toString().substring(0, 10));
         $('#formModalLabel').text('Edit Barcode');

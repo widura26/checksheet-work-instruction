@@ -54,6 +54,7 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::get('/', [BarcodeController::class, 'index'])->name('barcode.index');
         Route::get('/create', [BarcodeController::class, 'create'])->name('barcode.create');
         Route::get('/data', [BarcodeController::class, 'data'])->name('barcode.data');
+        Route::get('/parts', [BarcodeController::class, 'parts'])->name('barcode.parts');
         Route::get('/export', [BarcodeController::class, 'export'])->name('barcode.export');
         Route::post('/', [BarcodeController::class, 'store'])->name('barcode.store');
         Route::get('/{barcode}/edit', [BarcodeController::class, 'edit'])->name('barcode.edit');

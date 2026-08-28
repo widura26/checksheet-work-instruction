@@ -10,7 +10,8 @@ return new class extends Migration
     {
         Schema::create('barcodes', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('oka_id')->nullable()->index();
+            $table->uuid('cutting_plan_id')->nullable()->index();
+            $table->string('part_id')->nullable()->unique();
             $table->string('wbs')->nullable();
             $table->string('lot')->nullable()->index();
             $table->string('part_no')->nullable()->index();
@@ -20,11 +21,13 @@ return new class extends Migration
             $table->date('tgl')->nullable();
             $table->string('status')->nullable();
             $table->string('bil')->nullable();
-            $table->foreignUuid('wi_trn_id')->nullable()->index();
-            $table->foreignId('user_id')->nullable()->index();
+            $table->uuid('wi_trn_id')->nullable()->index();
+            $table->unsignedBigInteger('user_id')->nullable()->index();
             $table->date('tgl_print')->nullable();
             $table->index(['part_no', 'PR']);
             $table->timestamps();
+
+            $table->foreign('part_id')->references('id')->on('parts')->nullOnDelete();
         });
     }
 

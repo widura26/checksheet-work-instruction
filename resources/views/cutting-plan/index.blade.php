@@ -108,7 +108,8 @@
                 export: "{{ route('cutting-plan.export') }}",
                 bulkDestroy: "{{ route('cutting-plan.bulk-destroy') }}",
                 update: "{{ route('cutting-plan.update', '__ID__') }}",
-                destroy: "{{ route('cutting-plan.destroy', '__ID__') }}"
+                destroy: "{{ route('cutting-plan.destroy', '__ID__') }}",
+                barcodeCreate: "{{ route('barcode.create') }}"
             }
         };
     </script>
