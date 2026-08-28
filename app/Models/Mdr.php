@@ -30,7 +30,7 @@ class Mdr extends Model
         });
     }
 
-    public function proyek(): BelongsTo
+    public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
     }

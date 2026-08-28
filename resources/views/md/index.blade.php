@@ -32,14 +32,10 @@
                     <thead class="text-center">
                         <tr>
                             <th>No</th>
-                            <th>ID MDR</th>
-                            <th>Project ID</th>
-                            <th>OKA ID</th>
-                            <th>Tanggal MDR</th>
-                            <th>Masalah</th>
-                            <th>Lanjut</th>
-                            <th>Input</th>
-                            <th>Dampak</th>
+                            <th>Manufacture Drawing ID</th>
+                            <th>Proyek ID</th>
+                            <th>Tanggal</th>
+                            <th>Deskripsi</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -156,28 +152,12 @@
                         name: 'project_id'
                     },
                     {
-                        data: 'oka_id',
-                        name: 'oka_id'
-                    },
-                    {
                         data: 'tgl_mdr',
                         name: 'tgl_mdr'
                     },
                     {
                         data: 'masalah',
-                        name: 'masalah'
-                    },
-                    {
-                        data: 'lanjut',
-                        name: 'lanjut'
-                    },
-                    {
-                        data: 'input',
-                        name: 'input'
-                    },
-                    {
-                        data: 'dampak',
-                        name: 'dampak'
+                        name: 'deskripsi'
                     },
                     {
                         data: 'id',

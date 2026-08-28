@@ -136,9 +136,8 @@ return new class extends Migration
             $table->foreign('md_header_id')->references('id')->on('md_headers')->cascadeOnUpdate()->restrictOnDelete();
         });
 
-        Schema::table('mdrs', function (Blueprint $table) {
+        Schema::table('manufacture_drawings', function (Blueprint $table) {
             $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
         });
 
@@ -513,9 +512,8 @@ return new class extends Migration
             $table->dropForeign(['oka_id']);
         });
 
-        Schema::table('mdrs', function (Blueprint $table) {
+        Schema::table('manufacture_drawings', function (Blueprint $table) {
             $table->dropForeign(['project_id']);
-            $table->dropForeign(['oka_id']);
             $table->dropForeign(['user_id']);
         });
 
