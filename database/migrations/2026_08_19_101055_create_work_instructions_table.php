@@ -12,7 +12,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('cutting_plan_id')->nullable()->index();
             $table->foreignUuid('bpm_id')->nullable()->index();
-            $table->foreignUuid('barcode_id')->nullable()->index();
+            $table->uuid('barcode_id')->nullable()->index();
             $table->string('no_exp')->nullable();
             $table->bigInteger('qty_cp')->nullable();
             $table->text('ket_wi')->nullable();

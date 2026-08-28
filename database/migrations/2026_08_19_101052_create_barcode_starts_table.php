@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('barcode_starts', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('no_konv')->index();
-            $table->foreignUuid('barcode_id')->nullable()->index();
+            $table->uuid('barcode_id')->nullable()->index();
             $table->string('proses')->nullable();
             $table->foreignUuid('process_id')->nullable()->index();
             $table->dateTime('tgl_start')->nullable();

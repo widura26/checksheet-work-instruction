@@ -60,12 +60,6 @@ return new class extends Migration
             $table->foreign('exp_id')->references('id')->on('exps')->cascadeOnUpdate()->restrictOnDelete();
         });
 
-        Schema::table('barcodes', function (Blueprint $table) {
-            $table->foreign('cutting_plan_id')->references('id')->on('cutting_plans')->nullOnDelete();
-            $table->foreign('wi_trn_id')->references('id')->on('work_instructions')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
-        });
-
         Schema::table('bpms', function (Blueprint $table) {
             $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('material_id')->references('id')->on('wi_trn_bpms')->cascadeOnUpdate()->restrictOnDelete();
@@ -285,14 +279,12 @@ return new class extends Migration
         });
 
         Schema::table('barcode_details', function (Blueprint $table) {
-            $table->foreign('barcode_id')->references('id')->on('barcodes')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('process_id')->references('id')->on('processes')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('mesin_id')->references('id')->on('mesins')->cascadeOnUpdate()->restrictOnDelete();
         });
 
         Schema::table('barcode_starts', function (Blueprint $table) {
-            $table->foreign('barcode_id')->references('id')->on('barcodes')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('process_id')->references('id')->on('processes')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('mesin_id')->references('id')->on('mesins')->cascadeOnUpdate()->restrictOnDelete();
@@ -316,7 +308,6 @@ return new class extends Migration
         Schema::table('work_instructions', function (Blueprint $table) {
             $table->foreign('cutting_plan_id')->references('id')->on('cutting_plans')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('bpm_id')->references('id')->on('bpms')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('barcode_id')->references('id')->on('barcodes')->cascadeOnUpdate()->restrictOnDelete();
         });
     }
 
@@ -333,7 +324,6 @@ return new class extends Migration
             $table->dropForeign(['memo_id']);
             $table->dropForeign(['spm_ims_id']);
             $table->dropForeign(['bpm_id']);
-            $table->dropForeign(['barcode_id']);
             $table->dropForeign(['exp_id']);
             $table->dropForeign(['user_cp_id']);
             $table->dropForeign(['user_print_id']);
@@ -356,14 +346,12 @@ return new class extends Migration
         });
 
         Schema::table('barcode_starts', function (Blueprint $table) {
-            $table->dropForeign(['barcode_id']);
             $table->dropForeign(['process_id']);
             $table->dropForeign(['user_id']);
             $table->dropForeign(['mesin_id']);
         });
 
         Schema::table('barcode_details', function (Blueprint $table) {
-            $table->dropForeign(['barcode_id']);
             $table->dropForeign(['process_id']);
             $table->dropForeign(['user_id']);
             $table->dropForeign(['mesin_id']);
@@ -585,13 +573,6 @@ return new class extends Migration
             $table->dropForeign(['material_id']);
             $table->dropForeign(['wi_trn_id']);
             $table->dropForeign(['user_id']);
-        });
-
-        Schema::table('barcodes', function (Blueprint $table) {
-            $table->dropForeign(['cutting_plan_id']);
-            $table->dropForeign(['wi_trn_id']);
-            $table->dropForeign(['user_id']);
-            $table->dropForeign(['part_id']);
         });
 
         Schema::table('exp_orgs', function (Blueprint $table) {
