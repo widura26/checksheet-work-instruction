@@ -71,17 +71,18 @@
 
         @include('components.parts.sidebar-list-item', [
             'navtype' => 'nav-item',
+            'route' => 'barcode.index',
+            'icon' => 'cil-barcode',
+            'label' => 'Barcode'
+        ])
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
             'route' => 'wi.index',
             'icon' => 'cil-description',
             'label' => 'Work Instruction'
         ])
 
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'barcode.index',
-            'icon' => 'cil-barcode',
-            'label' => 'Barcode'
-        ])
 
         @include('components.parts.sidebar-list-item', [
             'navtype' => 'nav-item',
