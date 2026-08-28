@@ -1,28 +1,27 @@
 <?php
 
+use App\Http\Controllers\BagianController;
 use App\Http\Controllers\BarcodeController;
+use App\Http\Controllers\BpmController;
 use App\Http\Controllers\CheckSheetController;
 use App\Http\Controllers\CuttingPlanController;
+use App\Http\Controllers\DaftarKaryawanController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DepartemenController;
+use App\Http\Controllers\DistribusiController;
 use App\Http\Controllers\ExpedisiController;
 use App\Http\Controllers\GrafikController;
 use App\Http\Controllers\KodeMaterialController;
 use App\Http\Controllers\MdController;
-use App\Http\Controllers\DaftarKaryawanController;
-use App\Http\Controllers\DepartemenController;
-use App\Http\Controllers\BagianController;
-use App\Http\Controllers\UnitController;
 use App\Http\Controllers\OkaController;
-use App\Http\Controllers\ProsesController;
 use App\Http\Controllers\ProjectCodeController;
+use App\Http\Controllers\ProsesController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\SttpController;
+use App\Http\Controllers\UnitController;
 use App\Http\Controllers\WiController;
 use App\Http\Controllers\WiLapController;
-use App\Http\Controllers\DistribusiController;
-// use App\Http\Livewire\Distribusi\CreateForm;
-// use App\Http\Livewire\Distribusi\PenyerahanCreateForm;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -96,6 +95,10 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::get('/materials', [CuttingPlanController::class, 'materials'])->name('cutting-plan.materials');
         Route::get('/projects', [CuttingPlanController::class, 'projects'])->name('cutting-plan.projects');
         Route::get('/processes', [CuttingPlanController::class, 'processes'])->name('cutting-plan.processes');
+    });
+
+    Route::prefix('bon-permintaan-material')->group(function(){
+        Route::get('/', [BpmController::class, 'index'])->name('bon-permintaan-material.index');
     });
 
     Route::prefix('work-instruction')->group(function () {

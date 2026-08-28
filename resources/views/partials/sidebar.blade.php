@@ -78,6 +78,13 @@
 
         @include('components.parts.sidebar-list-item', [
             'navtype' => 'nav-item',
+            'route' => 'bon-permintaan-material.index',
+            'icon' => 'cil-list',
+            'label' => 'Bon Permintaan Material'
+        ])
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
             'route' => 'wi.index',
             'icon' => 'cil-description',
             'label' => 'Work Instruction'
