@@ -26,6 +26,7 @@ class MdController extends Controller
         }
 
         $query = Mdr::select([
+            'id',
             'manufacture_drawing_code',
             'project_id',
             'manufacture_drawing_date',

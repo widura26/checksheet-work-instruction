@@ -156,8 +156,8 @@
                         name: 'tgl_mdr'
                     },
                     {
-                        data: 'masalah',
-                        name: 'deskripsi'
+                        data: 'description',
+                        name: 'description'
                     },
                     {
                         data: 'id',
