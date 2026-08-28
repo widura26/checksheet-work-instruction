@@ -32,8 +32,8 @@
                     <thead class="text-center">
                         <tr>
                             <th>No</th>
-                            <th>Manufacture Drawing ID</th>
-                            <th>Proyek ID</th>
+                            <th>Manufacture Drawing Code</th>
+                            <th>Project</th>
                             <th>Tanggal</th>
                             <th>Deskripsi</th>
                             <th>Aksi</th>
@@ -115,6 +115,7 @@
 @push('js')
     <script type="module">
         $(function() {
+
             var table = $('#md-table').DataTable({
                 processing: false,
                 serverSide: true,
@@ -148,12 +149,15 @@
                         name: 'id_mdr'
                     },
                     {
-                        data: 'project_id',
-                        name: 'project_id'
+                        data: 'name_project',
+                        name: 'name_project'
                     },
                     {
                         data: 'manufacture_drawing_date',
-                        name: 'tgl_mdr'
+                        name: 'tgl_mdr',
+                        render: (data, type) => {
+                            return data ? convertDate(data) : '';
+                        }
                     },
                     {
                         data: 'description',

@@ -7,6 +7,18 @@ window.$ = window.jQuery = $;
 import "datatables.net-bs5";
 import "datatables.net-responsive-bs5";
 
+const convertDate = (timestamp) => {
+    const date = new Date(timestamp);
+    const formatted = date.toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+    });
+
+    return formatted;
+}
+window.convertDate = convertDate;
+
 // Global DataTables defaults — seragamkan dengan menu "Kode Proses"
 $.fn.DataTable.defaults.info = false;
 $.fn.DataTable.defaults.autoWidth = false;

@@ -25,22 +25,20 @@ class MdController extends Controller
             abort(404);
         }
 
-        $query = Mdr::select([
-            'id',
-            'manufacture_drawing_code',
-            'project_id',
-            'manufacture_drawing_date',
-            'description',
+        $query = Mdr::query()->leftJoin('projects', 'manufacture_drawings.project_id', '=', 'projects.id')
+        ->select([
+            'manufacture_drawings.id',
+            'manufacture_drawings.manufacture_drawing_code',
+            'projects.name_project as name_project',
+            'manufacture_drawings.manufacture_drawing_date',
+            'manufacture_drawings.description',
         ]);
 
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('id_mdr', 'LIKE', "%{$search}%")
-                    ->orWhere('masalah', 'LIKE', "%{$search}%")
-                    ->orWhere('lanjut', 'LIKE', "%{$search}%")
-                    ->orWhere('input', 'LIKE', "%{$search}%")
-                    ->orWhere('dampak', 'LIKE', "%{$search}%");
+                $q->where('manufacture_drawing_code', 'LIKE', "%{$search}%")
+                    ->orWhere('description', 'LIKE', "%{$search}%");
             });
         }
 
@@ -74,15 +72,11 @@ class MdController extends Controller
         }
 
         Mdr::create([
-            'id_mdr' => $request->id_mdr,
+            'manufacture_drawing_code' => $request->id_mdr,
             'project_id' => $request->project_id ?: null,
-            'oka_id' => $request->oka_id ?: null,
-            'tgl_mdr' => $request->tgl_mdr ?: null,
-            'masalah' => $request->masalah,
-            'lanjut' => $request->lanjut,
-            'input' => $request->input,
-            'dampak' => $request->dampak,
+            'manufacture_drawing_date' => $request->tgl_mdr ?: null,
             'user_id' => Auth::id(),
+            'description' => $request->masalah,
         ]);
 
         return response()->json(['success' => true, 'message' => 'Data berhasil ditambahkan.']);
