@@ -312,10 +312,15 @@ $(function() {
 
                     var iconBarcode = '<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 5h2v14H3zM7 5h2v14H7zM11 5h2v14h-2zM15 5h1v14h-1zM18 5h1v14h-1zM20.5 5h1.5v14H20.5z"></path></svg>';
 
+                    var iconBpm = '<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 2h9l5 5v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zM14 3.5V8h4.5L14 3.5zM8 12h8v1.5H8zM8 15h8v1.5H8zM8 18h5v1.5H8z"></path></svg>';
+
                     return `
                         <div class="btn-group" style="display:flex; gap:10px; align-items:center;" role="group" aria-label="Aksi">
                             <a class="w-fit btn btn-info btn-sm" href="${CP.routes.barcodeCreate}?cutting_plan_id=${data}" title="Barcode">
                                 ${iconBarcode}
+                            </a>
+                            <a class="w-fit btn btn-primary btn-sm" href="${CP.routes.bpmCreate}?cutting_plan_id=${data}" title="Buat BPM">
+                                ${iconBpm}
                             </a>
                             <button class="w-fit btn btn-warning btn-sm btn-edit" title="Edit">
                                 ${iconEdit}

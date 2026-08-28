@@ -99,6 +99,8 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
 
     Route::prefix('bon-permintaan-material')->group(function(){
         Route::get('/', [BpmController::class, 'index'])->name('bon-permintaan-material.index');
+        Route::get('/create', [BpmController::class, 'create'])->name('bon-permintaan-material.create');
+        Route::post('/', [BpmController::class, 'store'])->name('bon-permintaan-material.store');
         Route::get('/data', [BpmController::class, 'data'])->name('bon-permintaan-material.data');
         Route::get('/export', [BpmController::class, 'export'])->name('bon-permintaan-material.export');
         Route::delete('/bulk-destroy', [BpmController::class, 'bulkDestroy'])->name('bon-permintaan-material.bulk-destroy');

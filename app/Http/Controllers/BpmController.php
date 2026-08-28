@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bpm;
+use App\Models\CuttingPlan;
+use App\Models\Material;
 use Illuminate\Http\Request;
-// use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 
 class BpmController extends Controller
@@ -12,6 +15,59 @@ class BpmController extends Controller
     public function index()
     {
         return view('bon-permintaan-material.index');
+    }
+
+    public function create(Request $request)
+    {
+        $selectedId = $request->get('cutting_plan_id');
+
+        $cuttingPlans = CuttingPlan::orderBy('no_cp')
+            ->when($selectedId, fn ($q) => $q->where('id', $selectedId))
+            ->get(['id', 'no_cp', 'material_id']);
+
+        $materials = Material::orderBy('kode_material')
+            ->get(['id', 'kode_material', 'deskripsi']);
+
+        $cpMaterials = CuttingPlan::pluck('material_id', 'id');
+
+        return view('bon-permintaan-material.create', compact(
+            'cuttingPlans', 'materials', 'selectedId', 'cpMaterials'
+        ));
+    }
+
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'cutting_plan_id' => 'required|exists:cutting_plans,id|unique:bpms,cutting_plan_id',
+            'bpm_no'         => 'nullable|string|max:255|unique:bpms,bpm_no',
+            'material_id'     => 'nullable|exists:materials,id',
+            'specification'   => 'nullable|string',
+            'total'          => 'nullable|numeric',
+            'unit'           => 'nullable|string|max:50',
+            'request_date'   => 'nullable|date',
+            'bprm_no'        => 'nullable|string|max:255',
+            'brpm_date'      => 'nullable|date',
+            'bprm_total'     => 'nullable|numeric',
+            'stock'          => 'nullable|string|max:255',
+        ], [
+            'cutting_plan_id.required' => 'Cutting Plan wajib dipilih.',
+            'cutting_plan_id.unique'   => 'Cutting Plan ini sudah memiliki BPM.',
+            'bpm_no.unique'            => 'No BPM sudah digunakan.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        Bpm::create(array_merge($validator->validated(), [
+            'user_id' => Auth::id(),
+        ]));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Bon Permintaan Material berhasil ditambahkan.',
+            'redirect' => route('bon-permintaan-material.index'),
+        ]);
     }
 
     public function data(Request $request)
