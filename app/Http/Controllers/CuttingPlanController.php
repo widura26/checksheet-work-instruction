@@ -60,7 +60,7 @@ class CuttingPlanController extends Controller
             ->leftJoin('projects', 'cutting_plans.project_id', '=', 'projects.project_id')
             ->leftJoin('processes', 'cutting_plans.process_id', '=', 'processes.id')
             ->leftJoin('materials', 'cutting_plans.material_id', '=', 'materials.id')
-            ->leftJoin('bpms', 'cutting_plans.bpm_id', '=', 'bpms.id')
+            ->leftJoin('bpms', 'bpms.cutting_plan_id', '=', 'cutting_plans.id')
             ->leftJoin('users as u_prepared', 'cutting_plans.prepared_by', '=', 'u_prepared.id')
             ->leftJoin('users as u_approved', 'cutting_plans.approved_by', '=', 'u_approved.id')
             ->leftJoin('users as u_operator', 'cutting_plans.date_operator', '=', 'u_operator.id')

@@ -25,7 +25,6 @@ return new class extends Migration
             $table->date('date_revised')->nullable();
             $table->foreignId('prepared_by')->nullable()->index();
             $table->foreignId('approved_by')->nullable()->index();
-            $table->foreignUUid('bpm_id')->nullable()->index();
             $table->foreignId('date_operator')->nullable()->index();
             $table->timestamps();
         });

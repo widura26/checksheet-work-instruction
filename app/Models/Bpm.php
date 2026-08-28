@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\CuttingPlan;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -52,5 +53,10 @@ class Bpm extends Model
     public function cpDetails()
     {
         return $this->belongsToMany(CpDetail::class, 'bpm_cps');
+    }
+
+    public function cuttingPlan()
+    {
+        return $this->belongsTo(CuttingPlan::class, 'cutting_plan_id');
     }
 }

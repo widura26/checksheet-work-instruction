@@ -66,8 +66,8 @@ $(function() {
                 }
             },
             {
-                data: 'no_bpm',
-                name: 'no_bpm',
+                data: 'bpm_no',
+                name: 'bpm_no',
                 className: 'text-center',
                 defaultContent: ''
             },
@@ -82,20 +82,20 @@ $(function() {
                 defaultContent: '-'
             },
             {
-                data: 'jumlah',
-                name: 'jumlah',
+                data: 'total',
+                name: 'total',
                 className: 'text-center',
                 defaultContent: ''
             },
             {
-                data: 'satuan',
-                name: 'satuan',
+                data: 'unit',
+                name: 'unit',
                 className: 'text-center',
                 defaultContent: ''
             },
             {
-                data: 'tgl_permintaan',
-                name: 'tgl_permintaan',
+                data: 'request_date',
+                name: 'request_date',
                 className: 'text-center',
                 render: function(data) {
                     return data ? convertDate(data) : '';
@@ -103,19 +103,19 @@ $(function() {
                 defaultContent: '-'
             },
             {
-                data: 'ket_bpm',
-                name: 'ket_bpm',
+                data: 'specification',
+                name: 'specification',
                 defaultContent: '-'
             },
             {
-                data: 'no_bprm',
-                name: 'no_bprm',
+                data: 'bprm_no',
+                name: 'bprm_no',
                 className: 'text-center',
                 defaultContent: '-'
             },
             {
-                data: 'tgl_bprm',
-                name: 'tgl_bprm',
+                data: 'brpm_date',
+                name: 'brpm_date',
                 className: 'text-center',
                 render: function(data) {
                     return data ? convertDate(data) : '';
@@ -123,14 +123,14 @@ $(function() {
                 defaultContent: '-'
             },
             {
-                data: 'jml_bprm',
-                name: 'jml_bprm',
+                data: 'bprm_total',
+                name: 'bprm_total',
                 className: 'text-center',
                 defaultContent: ''
             },
             {
-                data: 'stok',
-                name: 'stok',
+                data: 'stock',
+                name: 'stock',
                 className: 'text-center',
                 defaultContent: '-'
             },

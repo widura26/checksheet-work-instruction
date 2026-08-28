@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Bpm;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -98,5 +99,9 @@ class CuttingPlan extends Model
 
     public function material(){
         return $this->belongsTo(Material::class, 'material_id');
+    }
+
+    public function bpm(){
+        return $this->hasOne(Bpm::class, 'cutting_plan_id');
     }
 }

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Bpm;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+// use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class BpmController extends Controller
@@ -41,14 +41,14 @@ class BpmController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('bpms.no_bpm', 'LIKE', "%{$search}%")
+                $q->where('bpms.bpm_no', 'LIKE', "%{$search}%")
                     ->orWhere('materials.deskripsi', 'LIKE', "%{$search}%")
                     ->orWhere('materials.spesifikasi', 'LIKE', "%{$search}%")
-                    ->orWhere('bpms.jumlah', 'LIKE', "%{$search}%")
-                    ->orWhere('bpms.satuan', 'LIKE', "%{$search}%")
-                    ->orWhere('bpms.no_bprm', 'LIKE', "%{$search}%")
-                    ->orWhere('bpms.ket_bpm', 'LIKE', "%{$search}%")
-                    ->orWhere('bpms.stok', 'LIKE', "%{$search}%");
+                    ->orWhere('bpms.total', 'LIKE', "%{$search}%")
+                    ->orWhere('bpms.unit', 'LIKE', "%{$search}%")
+                    ->orWhere('bpms.bprm_no', 'LIKE', "%{$search}%")
+                    ->orWhere('bpms.specification', 'LIKE', "%{$search}%")
+                    ->orWhere('bpms.stock', 'LIKE', "%{$search}%");
             });
         }
 
@@ -58,25 +58,25 @@ class BpmController extends Controller
     private function exportColumns()
     {
         return [
-            'no_bpm'         => 'No BPM',
-            'material_name'  => 'Material',
-            'material_spec'  => 'Spesification',
-            'jumlah'         => 'Jumlah',
-            'satuan'         => 'Unit',
-            'tgl_permintaan' => 'Tanggal Permintaan',
-            'ket_bpm'        => 'Keterangan',
-            'no_bprm'        => 'Nomor BPRM',
-            'tgl_bprm'       => 'Tanggal BPRM',
-            'jml_bprm'       => 'Jumlah BPRM',
-            'stok'           => 'Stok',
+            'bpm_no'        => 'No BPM',
+            'material_name' => 'Material',
+            'material_spec' => 'Spesification',
+            'total'         => 'Jumlah',
+            'unit'          => 'Unit',
+            'request_date'  => 'Tanggal Permintaan',
+            'specification' => 'Keterangan',
+            'bprm_no'       => 'Nomor BPRM',
+            'brpm_date'     => 'Tanggal BPRM',
+            'bprm_total'    => 'Jumlah BPRM',
+            'stock'         => 'Stok',
         ];
     }
 
     private function formatExportValue($row, $key)
     {
         switch ($key) {
-            case 'tgl_permintaan':
-            case 'tgl_bprm':
+            case 'request_date':
+            case 'brpm_date':
                 return $row->$key
                     ? \Carbon\Carbon::parse($row->$key)->translatedFormat('d F Y')
                     : '';

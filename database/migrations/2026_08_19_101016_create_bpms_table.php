@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('bpms', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->uuid('cutting_plan_id')->nullable()->unique();
             $table->string('bpm_no')->nullable()->unique();
             $table->foreignUuid('material_id')->nullable()->index();
             $table->text('specification')->nullable();
