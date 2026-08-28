@@ -69,7 +69,7 @@ class CuttingPlanController extends Controller
                 'projects.project_id as kode_proyek',
                 'projects.name_project as project_name',
                 'processes.nama as cutting_method',
-                'bpms.no_bpm as bpm_number',
+                'bpms.bpm_no as bpm_number',
                 'materials.kode_material as mat',
                 'u_prepared.name as prepared_by_name',
                 'u_approved.name as approved_by_name',
