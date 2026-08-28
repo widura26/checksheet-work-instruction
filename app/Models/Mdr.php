@@ -11,7 +11,7 @@ class Mdr extends Model
 {
     use HasFactory;
 
-    protected $table = 'mdrs';
+    protected $table = 'manufacture_drawings';
 
     protected $guarded = ['id'];
 

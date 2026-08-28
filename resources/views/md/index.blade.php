@@ -144,7 +144,7 @@
                         }
                     },
                     {
-                        data: 'id_mdr',
+                        data: 'manufacture_drawing_code',
                         name: 'id_mdr'
                     },
                     {
@@ -152,7 +152,7 @@
                         name: 'project_id'
                     },
                     {
-                        data: 'tgl_mdr',
+                        data: 'manufacture_drawing_date',
                         name: 'tgl_mdr'
                     },
                     {

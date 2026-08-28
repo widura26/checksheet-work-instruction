@@ -26,15 +26,10 @@ class MdController extends Controller
         }
 
         $query = Mdr::select([
-            'id',
-            'id_mdr',
+            'manufacture_drawing_code',
             'project_id',
-            'oka_id',
-            'tgl_mdr',
-            'masalah',
-            'lanjut',
-            'input',
-            'dampak',
+            'manufacture_drawing_date',
+            'description',
         ]);
 
         if ($request->filled('search')) {
