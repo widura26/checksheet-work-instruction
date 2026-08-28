@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             ManufactureDrawingSeeder::class,
             ProsesSeeder::class,
             MaterialSeeder::class,
+            CuttingPlanSeeder::class,
             DepartemenSeeder::class,
             BagianSeeder::class,
             KaryawanSeeder::class,
