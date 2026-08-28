@@ -61,9 +61,8 @@ return new class extends Migration
         });
 
         Schema::table('bpms', function (Blueprint $table) {
-            $table->foreign('oka_id')->references('id')->on('okas')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('material_id')->references('id')->on('wi_trn_bpms')->cascadeOnUpdate()->restrictOnDelete();
-            $table->foreign('wi_trn_id')->references('id')->on('work_instructions')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('work_instruction_id')->references('id')->on('work_instructions')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
         });
 
