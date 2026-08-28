@@ -13,6 +13,10 @@ class Part extends Model
     protected $table = 'parts';
     protected $guarded = ['id'];
 
+    public $incrementing = false;
+
+    protected $keyType = 'string';
+
     protected static function boot()
     {
         parent::boot();

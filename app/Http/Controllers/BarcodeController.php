@@ -24,8 +24,11 @@ class BarcodeController extends Controller
 
     public function create(Request $request)
     {
-        $cuttingPlans = CuttingPlan::orderBy('no_cp')->get(['id', 'no_cp']);
         $selectedId = $request->get('cutting_plan_id');
+
+        $cuttingPlans = CuttingPlan::orderBy('no_cp')
+            ->when($selectedId, fn ($q) => $q->where('id', $selectedId))
+            ->get(['id', 'no_cp']);
 
         return view('barcode.create', compact('cuttingPlans', 'selectedId'));
     }

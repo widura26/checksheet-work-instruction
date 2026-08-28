@@ -84,14 +84,14 @@ $(function() {
             $('#f_barcode_id').val(part.barcode_id);
             $('#f_wbs').val(part.barcode_wbs || '');
             $('#f_lot').val(part.barcode_lot || '');
-            $('#f_part_no').val(part.barcode_part_no || '');
+            $('#f_part_no').val(part.barcode_part_no || part.part_number || '');
             $('#barcodeModalLabel').text('Edit Barcode');
         } else {
             $('#barcode_method').val('POST');
             $('#f_barcode_id').val('');
             $('#f_wbs').val('');
             $('#f_lot').val('');
-            $('#f_part_no').val('');
+            $('#f_part_no').val(part ? part.part_number : '');
             $('#barcodeModalLabel').text('Tambah Barcode');
         }
 

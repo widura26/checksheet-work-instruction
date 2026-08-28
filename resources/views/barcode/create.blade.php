@@ -20,7 +20,9 @@
             <div class="mb-3" style="max-width: 480px;">
                 <label for="cutting_plan_id" class="form-label">Cutting Plan</label>
                 <select class="form-select" id="cutting_plan_id">
-                    <option value="">-- Pilih Cutting Plan --</option>
+                    @if (!$selectedId)
+                        <option value="">-- Pilih Cutting Plan --</option>
+                    @endif
                     @foreach ($cuttingPlans as $cp)
                         <option value="{{ $cp->id }}" {{ $selectedId == $cp->id ? 'selected' : '' }}>
                             {{ $cp->no_cp }}
@@ -79,7 +81,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="f_part_no" class="form-label">No Part</label>
-                            <input type="text" class="form-control" name="part_no" id="f_part_no">
+                            <input type="text" class="form-control" name="part_no" id="f_part_no" readonly>
                         </div>
                     </div>
                     <div class="modal-footer">
