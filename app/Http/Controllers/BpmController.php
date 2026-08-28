@@ -31,26 +31,24 @@ class BpmController extends Controller
     private function baseQuery(Request $request)
     {
         $query = Bpm::query()
-            ->leftJoin('okas', 'bpms.oka_id', '=', 'okas.id')
-            ->leftJoin('wi_trn_bpms', 'bpms.material_id', '=', 'wi_trn_bpms.id')
-            ->leftJoin('users', 'bpms.user_id', '=', 'users.id')
+            ->leftJoin('materials', 'bpms.material_id', '=', 'materials.id')
             ->select(
                 'bpms.*',
-                'okas.oka as oka_no',
-                'wi_trn_bpms.idbarang as material_no',
-                'users.name as user_name'
+                'materials.deskripsi as material_name',
+                'materials.spesifikasi as material_spec'
             );
 
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('bpms.no_bpm', 'LIKE', "%{$search}%")
-                    ->orWhere('okas.oka', 'LIKE', "%{$search}%")
-                    ->orWhere('wi_trn_bpms.idbarang', 'LIKE', "%{$search}%")
-                    ->orWhere('bpms.spec', 'LIKE', "%{$search}%")
+                    ->orWhere('materials.deskripsi', 'LIKE', "%{$search}%")
+                    ->orWhere('materials.spesifikasi', 'LIKE', "%{$search}%")
+                    ->orWhere('bpms.jumlah', 'LIKE', "%{$search}%")
+                    ->orWhere('bpms.satuan', 'LIKE', "%{$search}%")
                     ->orWhere('bpms.no_bprm', 'LIKE', "%{$search}%")
                     ->orWhere('bpms.ket_bpm', 'LIKE', "%{$search}%")
-                    ->orWhere('users.name', 'LIKE', "%{$search}%");
+                    ->orWhere('bpms.stok', 'LIKE', "%{$search}%");
             });
         }
 
@@ -60,20 +58,17 @@ class BpmController extends Controller
     private function exportColumns()
     {
         return [
-            'no_bpm'           => 'No BPM',
-            'oka_no'           => 'OKA',
-            'material_no'      => 'Material',
-            'spec'             => 'Spec',
-            'jumlah'           => 'Jumlah',
-            'satuan'           => 'Satuan',
-            'tgl_permintaan'   => 'Tgl Permintaan',
-            'ket_bpm'          => 'Keterangan',
-            'no_bprm'          => 'No BPRM',
-            'tgl_bprm'         => 'Tgl BPRM',
-            'head_number'      => 'Head Number',
-            'jml_bprm'         => 'Jml BPRM',
-            'stok'             => 'Stok',
-            'user_name'        => 'User',
+            'no_bpm'         => 'No BPM',
+            'material_name'  => 'Material',
+            'material_spec'  => 'Spesification',
+            'jumlah'         => 'Jumlah',
+            'satuan'         => 'Unit',
+            'tgl_permintaan' => 'Tanggal Permintaan',
+            'ket_bpm'        => 'Keterangan',
+            'no_bprm'        => 'Nomor BPRM',
+            'tgl_bprm'       => 'Tanggal BPRM',
+            'jml_bprm'       => 'Jumlah BPRM',
+            'stok'           => 'Stok',
         ];
     }
 

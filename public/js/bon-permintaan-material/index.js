@@ -19,20 +19,17 @@ $(function() {
             { targets: 0,  width: '40px',  minWidth: '40px'  },
             { targets: 1,  width: '40px',  minWidth: '40px'  },
             { targets: 2,  width: '130px', minWidth: '130px' },
-            { targets: 3,  width: '100px', minWidth: '100px' },
-            { targets: 4,  width: '140px', minWidth: '140px' },
-            { targets: 5,  width: '160px', minWidth: '160px' },
+            { targets: 3,  width: '180px', minWidth: '180px' },
+            { targets: 4,  width: '200px', minWidth: '200px' },
+            { targets: 5,  width: '80px',  minWidth: '80px'  },
             { targets: 6,  width: '80px',  minWidth: '80px'  },
-            { targets: 7,  width: '80px',  minWidth: '80px'  },
-            { targets: 8,  width: '130px', minWidth: '130px' },
-            { targets: 9,  width: '200px', minWidth: '200px' },
-            { targets: 10, width: '130px', minWidth: '130px' },
-            { targets: 11, width: '130px', minWidth: '130px' },
-            { targets: 12, width: '120px', minWidth: '120px' },
-            { targets: 13, width: '100px', minWidth: '100px' },
-            { targets: 14, width: '100px', minWidth: '100px' },
-            { targets: 15, width: '130px', minWidth: '130px' },
-            { targets: 16, width: '80px',  minWidth: '80px'  },
+            { targets: 7,  width: '140px', minWidth: '140px' },
+            { targets: 8,  width: '200px', minWidth: '200px' },
+            { targets: 9,  width: '130px', minWidth: '130px' },
+            { targets: 10, width: '140px', minWidth: '140px' },
+            { targets: 11, width: '110px', minWidth: '110px' },
+            { targets: 12, width: '100px', minWidth: '100px' },
+            { targets: 13, width: '80px',  minWidth: '80px'  },
         ],
         ajax: function(data, callback, settings) {
             $.get(BPM.routes.data, {
@@ -75,19 +72,13 @@ $(function() {
                 defaultContent: ''
             },
             {
-                data: 'oka_no',
-                name: 'oka_no',
-                className: 'text-center',
+                data: 'material_name',
+                name: 'material_name',
                 defaultContent: '-'
             },
             {
-                data: 'material_no',
-                name: 'material_no',
-                defaultContent: '-'
-            },
-            {
-                data: 'spec',
-                name: 'spec',
+                data: 'material_spec',
+                name: 'material_spec',
                 defaultContent: '-'
             },
             {
@@ -132,12 +123,6 @@ $(function() {
                 defaultContent: '-'
             },
             {
-                data: 'head_number',
-                name: 'head_number',
-                className: 'text-center',
-                defaultContent: '-'
-            },
-            {
                 data: 'jml_bprm',
                 name: 'jml_bprm',
                 className: 'text-center',
@@ -146,12 +131,6 @@ $(function() {
             {
                 data: 'stok',
                 name: 'stok',
-                className: 'text-center',
-                defaultContent: '-'
-            },
-            {
-                data: 'user_name',
-                name: 'user_name',
                 className: 'text-center',
                 defaultContent: '-'
             },

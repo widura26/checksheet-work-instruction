@@ -49,19 +49,16 @@
                         <th class="text-center" style="width: 40px;"><input type="checkbox" id="selectAll" title="Pilih semua"></th>
                         <th>No</th>
                         <th>No BPM</th>
-                        <th>OKA</th>
                         <th>Material</th>
-                        <th>Spec</th>
+                        <th>Spesification</th>
                         <th>Jumlah</th>
-                        <th>Satuan</th>
-                        <th>Tgl Permintaan</th>
+                        <th>Unit</th>
+                        <th>Tanggal Permintaan</th>
                         <th>Keterangan</th>
-                        <th>No BPRM</th>
-                        <th>Tgl BPRM</th>
-                        <th>Head Number</th>
-                        <th>Jml BPRM</th>
+                        <th>Nomor BPRM</th>
+                        <th>Tanggal BPRM</th>
+                        <th>Jumlah BPRM</th>
                         <th>Stok</th>
-                        <th>User</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
