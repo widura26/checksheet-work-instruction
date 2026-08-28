@@ -50,7 +50,17 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::put('/{kodeMaterial}', [KodeMaterialController::class, 'update'])->name('kode-material.update');
         Route::delete('/{kodeMaterial}', [KodeMaterialController::class, 'destroy'])->name('kode-material.destroy');
     });
-    Route::get('/barcode', [BarcodeController::class, 'index'])->name('barcode.index');
+    Route::prefix('barcode')->group(function () {
+        Route::get('/', [BarcodeController::class, 'index'])->name('barcode.index');
+        Route::get('/create', [BarcodeController::class, 'create'])->name('barcode.create');
+        Route::get('/data', [BarcodeController::class, 'data'])->name('barcode.data');
+        Route::get('/export', [BarcodeController::class, 'export'])->name('barcode.export');
+        Route::post('/', [BarcodeController::class, 'store'])->name('barcode.store');
+        Route::get('/{barcode}/edit', [BarcodeController::class, 'edit'])->name('barcode.edit');
+        Route::put('/{barcode}', [BarcodeController::class, 'update'])->name('barcode.update');
+        Route::delete('/bulk-destroy', [BarcodeController::class, 'bulkDestroy'])->name('barcode.bulk-destroy');
+        Route::delete('/{barcode}', [BarcodeController::class, 'destroy'])->name('barcode.destroy');
+    });
 
     Route::prefix('project-code')->group(function(){
         Route::get('/', [ProjectCodeController::class, 'index'])->name('project-code.index');
