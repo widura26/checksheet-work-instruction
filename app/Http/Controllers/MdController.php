@@ -29,6 +29,7 @@ class MdController extends Controller
         ->select([
             'manufacture_drawings.id',
             'manufacture_drawings.manufacture_drawing_code',
+            'manufacture_drawings.project_id',
             'projects.name_project as name_project',
             'manufacture_drawings.manufacture_drawing_date',
             'manufacture_drawings.description',

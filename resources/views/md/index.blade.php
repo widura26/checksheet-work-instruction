@@ -173,6 +173,7 @@
                 $('#crudForm').attr('action', "{{ route('md.store') }}");
                 $('#formModalLabel').text('Tambah Manufacture Drawing');
                 $('#formError').addClass('d-none').text('');
+                $('#btnSubmit').prop('disabled', false).text('Simpan');
             });
 
             $('#md-table').on('click', '.btn-edit', function() {
@@ -186,6 +187,7 @@
                 $('#tgl_mdr').val(row.manufacture_drawing_date ? row.manufacture_drawing_date.substring(0, 10) : '');
                 $('#masalah').val(row.description);
                 $('#formModalLabel').text('Edit Manufacture Drawing');
+                $('#btnSubmit').prop('disabled', false).text('Simpan');
                 modal.show();
             });
 
@@ -236,6 +238,7 @@
                     },
                     success: function(res) {
                         modal.hide();
+                        btn.prop('disabled', false).text('Simpan');
                         Swal.fire('Berhasil', res.message, 'success');
                         table.ajax.reload();
                     },
