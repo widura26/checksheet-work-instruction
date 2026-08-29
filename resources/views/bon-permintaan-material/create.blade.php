@@ -38,13 +38,14 @@
                     <div class="col-md-6">
                         <label for="material_id" class="form-label">Material</label>
                         <select class="form-select" id="material_id" name="material_id">
-                            <option value="">-- Pilih Material --</option>
-                            @foreach ($materials as $m)
-                                <option value="{{ $m->id }}">
-                                    {{ $m->kode_material }} - {{ $m->deskripsi }}
-                                </option>
-                            @endforeach
+                            <option value="">-- Pilih Cutting Plan terlebih dahulu --</option>
                         </select>
+                        <div class="form-text">Material diambil otomatis dari Cutting Plan yang dipilih.</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="request_date" class="form-label">Tanggal Permintaan</label>
+                        <input type="date" class="form-control" id="request_date" name="request_date">
                     </div>
 
                     <div class="col-md-6">
@@ -60,11 +61,6 @@
                     <div class="col-md-6">
                         <label for="unit" class="form-label">Unit</label>
                         <input type="text" class="form-control" id="unit" name="unit">
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="request_date" class="form-label">Tanggal Permintaan</label>
-                        <input type="date" class="form-control" id="request_date" name="request_date">
                     </div>
 
                     <div class="col-md-6">

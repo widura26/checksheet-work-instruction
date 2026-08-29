@@ -25,13 +25,19 @@ class BpmController extends Controller
             ->when($selectedId, fn ($q) => $q->where('id', $selectedId))
             ->get(['id', 'no_cp', 'material_id']);
 
-        $materials = Material::orderBy('kode_material')
-            ->get(['id', 'kode_material', 'deskripsi']);
-
-        $cpMaterials = CuttingPlan::pluck('material_id', 'id');
+        $cpMaterials = CuttingPlan::with('material')
+            ->get()
+            ->mapWithKeys(function ($cp) {
+                $mat = $cp->material;
+                return [
+                    $cp->id => $mat
+                        ? ['id' => $mat->id, 'label' => $mat->kode_material . ' - ' . $mat->deskripsi]
+                        : null,
+                ];
+            });
 
         return view('bon-permintaan-material.create', compact(
-            'cuttingPlans', 'materials', 'selectedId', 'cpMaterials'
+            'cuttingPlans', 'selectedId', 'cpMaterials'
         ));
     }
 

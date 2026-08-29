@@ -4,12 +4,25 @@ $(function() {
 
     function syncMaterial() {
         var cpId = $cp.val();
-        var materialId = cpId && window.BPM.cpMaterials
+        var mat = cpId && window.BPM.cpMaterials
             ? window.BPM.cpMaterials[cpId]
-            : '';
-        if (materialId) {
-            $material.val(materialId);
+            : null;
+
+        $material.empty();
+
+        if (!mat) {
+            $material.append($('<option>', {
+                value: '',
+                text: '-- Pilih Cutting Plan terlebih dahulu --'
+            }));
+            return;
         }
+
+        $material.append($('<option>', {
+            value: mat.id,
+            text: mat.label,
+            selected: true
+        }));
     }
 
     $cp.on('change', syncMaterial);
