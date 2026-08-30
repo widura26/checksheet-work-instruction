@@ -168,6 +168,7 @@
                 $('#no_wi').val('');
                 $('#formModalLabel').text('Tambah Work Instruction');
                 $('#formError').addClass('d-none').text('');
+                $('#btnSubmit').prop('disabled', false).text('Simpan');
             });
 
             $('#table-wi').on('click', '.btn-edit', function() {
@@ -232,6 +233,7 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(res) {
+                        btn.prop('disabled', false).text('Simpan');
                         modal.hide();
                         Swal.fire('Berhasil', res.message, 'success');
                         table.ajax.reload();
