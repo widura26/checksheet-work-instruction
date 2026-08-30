@@ -37,7 +37,7 @@ class Bpm extends Model
 
     public function material()
     {
-        return $this->belongsTo(WiTrnBpm::class, 'material_id');
+        return $this->belongsTo(Material::class, 'material_id');
     }
 
     public function wiTrn()
