@@ -17,6 +17,7 @@ use App\Http\Controllers\OkaController;
 use App\Http\Controllers\ProjectCodeController;
 use App\Http\Controllers\ProsesController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SpmController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\SttpController;
 use App\Http\Controllers\UnitController;
@@ -113,6 +114,21 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::post('/', [WiController::class, 'store'])->name('wi.store');
         Route::put('/{wiTrn}', [WiController::class, 'update'])->name('wi.update');
         Route::delete('/{wiTrn}', [WiController::class, 'destroy'])->name('wi.destroy');
+    });
+
+    Route::prefix('spm')->name('spm.')->group(function () {
+        Route::get('/', [SpmController::class, 'index'])->name('index');
+        Route::get('/data', [SpmController::class, 'getData'])->name('getData');
+        Route::get('/projects', [SpmController::class, 'getProjects'])->name('getProjects');
+        Route::get('/statuses', [SpmController::class, 'getStatuses'])->name('getStatuses');
+        Route::get('/create', [SpmController::class, 'create'])->name('create');
+        Route::get('/{spm}', [SpmController::class, 'show'])->name('show');
+        Route::get('/{spm}/print', [SpmController::class, 'print'])->name('print');
+        Route::get('/{spm}/terima', [SpmController::class, 'terima'])->name('terima');
+        Route::post('/{spm}/cancel', [SpmController::class, 'cancelSpm'])->name('cancel');
+        Route::get('/{spm}/download', [SpmController::class, 'download'])->name('download');
+        Route::get('/{spm}/ajukan-ulang', [SpmController::class, 'ajukanUlang'])->name('ajukan-ulang');
+        Route::delete('/{spm}', [SpmController::class, 'destroy'])->name('destroy');
     });
 
     Route::get('/check-sheet', [CheckSheetController::class, 'index'])->name('check-sheet.index');

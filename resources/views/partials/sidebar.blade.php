@@ -90,6 +90,12 @@
             'label' => 'Work Instruction'
         ])
 
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
+            'route' => 'spm.index',
+            'icon' => 'cil-cart',
+            'label' => 'SPM'
+        ])
 
         @include('components.parts.sidebar-list-item', [
             'navtype' => 'nav-item',

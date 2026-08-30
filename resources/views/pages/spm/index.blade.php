@@ -87,88 +87,134 @@
 
 @push('js')
     <script type="module">
-        $(document).ready(function() {
-            // Populate Project Filter
-            $.get('{{ route('spm.getProjects') }}', function(data) {
-                const projectFilter = $('#filter_project');
-                projectFilter.empty();
-                projectFilter.append('<option value="">Semua Project</option>');
-                data.forEach(function(project) {
-                    projectFilter.append(new Option(project.name, project.project_id));
-                });
+        window.SPM = {
+            routes: {
+                data: "{{ route('spm.getData') }}",
+                getProjects: "{{ route('spm.getProjects') }}",
+                getStatuses: "{{ route('spm.getStatuses') }}",
+                create: "{{ route('spm.create') }}",
+                show: "{{ route('spm.show', '__ID__') }}",
+                print: "{{ route('spm.print', '__ID__') }}",
+                terima: "{{ route('spm.terima', '__ID__') }}",
+                cancel: "{{ route('spm.cancel', '__ID__') }}",
+                download: "{{ route('spm.download', '__ID__') }}",
+                ajukanUlang: "{{ route('spm.ajukan-ulang', '__ID__') }}",
+                destroy: "{{ route('spm.destroy', '__ID__') }}"
+            },
+            isAdmin: {{ Auth::user()->hasRole('admin') ? 'true' : 'false' }}
+        };
+    </script>
+    <script type="module">
+        $(function() {
+            $.get(SPM.routes.getProjects, function(data) {
+                var $filter = $('#filter_project');
+                $filter.empty().append('<option value="">Semua Project</option>');
+                data.forEach(function(p) { $filter.append(new Option(p.name, p.project_id)); });
             });
 
-            // Populate Status Filter
-            $.get('{{ route('spm.getStatuses') }}', function(data) {
-                const statusFilter = $('#filter_status');
-                statusFilter.empty();
-                statusFilter.append('<option value="">Semua Status</option>');
-                data.forEach(function(status) {
-                    statusFilter.append(new Option(status.name, status.value));
-                });
+            $.get(SPM.routes.getStatuses, function(data) {
+                var $filter = $('#filter_status');
+                $filter.empty().append('<option value="">Semua Status</option>');
+                data.forEach(function(s) { $filter.append(new Option(s.name, s.value)); });
             });
 
             var table = $('#table-spm').DataTable({
-                processing: true,
+                processing: false,
                 serverSide: true,
-                responsive: true,
-                ajax: {
-                    url: "{{ route('spm.getData') }}",
-                    data: function(d) {
-                        d.no_spm = $('#filter_no_spm').val();
-                        d.project_id = $('#filter_project').val();
-                        d.tanggal_spm = $('#filter_tanggal_spm').val();
-                        d.status = $('#filter_status').val();
-                    }
+                ajax: function(data, callback, settings) {
+                    $.get(SPM.routes.data, {
+                        page: (data.start / data.length) + 1,
+                        per_page: data.length,
+                        search: data.search.value,
+                        no_spm: $('#filter_no_spm').val(),
+                        project_id: $('#filter_project').val(),
+                        tanggal_spm: $('#filter_tanggal_spm').val(),
+                        status: $('#filter_status').val()
+                    }).done(function(json) {
+                        callback({
+                            draw: data.draw,
+                            recordsTotal: json.total,
+                            recordsFiltered: json.total,
+                            data: json.data
+                        });
+                    });
                 },
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
+                columns: [
+                    {
+                        data: null,
                         orderable: false,
                         searchable: false,
+                        className: 'text-center',
+                        render: function(data, type, row, meta) { return meta.row + 1; }
+                    },
+                    { data: 'no_spm', name: 'no_spm' },
+                    { data: 'project_name', name: 'project_name', defaultContent: '-' },
+                    { data: 'kepada', name: 'kepada', defaultContent: '-' },
+                    {
+                        data: 'tanggal_spm',
+                        name: 'tanggal_spm',
                         className: 'text-center'
                     },
                     {
-                        data: 'no_spm',
-                        name: 'no_spm'
-                    },
-                    {
-                        data: 'project_id',
-                        name: 'project_id'
-                    },
-                    {
-                        data: 'kepada',
-                        name: 'kepada'
-                    },
-                    {
-                        data: 'tanggal_spm',
-                        name: 'tanggal_spm'
-                    },
-                    {
                         data: 'status',
-                        name: 'status'
+                        name: 'status',
+                        className: 'text-center',
+                        render: function(data) {
+                            var map = {
+                                'COMPLETED': '<span class="badge bg-success">SELESAI</span>',
+                                'WAITING': '<span class="badge bg-secondary">MENUNGGU</span>',
+                                'CANCELED': '<span class="badge bg-danger">DI BATALKAN</span>'
+                            };
+                            return map[data] || '<span class="badge bg-light text-dark">Unknown</span>';
+                        }
                     },
                     @if (Auth::user()->hasRole('admin') || Auth::user()->hasRole('staff'))
-                        {
-                            data: 'action',
-                            name: 'action',
-                            orderable: false,
-                            searchable: false,
-                            className: 'text-center',
-
-                        },
-                    @endif {
-                        data: 'kedatangan',
-                        name: 'kedatangan'
+                    {
+                        data: null,
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center',
+                        render: function(data, type, row) {
+                            if (row.status === 'CANCELED') {
+                                return '<a href="' + SPM.routes.ajukanUlang.replace('__ID__', row.id) + '" class="btn btn-info text-white rounded btn-sm">Ajukan Ulang</a>';
+                            }
+                            var iconUrl = '{{ asset("template/vendors/@coreui/icons/svg/free.svg") }}';
+                            var btns = '<div class="btn-group gap-2">';
+                            btns += '<a href="' + SPM.routes.show.replace('__ID__', row.id) + '" class="btn btn-info text-white rounded btn-sm" title="Lihat">';
+                            btns += '<svg class="icon"><use xlink:href="' + iconUrl + '#cil-fullscreen"></use></svg></a>';
+                            btns += '<a href="' + SPM.routes.print.replace('__ID__', row.id) + '" target="_blank" class="btn btn-warning text-white rounded btn-sm" title="Cetak">';
+                            btns += '<svg class="icon"><use xlink:href="' + iconUrl + '#cil-print"></use></svg></a>';
+                            if (SPM.isAdmin && row.status === 'WAITING' && !row.file_ttd) {
+                                btns += '<form action="' + SPM.routes.cancel.replace('__ID__', row.id) + '" method="POST" onsubmit="return confirm(\'Yakin ingin membatalkan?\')" style="display:inline;">';
+                                btns += '@csrf @method("POST")';
+                                btns += '<button type="submit" class="btn btn-danger text-white rounded btn-sm" title="Batalkan">';
+                                btns += '<svg class="icon"><use xlink:href="' + iconUrl + '#cil-x-circle"></use></svg></button></form>';
+                            }
+                            btns += '</div>';
+                            return btns;
+                        }
                     },
-                ],
-                autoWidth: false,
+                    @endif
+                    {
+                        data: null,
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center',
+                        render: function(data, type, row) {
+                            var iconUrl = '{{ asset("template/vendors/@coreui/icons/svg/free.svg") }}';
+                            if (row.status !== 'COMPLETED' && row.status !== 'PARTIAL' && row.status !== 'CANCELED') {
+                                return '<a href="' + SPM.routes.terima.replace('__ID__', row.id) + '" class="btn btn-success btn-sm text-white">Terima Barang</a>';
+                            }
+                            if (row.file_ttd) {
+                                return '<a href="' + SPM.routes.download.replace('__ID__', row.id) + '" class="btn btn-success btn-sm text-white" target="_blank"><svg class="icon"><use xlink:href="' + iconUrl + '#cil-cloud-download"></use></svg></a>';
+                            }
+                            return '';
+                        }
+                    }
+                ]
             });
 
-            $('#filter-button').click(function() {
-                table.ajax.reload();
-            });
-
+            $('#filter-button').click(function() { table.ajax.reload(); });
             $('#reset-filter-button').click(function() {
                 $('#filter_no_spm').val('');
                 $('#filter_project').val('');
@@ -177,71 +223,11 @@
                 table.ajax.reload();
             });
 
-            $(document).on('click', '.uploadButton', function() {
-                const id = $(this).data('id');
-                $('#spm_id').val(id);
-            });
-
-            $(document).on('click', '.deleteButton', function() {
-                const id = $(this).data('id');
-
-                Swal.fire({
-                    title: 'Apakah Anda yakin?',
-                    text: "Data ini akan dihapus secara permanen!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Ya, Hapus!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: `/spm/${id}`,
-                            type: 'DELETE',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                            success: function(response) {
-                                Swal.fire(
-                                    'Terhapus!',
-                                    'Data berhasil dihapus.',
-                                    'success'
-                                );
-                                table.ajax.reload();
-                            },
-                            error: function(xhr, status, error) {
-                                Swal.fire(
-                                    'Gagal!',
-                                    'Terjadi kesalahan saat menghapus data.',
-                                    'error'
-                                );
-                            }
-                        });
-                    }
-                });
-            });
-
             @if (session('success'))
-                Swal.fire({
-                    title: 'Berhasil!',
-                    text: '{{ session('success') }}',
-                    icon: 'success'
-                });
+                Swal.fire({ title: 'Berhasil!', text: '{{ session('success') }}', icon: 'success' });
             @endif
             @if (session('error'))
-                Swal.fire({
-                    title: 'Gagal!',
-                    text: '{{ session('error') }}',
-                    icon: 'error'
-                });
-            @endif
-            @if ($errors->any())
-                Swal.fire({
-                    title: 'Gagal!',
-                    html: `{!! implode('<br>', $errors->all()) !!}`,
-                    icon: 'error'
-                });
+                Swal.fire({ title: 'Gagal!', text: '{{ session('error') }}', icon: 'error' });
             @endif
         });
     </script>

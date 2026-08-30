@@ -4,12 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\Spm;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Yajra\DataTables\Facades\DataTables;
 
 class SpmController extends Controller
 {
@@ -18,88 +16,74 @@ class SpmController extends Controller
         return view('pages.spm.index');
     }
 
+    public function create()
+    {
+        return view('pages.spm.create');
+    }
+
+    public function ajukanUlang(Spm $spm)
+    {
+        return view('pages.spm.ajukan-ulang', compact('spm'));
+    }
+
+    public function destroy(Spm $spm)
+    {
+        $spm->items()->delete();
+        $spm->delete();
+
+        return response()->json(['success' => true, 'message' => 'SPM berhasil dihapus.']);
+    }
+
     public function getData(Request $request)
     {
-        if ($request->ajax()) {
-            $query = Spm::with(['project' => function ($q) {
-                $q->withoutGlobalScope('onlyWithStock');
-            }, 'posisiCt', 'createdBy']);
-
-            if ($request->filled('no_spm')) {
-                $query->where('no_spm', 'like', '%' . $request->no_spm . '%');
-            }
-
-            if ($request->filled('project_id')) {
-                $query->where('project_id', $request->project_id);
-            }
-
-            if ($request->filled('tanggal_spm')) {
-                $query->whereDate('tanggal_spm', $request->tanggal_spm);
-            }
-
-            if ($request->filled('status')) {
-                $query->where('status', $request->status);
-            }
-            $query->orderBy('created_at', 'desc');
-            return DataTables::of($query)
-                ->addIndexColumn()
-                ->addColumn('project_id', fn($row) => $row->project->nama_project)
-                ->addColumn('tanggal_spm', fn($row) => \Carbon\Carbon::parse($row->tanggal_spm)->format('d-m-Y'))
-                ->addColumn('status', function ($row) {
-                    return match ($row->status) {
-                        'COMPLETED' => '<span class="badge bg-success">SELESAI</span>',
-                        'WAITING' => '<span class="badge bg-secondary">MENUNGGU</span>',
-                        'CANCELED' => '<span class="badge bg-danger">DI BATALKAN</span>',
-                        default => '<span class="badge bg-light text-dark">Unknown</span>',
-                    };
-                })
-                ->addColumn('action', function ($row) {
-                    $ajukanUlangUrl = route('spm.ajukan-ulang', $row->id);
-                    if (! in_array($row->status, ['CANCELED'])) {
-                        $showUrl = route('spm.show', $row->id);
-                        $printUrl = route('spm.print', $row->id);
-                        $cancelUrl = route('spm.cancel', $row->id);
-                        $eyeIcon = '<svg class="icon"><use xlink:href="' . asset('template/vendors/@coreui/icons/svg/free.svg') . '#cil-fullscreen"></use></svg>';
-                        $printIcon = '<svg class="icon"><use xlink:href="' . asset('template/vendors/@coreui/icons/svg/free.svg') . '#cil-print"></use></svg>';
-                        $cancelIcon = '<svg class="icon"><use xlink:href="' . asset('template/vendors/@coreui/icons/svg/free.svg') . '#cil-x-circle"></use></svg>';
-                        $buttons = '<div class="btn-group d-flex justify-content-center align-items-center gap-2">
-                                <a href="' . $showUrl . '" class="btn btn-info text-white rounded">' . $eyeIcon . '</a>';
-                        $buttons .= '<a href="' . $printUrl . '" target="_blank" class="btn btn-warning text-white rounded">' . $printIcon . '</a>';
-                        if (Auth::check() && Auth::user()->hasRole('admin') && in_array($row->status, ['WAITING']) && $row->file_ttd === null) {
-                            $buttons .= '
-        <form action="' . $cancelUrl . '" method="POST" onsubmit="return confirm(\'Yakin ingin membatalkan?\')" style="display:inline;">
-            ' . csrf_field() . '
-            ' . method_field('POST') . '
-            <button type="submit" class="btn btn-danger text-white">
-                ' . $cancelIcon . '
-            </button>
-        </form>';
-                        }
-                        $buttons .= '</div>';
-
-                        return $buttons;
-                    }
-
-                    return ' <a href="' . $ajukanUlangUrl . '" class="btn btn-info text-white rounded">Ajukan Ulang</a>';
-                })
-                ->addColumn('kedatangan', function ($row) {
-                    $terimaUrl = route('spm.terima', $row->id);
-                    $buttons = '';
-                    if (! in_array($row->status, ['COMPLETED', 'PARTIAL', 'CANCELED'])) {
-                        $buttons = '<a href="' . $terimaUrl . '" class="btn btn-success btn-sm text-white ms-2">' . 'Terima Barang' . '</a>';
-                    } else {
-                        if ($row->file_ttd) {
-                            $downloadUrl = route('spm.download', $row->id);
-                            $downloadIcon = '<svg class="icon"><use xlink:href="' . asset('template/vendors/@coreui/icons/svg/free.svg') . '#cil-cloud-download"></use></svg>';
-                            $buttons = '<a href="' . $downloadUrl . '" class="btn btn-success btn-sm text-white" target="_blank">' . $downloadIcon . '</a>';
-                        }
-                    }
-
-                    return $buttons;
-                })
-                ->rawColumns(['action', 'status', 'kedatangan'])
-                ->make(true);
+        if (! $request->ajax()) {
+            abort(404);
         }
+
+        $perPage = (int) $request->get('per_page', 10);
+        $query = Spm::with(['project' => function ($q) {
+            $q->withoutGlobalScope('onlyWithStock');
+        }, 'createdBy']);
+
+        if ($request->filled('no_spm')) {
+            $query->where('no_spm', 'like', '%' . $request->no_spm . '%');
+        }
+
+        if ($request->filled('project_id')) {
+            $query->where('project_id', $request->project_id);
+        }
+
+        if ($request->filled('tanggal_spm')) {
+            $query->whereDate('tanggal_spm', $request->tanggal_spm);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('no_spm', 'LIKE', "%{$search}%")
+                    ->orWhere('kepada', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $rows = $query->orderBy('created_at', 'desc')
+            ->paginate($perPage)
+            ->through(fn ($spm) => [
+                'id' => $spm->id,
+                'no_spm' => $spm->no_spm,
+                'project_name' => $spm->project?->name_project ?? '-',
+                'kepada' => $spm->kepada,
+                'tanggal_spm' => Carbon::parse($spm->tanggal_spm)->format('d-m-Y'),
+                'status' => $spm->status,
+                'file' => $spm->file,
+                'file_ttd' => $spm->file_ttd,
+                'created_by' => $spm->createdBy?->name ?? '-',
+            ]);
+
+        return response()->json($rows);
     }
 
     public function show(Spm $spm)
@@ -151,7 +135,7 @@ class SpmController extends Controller
     public function getProjects(Request $request)
     {
         if ($request->ajax()) {
-            $projects = Project::orderBy('nama_project')->get(['project_id', 'nama_project as name']);
+            $projects = Project::orderBy('name_project')->get(['project_id', 'name_project as name']);
             return response()->json($projects);
         }
         abort(403);
