@@ -54,7 +54,6 @@
                         <th>Jumlah</th>
                         <th>Unit</th>
                         <th>Tanggal Permintaan</th>
-                        <th>Keterangan</th>
                         <th>Nomor BPRM</th>
                         <th>Tanggal BPRM</th>
                         <th>Jumlah BPRM</th>

@@ -29,7 +29,6 @@ $(function() {
             { targets: 10, width: '140px', minWidth: '140px' },
             { targets: 11, width: '110px', minWidth: '110px' },
             { targets: 12, width: '100px', minWidth: '100px' },
-            { targets: 13, width: '80px',  minWidth: '80px'  },
         ],
         ajax: function(data, callback, settings) {
             $.get(BPM.routes.data, {
@@ -46,6 +45,7 @@ $(function() {
             });
         },
         columns: [
+            //checkbox
             {
                 data: null,
                 name: 'checkbox',
@@ -56,6 +56,7 @@ $(function() {
                     return '<input type="checkbox" class="row-select" value="' + row.id + '">';
                 }
             },
+            // No
             {
                 data: null,
                 name: 'DT_RowIndex',
@@ -66,12 +67,14 @@ $(function() {
                     return meta.row + 1;
                 }
             },
+            // no bpm
             {
                 data: 'bpm_no',
                 name: 'bpm_no',
                 className: 'text-center',
                 defaultContent: ''
             },
+            // cutting plan
             {
                 data: 'cutting_plans',
                 name: 'cutting_plans',
@@ -84,23 +87,28 @@ $(function() {
                     }).join(' ');
                 }
             },
+            // specification
             {
                 data: 'specification',
                 name: 'specification',
+                className: 'text-center',
                 defaultContent: '-'
             },
+            // total
             {
                 data: 'total',
                 name: 'total',
                 className: 'text-center',
                 defaultContent: ''
             },
+            // unit
             {
                 data: 'unit',
                 name: 'unit',
                 className: 'text-center',
                 defaultContent: ''
             },
+            // tanggal permintaan
             {
                 data: 'request_date',
                 name: 'request_date',
