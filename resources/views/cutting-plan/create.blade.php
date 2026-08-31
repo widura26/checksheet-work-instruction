@@ -30,6 +30,7 @@
 @push('js')
     <script type="module">
         $(function() {
+            // --- Combobox helper ---
             function initCombobox(opts) {
                 var $input = $(opts.input);
                 var $hidden = $(opts.hidden);
@@ -52,9 +53,7 @@
                 }
 
                 function search(q) {
-                    $.get(opts.url, {
-                        q: q || ''
-                    }, function(data) {
+                    $.get(opts.url, { q: q || '' }, function(data) {
                         render(data.results || []);
                     });
                 }
@@ -64,9 +63,7 @@
                     $hidden.val('');
                     clearTimeout(timer);
                     var val = $(this).val();
-                    timer = setTimeout(function() {
-                        search(val);
-                    }, 250);
+                    timer = setTimeout(function() { search(val); }, 250);
                 }).on('focus', function() {
                     if (!$dropdown.hasClass('show')) {
                         search($input.val());
@@ -76,9 +73,7 @@
                 $dropdown.on('click', '.dropdown-item', function() {
                     if ($(this).hasClass('disabled')) return;
                     var id = $(this).data('id');
-                    var found = results.find(function(m) {
-                        return String(m.id) === String(id);
-                    });
+                    var found = results.find(function(m) { return String(m.id) === String(id); });
                     $input.val(found ? found.text : '');
                     $hidden.val(id);
                     $dropdown.removeClass('show');
@@ -91,18 +86,7 @@
                 });
             }
 
-            initCombobox({
-                input: '#mat_search',
-                hidden: '#mat',
-                dropdown: '#mat_dropdown',
-                url: "{{ route('cutting-plan.materials') }}"
-            });
-            initCombobox({
-                input: '#kode_proyek_search',
-                hidden: '#kode_proyek',
-                dropdown: '#kode_proyek_dropdown',
-                url: "{{ route('cutting-plan.projects') }}"
-            });
+            // --- Global comboboxes ---
             initCombobox({
                 input: '#cutting_method_search',
                 hidden: '#cutting_method',
@@ -128,45 +112,168 @@
                 url: "{{ route('cutting-plan.users') }}"
             });
 
-            var piecepartTemplate = function(index, data) {
+            // --- Material section template ---
+            var materialIndex = 0;
+
+            function partTemplate(mi, pi, data) {
                 data = data || {};
                 return '<tr>' +
-                    '<td><input type="text" class="form-control form-control-sm" name="pieceparts[' + index + '][part_no]" value="' + (data.part_no ?? '') + '"></td>' +
-                    '<td><input type="text" class="form-control form-control-sm" name="pieceparts[' + index + '][cutting_size]" value="' + (data.cutting_size ?? '') + '"></td>' +
-                    '<td><input type="text" class="form-control form-control-sm" name="pieceparts[' + index + '][qty_car]" value="' + (data.qty_car ?? '') + '"></td>' +
-                    '<td><input type="text" class="form-control form-control-sm" name="pieceparts[' + index + '][qty_lot]" value="' + (data.qty_lot ?? '') + '"></td>' +
-                    '<td><input type="text" class="form-control form-control-sm" name="pieceparts[' + index + '][part_name]" value="' + (data.part_name ?? '') + '"></td>' +
-                    '<td><input type="text" class="form-control form-control-sm" name="pieceparts[' + index + '][remark]" value="' + (data.remark ?? '') + '"></td>' +
-                    '<td class="text-center"><button type="button" class="btn btn-danger btn-sm btn-remove-piecepart"><svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M4.5 22.125c-0 0.003-0 0.006-0 0.008 0 0.613 0.494 1.11 1.105 1.116h12.79c0.612-0.006 1.105-0.504 1.105-1.117 0-0.003-0-0.006-0-0.009v0-15h-15zM6 8.625h12v13.125h-12z"></path><path d="M7.875 10.125h1.5v9.375h-1.5v-9.375z"></path><path d="M11.25 10.125h1.5v9.375h-1.5v-9.375z"></path><path d="M14.625 10.125h1.5v9.375h-1.5v-9.375z"></path><path d="M15.375 4.125v-2.25c0-0.631-0.445-1.125-1.013-1.125h-4.725c-0.568 0-1.013 0.494-1.013 1.125v2.25h-5.625v1.5h18v-1.5zM10.125 2.25h3.75v1.875h-3.75z"></path></svg></button></td>' +
+                    '<td><input type="text" class="form-control form-control-sm" name="materials[' + mi + '][parts][' + pi + '][part_no]" value="' + (data.part_no ?? '') + '"></td>' +
+                    '<td><input type="text" class="form-control form-control-sm" name="materials[' + mi + '][parts][' + pi + '][cutting_size]" value="' + (data.cutting_size ?? '') + '"></td>' +
+                    '<td><input type="text" class="form-control form-control-sm" name="materials[' + mi + '][parts][' + pi + '][qty_car]" value="' + (data.qty_car ?? '') + '"></td>' +
+                    '<td><input type="text" class="form-control form-control-sm" name="materials[' + mi + '][parts][' + pi + '][qty_lot]" value="' + (data.qty_lot ?? '') + '"></td>' +
+                    '<td><input type="text" class="form-control form-control-sm" name="materials[' + mi + '][parts][' + pi + '][part_name]" value="' + (data.part_name ?? '') + '"></td>' +
+                    '<td><input type="text" class="form-control form-control-sm" name="materials[' + mi + '][parts][' + pi + '][remark]" value="' + (data.remark ?? '') + '"></td>' +
+                    '<td class="text-center"><button type="button" class="btn btn-danger btn-sm btn-remove-part"><svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M4.5 22.125c-0 0.003-0 0.006-0 0.008 0 0.613 0.494 1.11 1.105 1.116h12.79c0.612-0.006 1.105-0.504 1.105-1.117 0-0.003-0-0.006-0-0.009v0-15h-15zM6 8.625h12v13.125h-12z"></path><path d="M7.875 10.125h1.5v9.375h-1.5v-9.375z"></path><path d="M11.25 10.125h1.5v9.375h-1.5v-9.375z"></path><path d="M14.625 10.125h1.5v9.375h-1.5v-9.375z"></path><path d="M15.375 4.125v-2.25c0-0.631-0.445-1.125-1.013-1.125h-4.725c-0.568 0-1.013 0.494-1.013 1.125v2.25h-5.625v1.5h18v-1.5zM10.125 2.25h3.75v1.875h-3.75z"></path></svg></button></td>' +
                     '</tr>';
-            };
+            }
 
-            function reindexPieceparts() {
-                $('#piecepartsList tr').each(function(i) {
+            function materialSectionTemplate(mi, data) {
+                data = data || {};
+                var uid = 'mat_combo_' + mi;
+                var html = '<div class="material-section" data-material-index="' + mi + '">' +
+                    '<div class="material-header">' +
+                        '<h6>Material ' + (mi + 1) + '</h6>' +
+                        '<button type="button" class="btn btn-sm btn-outline-danger btn-remove-material">' +
+                            '<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M4.5 22.125c-0 0.003-0 0.006-0 0.008 0 0.613 0.494 1.11 1.105 1.116h12.79c0.612-0.006 1.105-0.504 1.105-1.117 0-0.003-0-0.006-0-0.009v0-15h-15zM6 8.625h12v13.125h-12z"></path><path d="M7.875 10.125h1.5v9.375h-1.5v-9.375z"></path><path d="M11.25 10.125h1.5v9.375h-1.5v-9.375z"></path><path d="M14.625 10.125h1.5v9.375h-1.5v-9.375z"></path></svg> Hapus' +
+                        '</button>' +
+                    '</div>' +
+                    '<div class="cp-form-grid">' +
+                        '<div>' +
+                            '<label class="form-label">Material <span class="text-danger">*</span></label>' +
+                            '<div class="position-relative mat-combobox">' +
+                                '<input type="text" class="form-control" id="' + uid + '_search" placeholder="Cari Material..." autocomplete="off">' +
+                                '<input type="hidden" name="materials[' + mi + '][material_id]" id="' + uid + '_hidden" value="' + (data.material_id ?? '') + '">' +
+                                '<div class="dropdown-menu w-100" id="' + uid + '_dropdown" style="max-height: 240px; overflow-y: auto;"></div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div>' +
+                            '<label class="form-label">Material Size</label>' +
+                            '<input type="text" class="form-control" name="materials[' + mi + '][material_size]" value="' + (data.material_size ?? '') + '">' +
+                        '</div>' +
+                        '<div>' +
+                            '<label class="form-label">Quantity</label>' +
+                            '<input type="number" class="form-control" name="materials[' + mi + '][quantity]" value="' + (data.quantity ?? '') + '">' +
+                        '</div>' +
+                        '<div>' +
+                            '<label class="form-label">WBS</label>' +
+                            '<input type="text" class="form-control" name="materials[' + mi + '][wbs]" value="' + (data.wbs ?? '') + '">' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="parts-section">' +
+                        '<div class="parts-header">' +
+                            '<label class="form-label fw-bold mb-0">Parts</label>' +
+                            '<button type="button" class="btn btn-sm btn-outline-primary btn-add-part">' +
+                                '<svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"></path></svg> Tambah Part' +
+                            '</button>' +
+                        '</div>' +
+                        '<div class="table-responsive">' +
+                            '<table class="table table-bordered table-sm align-middle mb-0">' +
+                                '<thead class="text-center">' +
+                                    '<tr>' +
+                                        '<th style="width: 14%">Part No</th>' +
+                                        '<th style="width: 14%">Cutting Size</th>' +
+                                        '<th style="width: 12%">Qty / Car</th>' +
+                                        '<th style="width: 12%">Qty / Lot</th>' +
+                                        '<th style="width: 18%">Part Name</th>' +
+                                        '<th style="width: 22%">Remark</th>' +
+                                        '<th style="width: 8%">Aksi</th>' +
+                                    '</tr>' +
+                                '</thead>' +
+                                '<tbody class="parts-body"></tbody>' +
+                            '</table>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+                return html;
+            }
+
+            function addMaterial(data) {
+                var mi = materialIndex++;
+                $('#materialsContainer').append(materialSectionTemplate(mi, data));
+                var $section = $('[data-material-index="' + mi + '"]');
+                // Init combobox for this material
+                initCombobox({
+                    input: '#' + 'mat_combo_' + mi + '_search',
+                    hidden: '#' + 'mat_combo_' + mi + '_hidden',
+                    dropdown: '#' + 'mat_combo_' + mi + '_dropdown',
+                    url: "{{ route('cutting-plan.materials') }}"
+                });
+                // Add default empty part
+                addPart(mi, null);
+                // Pre-fill if data provided
+                if (data && data.material_name) {
+                    $section.find('#mat_combo_' + mi + '_search').val(data.material_name);
+                }
+                if (data && Array.isArray(data.parts) && data.parts.length) {
+                    $section.find('.parts-body').empty();
+                    $.each(data.parts, function(i, pp) {
+                        addPart(mi, pp);
+                    });
+                }
+            }
+
+            function addPart(mi, data) {
+                var $section = $('[data-material-index="' + mi + '"]');
+                var $tbody = $section.find('.parts-body');
+                var pi = $tbody.find('tr').length;
+                $tbody.append(partTemplate(mi, pi, data));
+            }
+
+            function reindexParts(mi) {
+                var $section = $('[data-material-index="' + mi + '"]');
+                $section.find('.parts-body tr').each(function(i) {
                     $(this).find('input').each(function() {
                         var name = $(this).attr('name');
-                        var newName = name.replace(/pieceparts\[\d+\]/, 'pieceparts[' + i + ']');
+                        var newName = name.replace(/parts\[\d+\]/, 'parts[' + i + ']');
                         $(this).attr('name', newName);
                     });
                 });
             }
 
-            function addPiecepart(data) {
-                var index = $('#piecepartsList tr').length;
-                $('#piecepartsList').append(piecepartTemplate(index, data));
-            }
-
-            $('#btnAddPiecepart').on('click', function() {
-                addPiecepart();
+            // --- Events ---
+            $('#btnAddMaterial').on('click', function() {
+                addMaterial();
             });
 
-            $('#piecepartsList').on('click', '.btn-remove-piecepart', function() {
+            $(document).on('click', '.btn-remove-material', function() {
+                $(this).closest('.material-section').remove();
+                // Reindex remaining materials
+                $('#materialsContainer .material-section').each(function(newMi) {
+                    $(this).attr('data-material-index', newMi);
+                    $(this).find('.material-header h6').text('Material ' + (newMi + 1));
+                    $(this).find('input, .dropdown-menu').each(function() {
+                        var name = $(this).attr('name');
+                        if (name) {
+                            var newName = name.replace(/materials\[\d+\]/, 'materials[' + newMi + ']');
+                            $(this).attr('name', newName);
+                        }
+                        var id = $(this).attr('id');
+                        if (id) {
+                            var newId = id.replace(/mat_combo_\d+/, 'mat_combo_' + newMi);
+                            $(this).attr('id', newId);
+                        }
+                    });
+                });
+                materialIndex = $('#materialsContainer .material-section').length;
+            });
+
+            $(document).on('click', '.btn-add-part', function() {
+                var mi = $(this).closest('.material-section').data('material-index');
+                addPart(mi);
+            });
+
+            $(document).on('click', '.btn-remove-part', function() {
+                var $section = $(this).closest('.material-section');
+                var mi = $section.data('material-index');
                 $(this).closest('tr').remove();
-                reindexPieceparts();
+                reindexParts(mi);
             });
 
-            addPiecepart();
+            // Init with one material section
+            addMaterial();
 
+            // --- Form submission ---
             $('#crudForm').on('submit', function(e) {
                 e.preventDefault();
                 var form = this;
@@ -197,7 +304,7 @@
                             $('#formError').removeClass('d-none').html(msg);
                         } else {
                             $('#formError').removeClass('d-none').text(
-                                `Terjadi kesalahan saat menyimpan data. ${xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : ''}`);
+                                'Terjadi kesalahan saat menyimpan data. ' + (xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : ''));
                         }
                     }
                 });

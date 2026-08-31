@@ -52,11 +52,8 @@
                             <th class="text-center" style="width: 40px;"><input type="checkbox" id="selectAll" title="Pilih semua"></th>
                             <th>No</th>
                             <th>No CP</th>
-                            <th>Material</th>
+                            <th>Materials</th>
                             <th>Kode Proyek</th>
-                            <th>WBS</th>
-                            <th>Material Size</th>
-                            <th>Quantity</th>
                             <th>Cutting Method</th>
                             <th>Sket</th>
                             <th>Parts</th>
@@ -64,7 +61,6 @@
                             <th>Date Issued</th>
                             <th>Date Revised</th>
                             <th>BPM Number</th>
-                            <th>Date of BPM</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>

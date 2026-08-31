@@ -45,7 +45,9 @@ class BarcodeController extends Controller
             return response()->json(['data' => []]);
         }
 
-        $parts = Part::where('cutting_plan_id', $cuttingPlanId)
+        $parts = Part::whereHas('cuttingPlanMaterial', function ($q) use ($cuttingPlanId) {
+                $q->where('cutting_plan_id', $cuttingPlanId);
+            })
             ->orderBy('part_number')
             ->get(['id', 'part_number', 'cutting_size', 'part_name'])
             ->map(function ($part) {

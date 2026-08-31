@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('okas', function (Blueprint $table) {
-            $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('project_id', 'okas_project_id_foreign_2')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
         });
 
         Schema::table('drawings', function (Blueprint $table) {
