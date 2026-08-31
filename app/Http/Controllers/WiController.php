@@ -2,20 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MdHeader;
+use App\Models\CuttingPlan;
 use App\Models\WiTrn;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Yajra\DataTables\Facades\DataTables;
 
 class WiController extends Controller
 {
     public function index()
     {
-        $mdHeaders = MdHeader::orderBy('part_no')->get(['id', 'part_no', 'title']);
+        $cuttingPlans = CuttingPlan::orderBy('no_cp')->get(['id', 'no_cp']);
 
-        return view('wi.index', compact('mdHeaders'));
+        return view('wi.index', compact('cuttingPlans'));
     }
 
     public function data(Request $request)
@@ -24,70 +22,38 @@ class WiController extends Controller
             abort(404);
         }
 
-        $query = WiTrn::query()
-            ->leftJoin('md_headers', 'wi_trns.md_header_id', '=', 'md_headers.id')
-            ->leftJoin('cps', 'wi_trns.cp_id', '=', 'cps.id')
-            ->leftJoinSub(
-                DB::table('cp_details')
-                    ->select('id_cp', DB::raw('MAX(shop_name) as shop_name'))
-                    ->groupBy('id_cp'),
-                'cpd',
-                'cpd.id_cp',
-                '=',
-                'cps.no_cp'
-            )
+        $perPage = (int) $request->get('per_page', 10);
+        $wiTrns = WiTrn::query()
+            ->leftJoin('cutting_plans', 'work_instructions.cutting_plan_id', '=', 'cutting_plans.id')
             ->select([
-                'wi_trns.id',
-                'wi_trns.md_header_id',
-                'wi_trns.part_no',
-                'wi_trns.name',
-                'wi_trns.mat_cp as mat',
-                'md_headers.t1',
-                'md_headers.h1',
-                'md_headers.b1',
-                'md_headers.l1',
-                'md_headers.ws1',
-                'md_headers.ws2',
-                'md_headers.ws3',
-                'md_headers.ws4',
-                'md_headers.ws5',
-                'cps.shop as shop1',
-                'cpd.shop_name as shop2',
-                'md_headers.des',
-                'wi_trns.no_ctplan',
-                'wi_trns.tgl_ctplan',
-                'wi_trns.qty_lot',
-                'wi_trns.no_bpm',
-                'wi_trns.tgl_bpm',
-                'wi_trns.tgl_trn',
-                'wi_trns.keterangan',
-            ]);
+                'work_instructions.id',
+                'work_instructions.work_instruction_number',
+                'work_instructions.cutting_plan_id',
+                'work_instructions.ket_wi',
+                'work_instructions.rev',
+                'work_instructions.estimasi',
+                'work_instructions.note',
+                'cutting_plans.no_cp as no_cp',
+            ])
+            ->orderBy('work_instructions.created_at', 'desc')
+            ->paginate($perPage);
 
-        return DataTables::of($query)
-            ->addIndexColumn()
-            ->make(true);
+        return response()->json($wiTrns);
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'part_no' => 'nullable|string|max:255',
-            'name' => 'nullable|string|max:255',
-            'mat_cp' => 'nullable|string|max:255',
-            'md_header_id' => 'nullable|exists:md_headers,id',
-            'no_ctplan' => 'nullable|string|max:255',
-            'tgl_ctplan' => 'nullable|date',
-            'qty_lot' => 'nullable|integer',
-            'no_bpm' => 'nullable|string|max:255',
-            'tgl_bpm' => 'nullable|date',
-            'tgl_trn' => 'nullable|date',
+            'cutting_plan_id' => 'nullable|exists:cutting_plans,id',
+            'work_instruction_number' => 'required|string',
             'keterangan' => 'nullable|string',
+            'rev' => 'nullable|integer',
+            'estimasi' => 'nullable|date',
+            'note' => 'nullable|string',
         ], [
-            'md_header_id.exists' => 'Manufacture Drawing tidak ditemukan.',
-            'tgl_ctplan.date' => 'Tgl Cp harus berupa tanggal.',
-            'tgl_bpm.date' => 'Tgl Bpm harus berupa tanggal.',
-            'tgl_trn.date' => 'Tgl WI Trn harus berupa tanggal.',
-            'qty_lot.integer' => 'Qty/lot harus berupa angka.',
+            'cutting_plan_id.exists' => 'Cutting Plan tidak ditemukan.',
+            'rev.integer' => 'Revisi harus berupa angka.',
+            'estimasi.date' => 'Estimasi harus berupa tanggal.',
         ]);
 
         if ($validator->fails()) {
@@ -102,23 +68,15 @@ class WiController extends Controller
     public function update(Request $request, WiTrn $wiTrn)
     {
         $validator = Validator::make($request->all(), [
-            'part_no' => 'nullable|string|max:255',
-            'name' => 'nullable|string|max:255',
-            'mat_cp' => 'nullable|string|max:255',
-            'md_header_id' => 'nullable|exists:md_headers,id',
-            'no_ctplan' => 'nullable|string|max:255',
-            'tgl_ctplan' => 'nullable|date',
-            'qty_lot' => 'nullable|integer',
-            'no_bpm' => 'nullable|string|max:255',
-            'tgl_bpm' => 'nullable|date',
-            'tgl_trn' => 'nullable|date',
+            'cutting_plan_id' => 'nullable|exists:cutting_plans,id',
             'keterangan' => 'nullable|string',
+            'rev' => 'nullable|integer',
+            'estimasi' => 'nullable|date',
+            'note' => 'nullable|string',
         ], [
-            'md_header_id.exists' => 'Manufacture Drawing tidak ditemukan.',
-            'tgl_ctplan.date' => 'Tgl Cp harus berupa tanggal.',
-            'tgl_bpm.date' => 'Tgl Bpm harus berupa tanggal.',
-            'tgl_trn.date' => 'Tgl WI Trn harus berupa tanggal.',
-            'qty_lot.integer' => 'Qty/lot harus berupa angka.',
+            'cutting_plan_id.exists' => 'Cutting Plan tidak ditemukan.',
+            'rev.integer' => 'Revisi harus berupa angka.',
+            'estimasi.date' => 'Estimasi harus berupa tanggal.',
         ]);
 
         if ($validator->fails()) {

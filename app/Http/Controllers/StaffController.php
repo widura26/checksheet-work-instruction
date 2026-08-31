@@ -15,7 +15,7 @@ class StaffController extends Controller
     }
     public function index()
     {
-        $roles = Role::where('name', '<>', 'admin')->get();
+        $roles = Role::all();
 
         return view('pages.staff.index', compact('roles'));
     }
@@ -56,7 +56,7 @@ class StaffController extends Controller
                     : '<span class="badge bg-secondary">Nonaktif</span>';
             }
 
-            $action = '<a href="' . route('staff.edit', $staff->id) . '" class="btn btn-sm btn-warning me-1">Edit</a>';
+                $action = '<button type="button" class="btn btn-sm btn-warning me-1" onclick="openEditModal(' . $staff->id . ')">Edit</button>';
             $action .= '<form action="' . route('staff.destroy', $staff->id) . '" method="POST" class="d-inline" onsubmit="return confirm(\'Apakah Anda yakin ingin menghapus user ini?\')">
                     ' . csrf_field() . '
                     ' . method_field('DELETE') . '
@@ -68,7 +68,9 @@ class StaffController extends Controller
                 'name' => $staff->name,
                 'email' => $staff->email,
                 'nip' => $staff->nip,
-                'role' => ucfirst($staff->roles->first()->name ?? '-'),
+                'role' => $staff->roles->isNotEmpty()
+                    ? $staff->roles->pluck('name')->map(fn($r) => ucfirst($r))->join(', ')
+                    : '-',
                 'status' => $status,
                 'action' => $action,
             ];
@@ -84,7 +86,8 @@ class StaffController extends Controller
             'email' => 'required|email|unique:users',
             'nip' => 'required|unique:users|min:9',
             'password' => 'required|string|min:6',
-            'role' => 'required|exists:roles,name',
+            'role' => 'required|array',
+            'role.*' => 'exists:roles,name',
         ]);
 
         $user = User::create([
@@ -94,15 +97,24 @@ class StaffController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        $user->assignRole($request->role);
+        $user->syncRoles($request->role);
 
         return redirect()->route('staff.index')->with('success', 'Staff berhasil dibuat.');
     }
 
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
         $staff = User::findOrFail($id);
         $roles = Role::all();
+        $assigned = $staff->roles->pluck('name')->toArray();
+
+        if ($this->isApiRequest($request)) {
+            return response()->json([
+                'staff' => $staff,
+                'roles' => $roles,
+                'assigned' => $assigned,
+            ]);
+        }
 
         return view('pages.staff.edit', compact('staff', 'roles'));
     }
@@ -114,7 +126,8 @@ class StaffController extends Controller
             'email' => 'required|email|unique:users,email,' . $id,
             'nip' => 'required|unique:users,nip,' . $id,
             'password' => 'nullable|string|min:6',
-            'role' => 'required|exists:roles,name',
+            'role' => 'required|array',
+            'role.*' => 'exists:roles,name',
         ]);
 
         $staff = User::findOrFail($id);
@@ -129,9 +142,18 @@ class StaffController extends Controller
 
         $staff->save();
 
-        $staff->syncRoles([$request->role]);
+        $staff->syncRoles($request->role);
+
+        if ($this->isApiRequest($request)) {
+            return response()->json(['success' => 'Staff berhasil diperbarui.']);
+        }
 
         return redirect()->route('staff.index')->with('success', 'Staff berhasil diperbarui.');
+    }
+
+    protected function isApiRequest(Request $request)
+    {
+        return $request->ajax() || $request->wantsJson();
     }
     public function changeStatus($nip)
     {

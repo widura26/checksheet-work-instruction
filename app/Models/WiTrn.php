@@ -10,7 +10,7 @@ class WiTrn extends Model
 {
     use HasFactory;
 
-    protected $table = 'wi_trns';
+    protected $table = 'work_instructions';
 
     protected $guarded = ['id'];
 

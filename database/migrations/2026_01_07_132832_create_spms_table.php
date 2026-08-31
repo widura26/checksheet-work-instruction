@@ -13,16 +13,9 @@ return new class extends Migration
     {
         Schema::create('spms', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('created_by')
-                ->constrained('users')
-                ->cascadeOnUpdate()
-                ->restrictOnDelete();
+            $table->foreignId('created_by')->constrained('users')->cascadeOnUpdate()->restrictOnDelete();
             $table->string('project_id', 50);
-            $table->foreign('project_id')
-                ->references('id')
-                ->on('projects')
-                ->cascadeOnUpdate()
-                ->restrictOnDelete();
+            $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreignId('departemen_id')->nullable()->constrained('departemens');
             $table->foreignId('bagian_id')->nullable()->constrained('bagians');
             $table->foreignId('unit_id')->nullable()->constrained('units');

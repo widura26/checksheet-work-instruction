@@ -13,6 +13,10 @@ class Part extends Model
     protected $table = 'parts';
     protected $guarded = ['id'];
 
+    public $incrementing = false;
+
+    protected $keyType = 'string';
+
     protected static function boot()
     {
         parent::boot();
@@ -24,9 +28,9 @@ class Part extends Model
         });
     }
 
-    public function cuttingPlan()
+    public function cuttingPlanMaterial()
     {
-        return $this->belongsTo(CuttingPlan::class, 'cutting_plan_id');
+        return $this->belongsTo(CuttingPlanMaterial::class, 'cutting_plan_material_id');
     }
 
 }

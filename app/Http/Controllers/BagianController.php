@@ -22,8 +22,7 @@ class BagianController extends Controller
         if (!$request->ajax()) {
             abort(403);
         }
-        $bagian = Bagian::with('departemen')
-            ->withCount('distribusiTools');
+        $bagian = Bagian::with('departemen');
 
         return DataTables::of($bagian)
             ->addIndexColumn()
@@ -47,7 +46,7 @@ class BagianController extends Controller
                 $buttons .= '</div>';
                 return $buttons;
             })
-            ->rawColumns(['action', 'jumlah_distribusi'])
+            ->rawColumns(['action'])
             ->make(true);
     }
 

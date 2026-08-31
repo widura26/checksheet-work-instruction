@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Bpm;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -22,26 +23,34 @@ class CuttingPlan extends Model
         'date_issued' => 'date',
         'date_revised' => 'date',
         'date_of_bpm' => 'date',
-        'quantity' => 'integer',
-        'qty_lot' => 'integer',
     ];
 
-    protected $appends = ['pieceparts'];
+    protected $appends = ['materials_data'];
 
-    public function getPiecepartsAttribute()
+    public function getMaterialsDataAttribute()
     {
-        if (! $this->relationLoaded('parts')) {
-            $this->load('parts');
+        if (! $this->relationLoaded('materials')) {
+            $this->load('materials.parts');
         }
 
-        return $this->parts->map(function ($p) {
+        return $this->materials->map(function ($m) {
             return [
-                'part_no' => $p->part_number,
-                'cutting_size' => $p->cutting_size,
-                'qty_car' => $p->quantity_per_car,
-                'qty_lot' => $p->quantity_per_lot,
-                'part_name' => $p->part_name,
-                'remark' => $p->remark,
+                'id' => $m->id,
+                'material_id' => $m->material_id,
+                'material_name' => $m->material ? $m->material->kode_material . ' - ' . $m->material->deskripsi : '',
+                'material_size' => $m->material_size,
+                'quantity' => $m->quantity,
+                'wbs' => $m->wbs,
+                'parts' => $m->parts->map(function ($p) {
+                    return [
+                        'part_no' => $p->part_number,
+                        'cutting_size' => $p->cutting_size,
+                        'qty_car' => $p->quantity_per_car,
+                        'qty_lot' => $p->quantity_per_lot,
+                        'part_name' => $p->part_name,
+                        'remark' => $p->remark,
+                    ];
+                })->values()->all(),
             ];
         })->values()->all();
     }
@@ -93,10 +102,19 @@ class CuttingPlan extends Model
 
     public function parts()
     {
-        return $this->hasMany(Part::class, 'cutting_plan_id');
+        return $this->hasManyThrough(Part::class, CuttingPlanMaterial::class, 'cutting_plan_id', 'cutting_plan_material_id');
+    }
+
+    public function materials()
+    {
+        return $this->hasMany(CuttingPlanMaterial::class, 'cutting_plan_id');
     }
 
     public function material(){
         return $this->belongsTo(Material::class, 'material_id');
+    }
+
+    public function bpm(){
+        return $this->hasOne(Bpm::class, 'cutting_plan_id');
     }
 }

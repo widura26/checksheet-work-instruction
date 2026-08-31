@@ -1,26 +1,28 @@
 <?php
 
+use App\Http\Controllers\BagianController;
 use App\Http\Controllers\BarcodeController;
+use App\Http\Controllers\BpmController;
 use App\Http\Controllers\CheckSheetController;
 use App\Http\Controllers\CuttingPlanController;
+use App\Http\Controllers\DaftarKaryawanController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DepartemenController;
+use App\Http\Controllers\DistribusiController;
 use App\Http\Controllers\ExpedisiController;
 use App\Http\Controllers\GrafikController;
 use App\Http\Controllers\KodeMaterialController;
 use App\Http\Controllers\MdController;
-use App\Http\Controllers\DaftarKaryawanController;
-use App\Http\Controllers\DepartemenController;
 use App\Http\Controllers\OkaController;
-use App\Http\Controllers\ProsesController;
 use App\Http\Controllers\ProjectCodeController;
+use App\Http\Controllers\ProsesController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SpmController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\SttpController;
+use App\Http\Controllers\UnitController;
 use App\Http\Controllers\WiController;
 use App\Http\Controllers\WiLapController;
-use App\Http\Controllers\DistribusiController;
-// use App\Http\Livewire\Distribusi\CreateForm;
-// use App\Http\Livewire\Distribusi\PenyerahanCreateForm;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -48,7 +50,18 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::put('/{kodeMaterial}', [KodeMaterialController::class, 'update'])->name('kode-material.update');
         Route::delete('/{kodeMaterial}', [KodeMaterialController::class, 'destroy'])->name('kode-material.destroy');
     });
-    Route::get('/barcode', [BarcodeController::class, 'index'])->name('barcode.index');
+    Route::prefix('barcode')->group(function () {
+        Route::get('/', [BarcodeController::class, 'index'])->name('barcode.index');
+        Route::get('/create', [BarcodeController::class, 'create'])->name('barcode.create');
+        Route::get('/data', [BarcodeController::class, 'data'])->name('barcode.data');
+        Route::get('/parts', [BarcodeController::class, 'parts'])->name('barcode.parts');
+        Route::get('/export', [BarcodeController::class, 'export'])->name('barcode.export');
+        Route::post('/', [BarcodeController::class, 'store'])->name('barcode.store');
+        Route::get('/{barcode}/edit', [BarcodeController::class, 'edit'])->name('barcode.edit');
+        Route::put('/{barcode}', [BarcodeController::class, 'update'])->name('barcode.update');
+        Route::delete('/bulk-destroy', [BarcodeController::class, 'bulkDestroy'])->name('barcode.bulk-destroy');
+        Route::delete('/{barcode}', [BarcodeController::class, 'destroy'])->name('barcode.destroy');
+    });
 
     Route::prefix('project-code')->group(function(){
         Route::get('/', [ProjectCodeController::class, 'index'])->name('project-code.index');
@@ -85,12 +98,37 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::get('/processes', [CuttingPlanController::class, 'processes'])->name('cutting-plan.processes');
     });
 
+    Route::prefix('bon-permintaan-material')->group(function(){
+        Route::get('/', [BpmController::class, 'index'])->name('bon-permintaan-material.index');
+        Route::get('/create', [BpmController::class, 'create'])->name('bon-permintaan-material.create');
+        Route::post('/', [BpmController::class, 'store'])->name('bon-permintaan-material.store');
+        Route::get('/data', [BpmController::class, 'data'])->name('bon-permintaan-material.data');
+        Route::get('/export', [BpmController::class, 'export'])->name('bon-permintaan-material.export');
+        Route::delete('/bulk-destroy', [BpmController::class, 'bulkDestroy'])->name('bon-permintaan-material.bulk-destroy');
+        Route::delete('/{bpm}', [BpmController::class, 'destroy'])->name('bon-permintaan-material.destroy');
+    });
+
     Route::prefix('work-instruction')->group(function () {
         Route::get('/', [WiController::class, 'index'])->name('wi.index');
         Route::get('/data', [WiController::class, 'data'])->name('wi.data');
         Route::post('/', [WiController::class, 'store'])->name('wi.store');
         Route::put('/{wiTrn}', [WiController::class, 'update'])->name('wi.update');
         Route::delete('/{wiTrn}', [WiController::class, 'destroy'])->name('wi.destroy');
+    });
+
+    Route::prefix('spm')->name('spm.')->group(function () {
+        Route::get('/', [SpmController::class, 'index'])->name('index');
+        Route::get('/data', [SpmController::class, 'getData'])->name('getData');
+        Route::get('/projects', [SpmController::class, 'getProjects'])->name('getProjects');
+        Route::get('/statuses', [SpmController::class, 'getStatuses'])->name('getStatuses');
+        Route::get('/create', [SpmController::class, 'create'])->name('create');
+        Route::get('/{spm}', [SpmController::class, 'show'])->name('show');
+        Route::get('/{spm}/print', [SpmController::class, 'print'])->name('print');
+        Route::get('/{spm}/terima', [SpmController::class, 'terima'])->name('terima');
+        Route::post('/{spm}/cancel', [SpmController::class, 'cancelSpm'])->name('cancel');
+        Route::get('/{spm}/download', [SpmController::class, 'download'])->name('download');
+        Route::get('/{spm}/ajukan-ulang', [SpmController::class, 'ajukanUlang'])->name('ajukan-ulang');
+        Route::delete('/{spm}', [SpmController::class, 'destroy'])->name('destroy');
     });
 
     Route::get('/check-sheet', [CheckSheetController::class, 'index'])->name('check-sheet.index');
@@ -147,6 +185,32 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::get('/{id}/distribusi', [DepartemenController::class, 'distribusi'])->name('distribusi');
         Route::get('/{id}/distribusi/data', [DepartemenController::class, 'getDistribusiData'])->name('distribusi.data');
         Route::post('/{departemen}/toggle', [DepartemenController::class, 'toggleDepartemen'])->name('toggle');
+    });
+
+    Route::prefix('lokasi/bagian')->name('lokasi.bagian.')->group(function () {
+        Route::get('/', [BagianController::class, 'index'])->name('index');
+        Route::get('/data', [BagianController::class, 'getData'])->name('data');
+        Route::get('/create', [BagianController::class, 'create'])->name('create');
+        Route::post('/', [BagianController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [BagianController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [BagianController::class, 'update'])->name('update');
+        Route::delete('/{id}', [BagianController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}/distribusi', [BagianController::class, 'distribusi'])->name('distribusi');
+        Route::get('/{id}/distribusi/data', [BagianController::class, 'getDistribusiData'])->name('distribusi.data');
+        Route::post('/{bagian}/toggle', [BagianController::class, 'toggleBagian'])->name('toggle');
+    });
+
+    Route::prefix('lokasi/unit')->name('lokasi.unit.')->group(function () {
+        Route::get('/', [UnitController::class, 'index'])->name('index');
+        Route::get('/data', [UnitController::class, 'data'])->name('data');
+        Route::get('/create', [UnitController::class, 'create'])->name('create');
+        Route::post('/', [UnitController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [UnitController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [UnitController::class, 'update'])->name('update');
+        Route::delete('/{id}', [UnitController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}/distribusi', [UnitController::class, 'distribusi'])->name('distribusi');
+        Route::get('/{id}/distribusi/data', [UnitController::class, 'getDistribusiData'])->name('distribusi.data');
+        Route::post('/{unit}/toggle', [UnitController::class, 'toggleUnit'])->name('toggle');
     });
 
     Route::prefix('distribusi')->controller(DistribusiController::class)->group(function () {

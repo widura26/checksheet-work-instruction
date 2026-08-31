@@ -43,4 +43,14 @@ class Barcode extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function cuttingPlan()
+    {
+        return $this->belongsTo(CuttingPlan::class, 'cutting_plan_id');
+    }
+
+    public function part()
+    {
+        return $this->belongsTo(Part::class, 'part_id');
+    }
 }

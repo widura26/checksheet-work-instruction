@@ -71,13 +71,6 @@
 
         @include('components.parts.sidebar-list-item', [
             'navtype' => 'nav-item',
-            'route' => 'wi.index',
-            'icon' => 'cil-description',
-            'label' => 'Work Instruction'
-        ])
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
             'route' => 'barcode.index',
             'icon' => 'cil-barcode',
             'label' => 'Barcode'
@@ -85,9 +78,30 @@
 
         @include('components.parts.sidebar-list-item', [
             'navtype' => 'nav-item',
+            'route' => 'bon-permintaan-material.index',
+            'icon' => 'cil-list',
+            'label' => 'Bon Permintaan Material'
+        ])
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
+            'route' => 'wi.index',
+            'icon' => 'cil-description',
+            'label' => 'Work Instruction'
+        ])
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
+            'route' => 'spm.index',
+            'icon' => 'cil-cart',
+            'label' => 'Surat Permintaan Material'
+        ])
+
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
             'route' => 'sttp.index',
             'icon' => 'cil-file',
-            'label' => 'STTPP'
+            'label' => 'Surat Tanda Terima Penyerahan Produk'
         ])
 
         @include('components.parts.sidebar-list-item', [
@@ -154,16 +168,17 @@
                     'route' => 'lokasi.departemen.index',
                     'label' => 'Departemen',
                 ],
+                [
+                    'navtype' => 'nav-item',
+                    'route' => 'lokasi.bagian.index',
+                    'label' => 'Bagian',
+                ],
+                [
+                    'navtype' => 'nav-item',
+                    'route' => 'lokasi.unit.index',
+                    'label' => 'Unit',
+                ],
             ]
-        ])
-
-        <li class="nav-title">Akun</li>
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'logout',
-            'icon' => 'cil-account-logout',
-            'label' => 'Log out'
         ])
 
     </ul>

@@ -14,7 +14,6 @@
         margin-bottom: .35rem;
     }
 
-    /* Combobox Material: potong teks dengan ellipsis, tanpa scroll horizontal */
     .mat-combobox .dropdown-menu {
         overflow-x: hidden;
     }
@@ -25,6 +24,38 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    .material-section {
+        border: 1px solid #dee2e6;
+        border-radius: .5rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background: #f8f9fa;
+    }
+
+    .material-section .material-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+
+    .material-section .material-header h6 {
+        margin-bottom: 0;
+        color: #0d6efd;
+        font-weight: 600;
+    }
+
+    .parts-section {
+        margin-top: 0.75rem;
+    }
+
+    .parts-section .parts-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
     }
 
     @media (max-width: 575.98px) {
@@ -44,32 +75,12 @@
         <input type="text" class="form-control" name="no_cp" id="no_cp" required>
     </div>
     <div>
-        <label for="mat_search" class="form-label">Material</label>
+        <label for="project_search" class="form-label">Kode Proyek</label>
         <div class="position-relative mat-combobox">
-            <input type="text" class="form-control" id="mat_search" name="mat_search" placeholder="Cari Material..." autocomplete="off">
-            <input type="hidden" name="material_id" id="mat">
-            <div class="dropdown-menu w-100" id="mat_dropdown" style="max-height: 240px; overflow-y: auto;"></div>
+            <input type="text" class="form-control" id="project_search" name="project_search" placeholder="Cari Proyek..." autocomplete="off">
+            <input type="hidden" name="project_id" id="project_id">
+            <div class="dropdown-menu w-100" id="project_dropdown" style="max-height: 240px; overflow-y: auto;"></div>
         </div>
-    </div>
-    <div>
-        <label for="kode_proyek_search" class="form-label">Kode Proyek</label>
-        <div class="position-relative mat-combobox">
-            <input type="text" class="form-control" id="kode_proyek_search" name="kode_proyek_search" placeholder="Cari Kode Proyek..." autocomplete="off">
-            <input type="hidden" name="project_id" id="kode_proyek">
-            <div class="dropdown-menu w-100" id="kode_proyek_dropdown" style="max-height: 240px; overflow-y: auto;"></div>
-        </div>
-    </div>
-    <div>
-        <label for="wbs" class="form-label">WBS</label>
-        <input type="text" class="form-control" name="wbs" id="wbs">
-    </div>
-    <div>
-        <label for="material_size" class="form-label">Material Size</label>
-        <input type="text" class="form-control" name="material_size" id="material_size">
-    </div>
-    <div>
-        <label for="quantity" class="form-label">Quantity</label>
-        <input type="number" class="form-control" name="quantity" id="quantity">
     </div>
     <div>
         <label for="cutting_method_search" class="form-label">Cutting Method</label>
@@ -87,27 +98,13 @@
     <hr class="grid-full">
 
     <div class="grid-full d-flex justify-content-between align-items-center mb-2">
-        <h6 class="text-primary fw-bold mb-0">Pieceparts</h6>
-        <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddPiecepart">
-            <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"></path></svg> Tambah Piecepart
+        <h6 class="text-primary fw-bold mb-0">Materials</h6>
+        <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddMaterial">
+            <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"></path></svg> Tambah Material
         </button>
     </div>
-    <div class="grid-full table-responsive mb-1">
-        <table class="table table-bordered table-sm align-middle" id="piecepartsTable">
-            <thead class="text-center">
-                <tr>
-                    <th style="width: 14%">Part No</th>
-                    <th style="width: 14%">Cutting Size</th>
-                    <th style="width: 12%">Qty / Car</th>
-                    <th style="width: 12%">Qty / Lot</th>
-                    <th style="width: 18%">Part Name</th>
-                    <th style="width: 22%">Remark</th>
-                    <th style="width: 8%">Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="piecepartsList"></tbody>
-        </table>
-    </div>
+
+    <div id="materialsContainer" class="grid-full"></div>
 
     <hr class="grid-full">
 

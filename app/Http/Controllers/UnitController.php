@@ -18,8 +18,7 @@ class UnitController extends Controller
 
     public function data()
     {
-        $unit = Unit::with('bagian')
-            ->withCount('distribusiTools');
+        $unit = Unit::with('bagian');
 
         return DataTables::of($unit)
             ->addIndexColumn()
@@ -43,7 +42,7 @@ class UnitController extends Controller
                 $buttons .= '</div>';
                 return $buttons;
             })
-            ->rawColumns(['action', 'jumlah_distribusi'])
+            ->rawColumns(['action'])
             ->make(true);
     }
 

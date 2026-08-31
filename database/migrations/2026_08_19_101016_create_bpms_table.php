@@ -10,20 +10,18 @@ return new class extends Migration
     {
         Schema::create('bpms', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('no_bpm')->nullable()->unique();
-            $table->foreignUuid('oka_id')->nullable()->index();
+            $table->uuid('cutting_plan_id')->nullable()->unique();
+            $table->string('bpm_no')->nullable()->unique();
             $table->foreignUuid('material_id')->nullable()->index();
-            $table->string('spec')->nullable();
-            $table->bigInteger('jumlah')->nullable();
-            $table->string('satuan')->nullable();
-            $table->date('tgl_permintaan')->nullable();
-            $table->text('ket_bpm')->nullable();
-            $table->foreignUuid('wi_trn_id')->nullable()->index();
-            $table->string('no_bprm')->nullable();
-            $table->date('tgl_bprm')->nullable();
-            $table->string('head_number')->nullable();
-            $table->bigInteger('jml_bprm')->nullable();
-            $table->string('stok')->nullable();
+            $table->text('specification')->nullable();
+            $table->bigInteger('total')->nullable();
+            $table->string('unit')->nullable();
+            $table->date('request_date')->nullable();
+            $table->foreignUuid('work_instruction_id')->nullable()->index();
+            $table->string('bprm_no')->nullable();
+            $table->date('brpm_date')->nullable();
+            $table->bigInteger('bprm_total')->nullable();
+            $table->string('stock')->nullable();
             $table->foreignId('user_id')->nullable()->index();
             $table->timestamps();
         });

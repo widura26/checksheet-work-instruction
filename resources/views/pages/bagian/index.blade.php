@@ -59,7 +59,7 @@
     <script type="module">
         $(document).ready(function() {
             var table = $('#table-bagian').DataTable({
-                processing: true,
+                processing: false,
                 serverSide: true,
                 ajax: "{{ route('bagian.data') }}",
                 columns: [{

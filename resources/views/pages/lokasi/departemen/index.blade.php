@@ -32,7 +32,7 @@
     <script type="module">
         $(function() {
             $('#departemen-table').DataTable({
-                processing: true,
+                processing: false,
                 serverSide: true,
                 responsive: true,
                 scrollX: true,

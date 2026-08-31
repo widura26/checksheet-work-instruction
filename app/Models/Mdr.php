@@ -11,7 +11,7 @@ class Mdr extends Model
 {
     use HasFactory;
 
-    protected $table = 'mdrs';
+    protected $table = 'manufacture_drawings';
 
     protected $guarded = ['id'];
 
@@ -30,7 +30,7 @@ class Mdr extends Model
         });
     }
 
-    public function proyek(): BelongsTo
+    public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
     }
