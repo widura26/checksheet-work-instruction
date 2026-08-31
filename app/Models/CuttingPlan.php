@@ -92,6 +92,10 @@ class CuttingPlan extends Model
         return $this->belongsTo(Proses::class, 'process_id');
     }
 
+    public function project(){
+        return $this->belongsTo(project::class, 'project_id');
+    }
+
     public function material()
     {
         return $this->belongsTo(Material::class, 'material_id');

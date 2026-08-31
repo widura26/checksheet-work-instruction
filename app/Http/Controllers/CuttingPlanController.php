@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\CuttingPlan;
 use App\Models\Material;
-use App\Models\Part;
 use App\Models\Project;
 use App\Models\Proses;
 use Illuminate\Http\Request;
@@ -57,9 +56,10 @@ class CuttingPlanController extends Controller
     {
         $query = CuttingPlan::query()
             ->with('parts')
-            ->leftJoin('projects', 'cutting_plans.project_id', '=', 'projects.project_id')
+            ->leftJoin('projects', 'cutting_plans.project_id', '=', 'projects.id')
             ->leftJoin('processes', 'cutting_plans.process_id', '=', 'processes.id')
             ->leftJoin('bpms', 'cutting_plans.bpm_id', '=', 'bpms.id')
+            ->leftJoin('materials', 'cutting_plans.material_id', '=', 'materials.id')
             ->leftJoin('users as u_prepared', 'cutting_plans.prepared_by', '=', 'u_prepared.id')
             ->leftJoin('users as u_approved', 'cutting_plans.approved_by', '=', 'u_approved.id')
             ->leftJoin('users as u_operator', 'cutting_plans.date_operator', '=', 'u_operator.id')
@@ -67,6 +67,7 @@ class CuttingPlanController extends Controller
                 'cutting_plans.*',
                 'projects.project_id as kode_proyek',
                 'projects.name_project as project_name',
+                'materials.kode_material as mat',
                 'processes.nama as cutting_method',
                 'bpms.bpm_no as bpm_number',
                 'u_prepared.name as prepared_by_name',
