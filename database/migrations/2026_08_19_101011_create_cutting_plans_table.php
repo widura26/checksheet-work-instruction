@@ -26,6 +26,7 @@ return new class extends Migration
             $table->foreignId('prepared_by')->nullable()->index();
             $table->foreignId('approved_by')->nullable()->index();
             $table->foreignId('date_operator')->nullable()->index();
+            $table->foreignUuid('status_id')->nullable()->index();
             $table->timestamps();
         });
     }
