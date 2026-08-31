@@ -94,7 +94,7 @@
             'navtype' => 'nav-item',
             'route' => 'spm.index',
             'icon' => 'cil-cart',
-            'label' => 'SPM'
+            'label' => 'Surat Permintaan Material'
         ])
 
         @include('components.parts.sidebar-list-item', [

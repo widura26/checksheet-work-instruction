@@ -2,67 +2,55 @@
 
 @section('title', 'Manajemen SPM')
 
+@push('css')
+    <style>
+        .dataTables_wrapper {
+            overflow-x: auto;
+        }
+        .dataTables_scrollBody {
+            overflow-x: auto !important;
+        }
+        #table-spm {
+            width: 100% !important;
+        }
+        .icon {
+            vertical-align: middle;
+        }
+    </style>
+@endpush
+
 @section('content')
 
-    <div class="card mb-3">
-        <div class="card-header">
-            Filter Data
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-3">
-                    <label for="filter_no_spm">No. SPM</label>
-                    <input type="text" id="filter_no_spm" class="form-control" placeholder="Filter No. SPM">
-                </div>
-                <div class="col-md-3">
-                    <label for="filter_project">Project</label>
-                    <select id="filter_project" class="form-select">
-                        <option value="">Semua Project</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <label for="filter_tanggal_spm">Tanggal SPM</label>
-                    <input type="date" id="filter_tanggal_spm" class="form-control">
-                </div>
-                <div class="col-md-3">
-                    <label for="filter_status">Status</label>
-                    <select id="filter_status" class="form-select">
-                        <option value="">Semua Status</option>
-                    </select>
-                </div>
-            </div>
-            <div class="mt-3">
-                <button id="filter-button" class="btn btn-primary">
-                    <i class="fas fa-filter me-1"></i>
-                    Filter
-                </button>
-                <button id="reset-filter-button" class="btn btn-secondary">
-                    <i class="fas fa-undo me-1"></i>
-                    Reset
-                </button>
-            </div>
-        </div>
-    </div>
-
-
     <div class="card mb-4">
-        <div class="card-header">
-            Menampilkan Seluruh Surat Permintaan Material (SPM)
-        </div>
-        <div class="card-body">
-            <div class="d-flex justify-content-between mb-3">
-                <div class="d-flex align-items-center">
-                </div>
+        <div class="p-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h5 class="card-title mb-0">Manajemen SPM</h5>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <input type="text" id="filter_no_spm" class="form-control form-control-sm" placeholder="No. SPM" style="width: 150px;">
+                <select id="filter_project" class="form-select form-select-sm" style="width: 160px;">
+                    <option value="">Semua Project</option>
+                </select>
+                <input type="date" id="filter_tanggal_spm" class="form-control form-control-sm" style="width: 160px;">
+                <select id="filter_status" class="form-select form-select-sm" style="width: 150px;">
+                    <option value="">Semua Status</option>
+                </select>
+                <button id="filter-button" class="btn btn-primary btn-sm">
+                    <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"></path></svg> Filter
+                </button>
+                <button id="reset-filter-button" class="btn btn-secondary btn-sm">
+                    <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"></path></svg> Reset
+                </button>
                 @if (Auth::user()->hasRole('admin') || Auth::user()->hasRole('staff'))
-                    <a href="{{ route('spm.create') }}" class="btn btn-outline-primary">
-                        <i class="fas fa-plus me-1"></i>
-                        Buat SPM
+                    <a href="{{ route('spm.create') }}" class="btn btn-primary btn-sm">
+                        <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"></path></svg> Buat SPM
                     </a>
                 @endif
             </div>
-
+        </div>
+        <div class="card-body">
             <div class="table-responsive">
-                <table id="table-spm" class="table table-bordered table-hover">
+                <table id="table-spm" class="table table-bordered table-hover" style="width: 100%;">
                     <thead class="text-center">
                         <tr>
                             <th>No</th>
