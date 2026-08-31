@@ -129,7 +129,7 @@
                         }
                     },
                     {
-                        data: 'id',
+                        data: 'work_instruction_number',
                         name: 'no_wi',
                         orderable: false,
                         className: 'text-center'

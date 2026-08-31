@@ -27,6 +27,7 @@ class WiController extends Controller
             ->leftJoin('cutting_plans', 'work_instructions.cutting_plan_id', '=', 'cutting_plans.id')
             ->select([
                 'work_instructions.id',
+                'work_instructions.work_instruction_number',
                 'work_instructions.cutting_plan_id',
                 'work_instructions.ket_wi',
                 'work_instructions.rev',
