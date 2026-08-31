@@ -6,6 +6,7 @@ use App\Models\CuttingPlan;
 use App\Models\WiTrn;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class WiController extends Controller
 {
@@ -33,6 +34,7 @@ class WiController extends Controller
                 'work_instructions.rev',
                 'work_instructions.estimasi',
                 'work_instructions.note',
+                'work_instructions.release_date',
                 'cutting_plans.no_cp as no_cp',
             ])
             ->orderBy('work_instructions.created_at', 'desc')
@@ -86,6 +88,22 @@ class WiController extends Controller
         $wiTrn->update($validator->validated());
 
         return response()->json(['success' => true, 'message' => 'Data berhasil diperbarui.']);
+    }
+
+    public function release($id){
+        try {
+            DB::table('work_instructions')->where('id', $id)->update(['release_date' => now()->toDateString()]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Work Instruction berhasil di-release.'
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal me-release Work Instruction.'
+            ], 500);
+        }
     }
 
     public function destroy(WiTrn $wiTrn)

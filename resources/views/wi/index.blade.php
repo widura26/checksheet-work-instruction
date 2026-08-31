@@ -4,10 +4,9 @@
 
 @section('content')
     <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="p-3 d-flex justify-content-between align-items-center">
             <div>
                 <h5 class="card-title mb-0">Data Work Instruction</h5>
-                <small class="text-body-secondary">Kelola data Work Instruction (wi_trns)</small>
             </div>
             <button type="button" class="btn btn-primary" id="btnTambah" data-coreui-toggle="modal"
                 data-coreui-target="#formModal">
@@ -35,6 +34,7 @@
                             <th>No</th>
                             <th>No WI</th>
                             <th>No CP</th>
+                            <th>Release Date</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -141,16 +141,30 @@
                         className: 'text-center'
                     },
                     {
+                        data: 'release_date',
+                        name: 'release_date',
+                        orderable: true,
+                        className: 'text-center',
+                        render: function(data, type, row, meta) {
+                            return data ?? '-';
+                        }
+                    },
+                    {
                         data: 'id',
                         name: 'aksi',
                         orderable: false,
                         searchable: false,
                         className: 'text-center',
                         render: function(data) {
-                            return '<button class="btn btn-warning btn-sm btn-edit" title="Edit">' +
-                                '<i class="fas fa-edit"></i></button> ' +
-                                '<button class="btn btn-danger btn-sm btn-delete" data-id="' + data +
-                                '" title="Hapus"><i class="fas fa-trash"></i></button>';
+                            var iconArrow = '<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M11.293 13.293l-4 4c-0.391 0.391-1.024 0.391-1.414 0l-0.001-0.001c-0.391-0.391-0.391-1.024 0-1.414l4-4c0.391-0.391 1.024-0.391 1.414 0s0.391 1.024 0 1.414zM19.293 13.293l-4 4c-0.391 0.391-1.024 0.391-1.414 0l-0.001-0.001c-0.391-0.391-0.391-1.024 0-1.414l4-4c0.391-0.391 1.024-0.391 1.414 0s0.391 1.024 0 1.414zM12 2c0.553 0 1 0.447 1 1v16.172l3.293-3.293c0.391-0.391 1.024-0.391 1.414 0s0.391 1.024 0 1.414l-5 5c-0.391 0.391-1.024 0.391-1.414 0l-5-5c-0.391-0.391-0.391-1.024 0-1.414s1.024-0.391 1.414 0L11 19.172V3c0-0.553 0.447-1 1-1z"></path></svg>';
+                            var iconEdit = '<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M22.029 1.971c-0.754-0.754-1.795-1.22-2.944-1.22s-2.191 0.466-2.944 1.22l-12.773 12.773-2.258 6.657c-0.040 0.113-0.063 0.243-0.063 0.378 0 0.323 0.132 0.616 0.344 0.827l0.004 0.004c0.211 0.212 0.503 0.344 0.826 0.344h0c0.136-0 0.266-0.023 0.388-0.066l-0.008 0.003 6.657-2.258 12.773-12.773c0.754-0.754 1.22-1.795 1.22-2.944s-0.466-2.191-1.22-2.944v0zM8.443 19.325l-5.702 1.934 1.934-5.702 9.785-9.785 3.767 3.767zM20.969 6.799l-1.68 1.68-3.767-3.767 1.68-1.68c0.482-0.483 1.149-0.783 1.886-0.783 1.471 0 2.664 1.193 2.664 2.664 0 0.737-0.299 1.404-0.783 1.886l-0 0z"></path></svg>';
+                            var iconTrash = '<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M4.5 22.125c-0 0.003-0 0.006-0 0.008 0 0.613 0.494 1.11 1.105 1.116h12.79c0.612-0.006 1.105-0.504 1.105-1.117 0-0.003-0-0.006-0-0.009v0-15h-15zM6 8.625h12v13.125h-12z"></path><path d="M7.875 10.125h1.5v9.375h-1.5v-9.375z"></path><path d="M11.25 10.125h1.5v9.375h-1.5v-9.375z"></path><path d="M14.625 10.125h1.5v9.375h-1.5v-9.375z"></path><path d="M15.375 4.125v-2.25c0-0.631-0.445-1.125-1.013-1.125h-4.725c-0.568 0-1.013 0.494-1.013 1.125v2.25h-5.625v1.5h18v-1.5zM10.125 2.25h3.75v1.875h-3.75z"></path></svg>';
+
+                            return '<div class="btn-group" style="display:flex; gap:10px; align-items:center;" role="group" aria-label="Aksi">' +
+                                '<button class="w-fit btn btn-info btn-sm btn-download" title="Download">' + iconArrow + '</button>' +
+                                '<button class="w-fit btn btn-warning btn-sm btn-edit" title="Edit">' + iconEdit + '</button>' +
+                                '<button class="w-fit btn btn-danger btn-sm btn-delete" data-id="' + data + '" title="Hapus">' + iconTrash + '</button>' +
+                                '</div>';
                         }
                     },
                 ],
@@ -185,6 +199,40 @@
                 $('#note').val(row.note);
                 $('#formModalLabel').text('Edit Work Instruction');
                 modal.show();
+            });
+
+            $('#table-wi').on('click', '.btn-download', function() {
+                var row = table.row($(this).closest('tr')).data();
+                var wiId = row.id;
+                var noWi = row.work_instruction_number || '-';
+
+                Swal.fire({
+                    title: 'Release Work Instruction?',
+                    html: 'Apakah Anda yakin ingin me-release WI <b>' + noWi + '</b>?<br>Tanggal release akan diisi hari ini.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Ya, Release!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{ route('wi.release', '__ID__') }}".replace('__ID__', wiId),
+                            type: 'PUT',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function(res) {
+                                Swal.fire('Berhasil!', res.message, 'success');
+                                table.ajax.reload();
+                            },
+                            error: function() {
+                                Swal.fire('Gagal!', 'Terjadi kesalahan saat me-release WI.', 'error');
+                            }
+                        });
+                    }
+                });
             });
 
             $('#table-wi').on('click', '.btn-delete', function() {

@@ -111,6 +111,7 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
     Route::prefix('work-instruction')->group(function () {
         Route::get('/', [WiController::class, 'index'])->name('wi.index');
         Route::get('/data', [WiController::class, 'data'])->name('wi.data');
+        Route::put('/release/{id}', [WiController::class, 'release'])->name('wi.release');
         Route::post('/', [WiController::class, 'store'])->name('wi.store');
         Route::put('/{wiTrn}', [WiController::class, 'update'])->name('wi.update');
         Route::delete('/{wiTrn}', [WiController::class, 'destroy'])->name('wi.destroy');
