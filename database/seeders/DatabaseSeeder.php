@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             DepartemenSeeder::class,
             BagianSeeder::class,
             KaryawanSeeder::class,
+            StatusSeeder::class,
         ]);
         DB::table('kode_bagian_spm')->insert([
             'kode' => 4311,
