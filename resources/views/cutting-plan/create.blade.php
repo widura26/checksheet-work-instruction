@@ -88,6 +88,12 @@
 
             // --- Global comboboxes ---
             initCombobox({
+                input: '#project_search',
+                hidden: '#project_id',
+                dropdown: '#project_dropdown',
+                url: "{{ route('cutting-plan.projects') }}"
+            });
+            initCombobox({
                 input: '#cutting_method_search',
                 hidden: '#cutting_method',
                 dropdown: '#cutting_method_dropdown',

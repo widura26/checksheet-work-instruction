@@ -57,6 +57,12 @@ $(function() {
 
     // --- Global comboboxes ---
     initCombobox({
+        input: '#project_search',
+        hidden: '#project_id',
+        dropdown: '#project_dropdown',
+        url: CP.routes.projects
+    });
+    initCombobox({
         input: '#cutting_method_search',
         hidden: '#cutting_method',
         dropdown: '#cutting_method_dropdown',
@@ -512,6 +518,14 @@ $(function() {
         $('#date_revised').val((row.date_revised || '').toString().substring(0, 10));
         $('#bpm_number').val(row.bpm_number);
         $('#date_of_bpm').val((row.date_of_bpm || '').toString().substring(0, 10));
+
+        // Project
+        $('#project_id').val('');
+        $('#project_search').val('');
+        if (row.kode_proyek) {
+            $('#project_id').val(row.kode_proyek);
+            $('#project_search').val(row.kode_proyek + (row.project_name ? ' - ' + row.project_name : ''));
+        }
 
         // Cutting method
         $('#cutting_method').val('');

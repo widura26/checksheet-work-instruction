@@ -191,7 +191,11 @@ class CuttingPlanController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $cuttingPlan = CuttingPlan::create($validator->validated());
+        $data = $validator->validated();
+        if (!empty($data['project_id'])) {
+            $data['project_id'] = Project::where('project_id', $data['project_id'])->value('id') ?? $data['project_id'];
+        }
+        $cuttingPlan = CuttingPlan::create($data);
 
         $this->syncMaterials($cuttingPlan, $request->input('materials', []));
 
@@ -237,7 +241,11 @@ class CuttingPlanController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $cuttingPlan->update($validator->validated());
+        $data = $validator->validated();
+        if (!empty($data['project_id'])) {
+            $data['project_id'] = Project::where('project_id', $data['project_id'])->value('id') ?? $data['project_id'];
+        }
+        $cuttingPlan->update($data);
 
         $this->syncMaterials($cuttingPlan, $request->input('materials', []));
 

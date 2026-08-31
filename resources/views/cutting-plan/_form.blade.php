@@ -75,6 +75,14 @@
         <input type="text" class="form-control" name="no_cp" id="no_cp" required>
     </div>
     <div>
+        <label for="project_search" class="form-label">Kode Proyek</label>
+        <div class="position-relative mat-combobox">
+            <input type="text" class="form-control" id="project_search" name="project_search" placeholder="Cari Proyek..." autocomplete="off">
+            <input type="hidden" name="project_id" id="project_id">
+            <div class="dropdown-menu w-100" id="project_dropdown" style="max-height: 240px; overflow-y: auto;"></div>
+        </div>
+    </div>
+    <div>
         <label for="cutting_method_search" class="form-label">Cutting Method</label>
         <div class="position-relative mat-combobox">
             <input type="text" class="form-control" id="cutting_method_search" name="cutting_method_search" placeholder="Cari Cutting Method..." autocomplete="off">
