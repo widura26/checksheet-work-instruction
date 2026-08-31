@@ -257,8 +257,7 @@ $(function() {
             { targets: 9,  width: '110px', minWidth: '110px' },
             { targets: 10, width: '110px', minWidth: '110px' },
             { targets: 11, width: '110px', minWidth: '110px' },
-            { targets: 12, width: '110px', minWidth: '110px' },
-            { targets: 13, width: '80px',  minWidth: '80px'  },
+            { targets: 12, width: '80px',  minWidth: '80px'  },
         ],
         ajax: function(data, callback, settings) {
             $.get(CP.routes.data, {
