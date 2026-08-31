@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('ket_wi')->nullable();
             $table->string('rev')->nullable();
             $table->date('estimasi')->nullable();
+            $table->date('release_date')->nullable();
             $table->text('note')->nullable();
             $table->timestamps();
         });
