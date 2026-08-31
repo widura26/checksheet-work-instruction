@@ -1,37 +1,4 @@
 $(function() {
-    var $cp = $('#cutting_plan_id');
-    var $material = $('#material_id');
-
-    function syncMaterial() {
-        var cpId = $cp.val();
-        var mat = cpId && window.BPM.cpMaterials
-            ? window.BPM.cpMaterials[cpId]
-            : null;
-
-        $material.empty();
-
-        if (!mat) {
-            $material.append($('<option>', {
-                value: '',
-                text: '-- Pilih Cutting Plan terlebih dahulu --'
-            }));
-            return;
-        }
-
-        $material.append($('<option>', {
-            value: mat.id,
-            text: mat.label,
-            selected: true
-        }));
-    }
-
-    $cp.on('change', syncMaterial);
-
-    // Pre-load jika dibuka dari menu Cutting Plan (?cutting_plan_id=...)
-    if ($cp.val()) {
-        syncMaterial();
-    }
-
     $('#bpmForm').on('submit', function(e) {
         e.preventDefault();
         var form = this;

@@ -59,8 +59,7 @@ class CuttingPlanController extends Controller
             ->with('parts')
             ->leftJoin('projects', 'cutting_plans.project_id', '=', 'projects.project_id')
             ->leftJoin('processes', 'cutting_plans.process_id', '=', 'processes.id')
-            ->leftJoin('materials', 'cutting_plans.material_id', '=', 'materials.id')
-            ->leftJoin('bpms', 'bpms.cutting_plan_id', '=', 'cutting_plans.id')
+            ->leftJoin('bpms', 'cutting_plans.bpm_id', '=', 'bpms.id')
             ->leftJoin('users as u_prepared', 'cutting_plans.prepared_by', '=', 'u_prepared.id')
             ->leftJoin('users as u_approved', 'cutting_plans.approved_by', '=', 'u_approved.id')
             ->leftJoin('users as u_operator', 'cutting_plans.date_operator', '=', 'u_operator.id')
@@ -70,7 +69,6 @@ class CuttingPlanController extends Controller
                 'projects.name_project as project_name',
                 'processes.nama as cutting_method',
                 'bpms.bpm_no as bpm_number',
-                'materials.kode_material as mat',
                 'u_prepared.name as prepared_by_name',
                 'u_approved.name as approved_by_name',
                 'u_operator.name as date_operator_name',
@@ -81,16 +79,10 @@ class CuttingPlanController extends Controller
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                $q->where('id_cp', 'LIKE', "%{$search}%")
-                    ->orWhere('no_cp', 'LIKE', "%{$search}%")
-                    ->orWhere('mat', 'LIKE', "%{$search}%")
-                    ->orWhere('spec_mat', 'LIKE', "%{$search}%")
-                    ->orWhere('shop', 'LIKE', "%{$search}%")
-                    ->orWhere('grup', 'LIKE', "%{$search}%")
-                    ->orWhere('lot', 'LIKE', "%{$search}%")
+                $q->where('no_cp', 'LIKE', "%{$search}%")
                     ->orWhere('projects.project_id', 'LIKE', "%{$search}%")
                     ->orWhere('processes.nama', 'LIKE', "%{$search}%")
-                    ->orWhere('bpms.no_bpm', 'LIKE', "%{$search}%");
+                    ->orWhere('bpms.bpm_no', 'LIKE', "%{$search}%");
             });
         }
 
@@ -169,69 +161,20 @@ class CuttingPlanController extends Controller
 
         $validator = Validator::make($request->all(), [
             'no_cp' => 'required|string|max:255|unique:cutting_plans,no_cp',
-            'material_id' => 'nullable|string|max:255',
-            'qty_lot' => 'nullable|integer',
-            'material_size' => 'nullable|string|max:255',
-            'quantity' => 'nullable|integer',
-            'wbs' => 'nullable|string|max:255',
             'sketch' => 'nullable|string|max:255',
             'process_id' => 'nullable|string|max:255',
             'special_instruction' => 'nullable|string',
             'date_issued' => 'nullable|date',
             'date_revised' => 'nullable|date',
             'project_id' => 'nullable|string|max:255',
-            'prepared_by' => 'nullable|string|max:255',
-            'approved_by' => 'nullable|string|max:255',
-            'date_operator' => 'nullable|string|max:255',
-            'bpm_number' => 'nullable|string|max:255',
-            'date_of_bpm' => 'nullable|date',
-            'parts' => 'nullable|array',
-            'parts.*.part_number' => 'nullable|string|max:255',
-            'parts.*.cutting_size' => 'nullable|string|max:255',
-            'parts.*.quantity_per_car' => 'nullable|string|max:255',
-            'parts.*.quantity_per_lot' => 'nullable|string|max:255',
-            'parts.*.part_name' => 'nullable|string|max:255',
-            'parts.*.remark' => 'nullable|string|max:255',
-        ], [
-            'no_cp.required' => 'No CP wajib diisi.',
-            'no_cp.unique' => 'No CP sudah digunakan.',
-            'quantity.integer' => 'Quantity harus berupa angka.',
-            'qty_lot.integer' => 'Qty Lot harus berupa angka.',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        $cuttingPlan = CuttingPlan::create($validator->validated());
-
-        $this->syncParts($cuttingPlan, $request->input('pieceparts', []), $request);
-
-        return response()->json(['success' => true, 'message' => 'Data berhasil ditambahkan.']);
-    }
-
-    public function update(Request $request, CuttingPlan $cuttingPlan)
-    {
-        $this->normalizeEmpty($request);
-
-        $validator = Validator::make($request->all(), [
-            'no_cp' => 'required|string|max:255|unique:cutting_plans,no_cp,' . $cuttingPlan->id . ',id',
             'material_id' => 'nullable|string|max:255',
-            'qty_lot' => 'nullable|integer',
+            'wbs' => 'nullable|string|max:255',
             'material_size' => 'nullable|string|max:255',
             'quantity' => 'nullable|integer',
-            'wbs' => 'nullable|string|max:255',
-            'sketch' => 'nullable|string|max:255',
-            'process_id' => 'nullable|string|max:255',
-            'special_instruction' => 'nullable|string',
-            'date_issued' => 'nullable|date',
-            'date_revised' => 'nullable|date',
-            'project_id' => 'nullable|string|max:255',
+            'qty_lot' => 'nullable|integer',
             'prepared_by' => 'nullable|string|max:255',
             'approved_by' => 'nullable|string|max:255',
             'date_operator' => 'nullable|string|max:255',
-            'bpm_number' => 'nullable|string|max:255',
-            'date_of_bpm' => 'nullable|date',
             'parts' => 'nullable|array',
             'parts.*.part_number' => 'nullable|string|max:255',
             'parts.*.cutting_size' => 'nullable|string|max:255',
@@ -242,52 +185,122 @@ class CuttingPlanController extends Controller
         ], [
             'no_cp.required' => 'No CP wajib diisi.',
             'no_cp.unique' => 'No CP sudah digunakan.',
-            'quantity.integer' => 'Quantity harus berupa angka.',
-            'qty_lot.integer' => 'Qty Lot harus berupa angka.',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $cuttingPlan->update($validator->validated());
+        $validated = $validator->validated();
+        $validated['project_id'] = $this->resolveProjectUuid($validated['project_id'] ?? null);
+        $validated['material_id'] = $this->resolveMaterialUuid($validated['material_id'] ?? null);
 
-        $this->syncParts($cuttingPlan, $request->input('pieceparts', []), $request);
+        $cuttingPlan = CuttingPlan::create(collect($validated)->only([
+            'no_cp', 'sketch', 'process_id', 'special_instruction',
+            'date_issued', 'date_revised', 'project_id', 'material_id',
+            'wbs', 'material_size', 'quantity', 'qty_lot',
+            'prepared_by', 'approved_by', 'date_operator',
+        ])->toArray());
+
+        $this->syncParts($cuttingPlan, $validated['parts'] ?? []);
+
+        return response()->json(['success' => true, 'message' => 'Data berhasil ditambahkan.']);
+    }
+
+    public function update(Request $request, CuttingPlan $cuttingPlan)
+    {
+        $this->normalizeEmpty($request);
+
+        $validator = Validator::make($request->all(), [
+            'no_cp' => 'required|string|max:255|unique:cutting_plans,no_cp,' . $cuttingPlan->id . ',id',
+            'sketch' => 'nullable|string|max:255',
+            'process_id' => 'nullable|string|max:255',
+            'special_instruction' => 'nullable|string',
+            'date_issued' => 'nullable|date',
+            'date_revised' => 'nullable|date',
+            'project_id' => 'nullable|string|max:255',
+            'material_id' => 'nullable|string|max:255',
+            'wbs' => 'nullable|string|max:255',
+            'material_size' => 'nullable|string|max:255',
+            'quantity' => 'nullable|integer',
+            'qty_lot' => 'nullable|integer',
+            'prepared_by' => 'nullable|string|max:255',
+            'approved_by' => 'nullable|string|max:255',
+            'date_operator' => 'nullable|string|max:255',
+            'parts' => 'nullable|array',
+            'parts.*.part_number' => 'nullable|string|max:255',
+            'parts.*.cutting_size' => 'nullable|string|max:255',
+            'parts.*.quantity_per_car' => 'nullable|integer',
+            'parts.*.quantity_per_lot' => 'nullable|integer',
+            'parts.*.part_name' => 'nullable|string|max:255',
+            'parts.*.remark' => 'nullable|string|max:255',
+        ], [
+            'no_cp.required' => 'No CP wajib diisi.',
+            'no_cp.unique' => 'No CP sudah digunakan.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $validated = $validator->validated();
+        $validated['project_id'] = $this->resolveProjectUuid($validated['project_id'] ?? null);
+        $validated['material_id'] = $this->resolveMaterialUuid($validated['material_id'] ?? null);
+
+        $cuttingPlan->update(collect($validated)->only([
+            'no_cp', 'sketch', 'process_id', 'special_instruction',
+            'date_issued', 'date_revised', 'project_id', 'material_id',
+            'wbs', 'material_size', 'quantity', 'qty_lot',
+            'prepared_by', 'approved_by', 'date_operator',
+        ])->toArray());
+
+        $this->syncParts($cuttingPlan, $validated['parts'] ?? []);
 
         return response()->json(['success' => true, 'message' => 'Data berhasil diperbarui.']);
     }
 
-    private function syncParts(CuttingPlan $cuttingPlan, array $pieceparts, Request $request)
+    private function resolveProjectUuid($value)
     {
-        $cuttingPlan->parts()->delete();
+        if (!$value) return null;
+        return Project::where('project_id', $value)->value('id') ?? $value;
+    }
 
-        $materialId = $request->input('material_id');
-        $projectId = Project::where('project_id', $request->input('project_id'))->value('id')
-            ?? $request->input('project_id');
+    private function resolveMaterialUuid($value)
+    {
+        if (!$value) return null;
+        return Material::where('kode_material', $value)->value('id') ?? $value;
+    }
 
-        foreach ($pieceparts as $pp) {
-            if (! is_array($pp)) {
-                continue;
-            }
+    private function syncParts(CuttingPlan $cuttingPlan, array $parts)
+    {
+        $existingPartIds = [];
+
+        foreach ($parts as $pp) {
+            if (!is_array($pp)) continue;
 
             $filled = collect($pp)->filter(fn ($v) => $v !== null && $v !== '')->count();
+            if ($filled === 0) continue;
 
-            if ($filled === 0) {
-                continue;
+            $part = $cuttingPlan->parts()
+                ->where('part_number', $pp['part_number'] ?? null)
+                ->first();
+
+            if ($part) {
+                $part->update(collect($pp)->only([
+                    'part_number', 'cutting_size', 'quantity_per_car',
+                    'quantity_per_lot', 'part_name', 'remark',
+                ])->toArray());
+            } else {
+                $part = $cuttingPlan->parts()->create(collect($pp)->only([
+                    'part_number', 'cutting_size', 'quantity_per_car',
+                    'quantity_per_lot', 'part_name', 'remark',
+                ])->toArray());
             }
 
-            Part::create([
-                'cutting_plan_id' => $cuttingPlan->id,
-                'project_id' => $projectId,
-                'material_id' => $materialId,
-                'part_number' => $pp['part_no'] ?? null,
-                'cutting_size' => $pp['cutting_size'] ?? null,
-                'quantity_per_car' => isset($pp['qty_car']) && $pp['qty_car'] !== '' ? (int) $pp['qty_car'] : null,
-                'quantity_per_lot' => isset($pp['qty_lot']) && $pp['qty_lot'] !== '' ? (int) $pp['qty_lot'] : null,
-                'part_name' => $pp['part_name'] ?? null,
-                'remark' => $pp['remark'] ?? null,
-            ]);
+            $existingPartIds[] = $part->id;
         }
+
+        $cuttingPlan->parts()->whereNotIn('id', $existingPartIds)->delete();
     }
 
     public function destroy(CuttingPlan $cuttingPlan)

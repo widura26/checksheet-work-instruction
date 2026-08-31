@@ -92,16 +92,17 @@ class CuttingPlan extends Model
         return $this->belongsTo(Proses::class, 'process_id');
     }
 
+    public function material()
+    {
+        return $this->belongsTo(Material::class, 'material_id');
+    }
+
     public function parts()
     {
         return $this->hasMany(Part::class, 'cutting_plan_id');
     }
 
-    public function material(){
-        return $this->belongsTo(Material::class, 'material_id');
-    }
-
     public function bpm(){
-        return $this->hasOne(Bpm::class, 'cutting_plan_id');
+        return $this->belongsTo(Bpm::class, 'bpm_id');
     }
 }

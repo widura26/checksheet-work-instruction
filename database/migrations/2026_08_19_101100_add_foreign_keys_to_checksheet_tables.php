@@ -308,6 +308,11 @@ return new class extends Migration
             $table->foreign('cutting_plan_id')->references('id')->on('cutting_plans')->cascadeOnUpdate()->restrictOnDelete();
             $table->foreign('bpm_id')->references('id')->on('bpms')->cascadeOnUpdate()->restrictOnDelete();
         });
+
+        Schema::table('cutting_plans', function (Blueprint $table) {
+            $table->foreign('bpm_id')->references('id')->on('bpms')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreign('material_id')->references('id')->on('materials')->cascadeOnUpdate()->restrictOnDelete();
+        });
     }
 
     public function down(): void
@@ -592,6 +597,8 @@ return new class extends Migration
             $table->dropForeign(['bpm_cp_id']);
             $table->dropForeign(['exp_cp_id']);
             $table->dropForeign(['user_id']);
+            $table->dropForeign(['bpm_id']);
+            $table->dropForeign(['material_id']);
         });
 
         Schema::table('cp_details', function (Blueprint $table) {

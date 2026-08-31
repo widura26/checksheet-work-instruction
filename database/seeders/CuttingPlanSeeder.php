@@ -12,9 +12,6 @@ use Illuminate\Database\Seeder;
 
 class CuttingPlanSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $userId = User::query()->orderBy('id')->value('id');
@@ -25,6 +22,7 @@ class CuttingPlanSeeder extends Seeder
         $plans = [
             [
                 'no_cp' => 'CP-2026-0001',
+                'material_id' => $materialId,
                 'wbs' => 'WBS-CP-001',
                 'material_size' => 'PL 10 x 2000 x 6000',
                 'quantity' => 12,
@@ -61,6 +59,7 @@ class CuttingPlanSeeder extends Seeder
             ],
             [
                 'no_cp' => 'CP-2026-0002',
+                'material_id' => $materialId,
                 'wbs' => 'WBS-CP-002',
                 'material_size' => 'PL 8 x 1500 x 6000',
                 'quantity' => 20,
@@ -89,6 +88,7 @@ class CuttingPlanSeeder extends Seeder
             ],
             [
                 'no_cp' => 'CP-2026-0003',
+                'material_id' => $materialId,
                 'wbs' => 'WBS-CP-003',
                 'material_size' => 'PL 12 x 2000 x 6000',
                 'quantity' => 8,
@@ -109,16 +109,15 @@ class CuttingPlanSeeder extends Seeder
             ],
         ];
 
-        foreach ($plans as $plan) {
-            $parts = $plan['parts'];
-            unset($plan['parts']);
+        foreach ($plans as $planData) {
+            $parts = $planData['parts'];
+            unset($planData['parts']);
 
             $cuttingPlan = CuttingPlan::updateOrCreate(
-                ['no_cp' => $plan['no_cp']],
-                array_merge($plan, [
+                ['no_cp' => $planData['no_cp']],
+                array_merge($planData, [
                     'project_id' => $projectId,
                     'process_id' => $processId,
-                    'material_id' => $materialId,
                     'prepared_by' => $userId,
                     'approved_by' => $userId,
                     'date_operator' => $userId,
@@ -131,10 +130,7 @@ class CuttingPlanSeeder extends Seeder
                         'cutting_plan_id' => $cuttingPlan->id,
                         'part_number' => $part['part_number'],
                     ],
-                    array_merge($part, [
-                        'project_id' => $projectId,
-                        'material_id' => $materialId,
-                    ])
+                    $part
                 );
             }
         }

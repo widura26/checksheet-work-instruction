@@ -45,7 +45,8 @@ $(function() {
                 });
             });
         },
-        columns: [{
+        columns: [
+            {
                 data: null,
                 name: 'checkbox',
                 orderable: false,
@@ -72,13 +73,20 @@ $(function() {
                 defaultContent: ''
             },
             {
-                data: 'material_name',
-                name: 'material_name',
-                defaultContent: '-'
+                data: 'cutting_plans',
+                name: 'cutting_plans',
+                orderable: false,
+                searchable: false,
+                render: function(data) {
+                    if (!Array.isArray(data) || !data.length) return '-';
+                    return data.map(function(cp) {
+                        return '<span class="badge bg-light text-dark">' + (cp.no_cp || '-') + '</span>';
+                    }).join(' ');
+                }
             },
             {
-                data: 'material_spec',
-                name: 'material_spec',
+                data: 'specification',
+                name: 'specification',
                 defaultContent: '-'
             },
             {
@@ -100,11 +108,6 @@ $(function() {
                 render: function(data) {
                     return data ? convertDate(data) : '';
                 },
-                defaultContent: '-'
-            },
-            {
-                data: 'specification',
-                name: 'specification',
                 defaultContent: '-'
             },
             {

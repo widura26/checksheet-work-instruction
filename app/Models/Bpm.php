@@ -55,8 +55,8 @@ class Bpm extends Model
         return $this->belongsToMany(CpDetail::class, 'bpm_cps');
     }
 
-    public function cuttingPlan()
+    public function cuttingPlans()
     {
-        return $this->belongsTo(CuttingPlan::class, 'cutting_plan_id');
+        return $this->hasMany(CuttingPlan::class, 'bpm_id');
     }
 }

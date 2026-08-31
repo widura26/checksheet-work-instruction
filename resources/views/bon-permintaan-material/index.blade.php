@@ -49,7 +49,7 @@
                         <th class="text-center" style="width: 40px;"><input type="checkbox" id="selectAll" title="Pilih semua"></th>
                         <th>No</th>
                         <th>No BPM</th>
-                        <th>Material</th>
+                        <th>Cutting Plans</th>
                         <th>Spesification</th>
                         <th>Jumlah</th>
                         <th>Unit</th>

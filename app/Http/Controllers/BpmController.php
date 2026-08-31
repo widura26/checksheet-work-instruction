@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Bpm;
 use App\Models\CuttingPlan;
-use App\Models\Material;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -23,55 +22,52 @@ class BpmController extends Controller
 
         $cuttingPlans = CuttingPlan::orderBy('no_cp')
             ->when($selectedId, fn ($q) => $q->where('id', $selectedId))
-            ->get(['id', 'no_cp', 'material_id']);
-
-        $cpMaterials = CuttingPlan::with('material')
-            ->get()
-            ->mapWithKeys(function ($cp) {
-                $mat = $cp->material;
-                return [
-                    $cp->id => $mat
-                        ? ['id' => $mat->id, 'label' => $mat->kode_material . ' - ' . $mat->deskripsi]
-                        : null,
-                ];
-            });
+            ->get(['id', 'no_cp']);
 
         return view('bon-permintaan-material.create', compact(
-            'cuttingPlans', 'selectedId', 'cpMaterials'
+            'cuttingPlans', 'selectedId'
         ));
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'cutting_plan_id' => 'required|exists:cutting_plans,id|unique:bpms,cutting_plan_id',
-            'bpm_no'         => 'nullable|string|max:255|unique:bpms,bpm_no',
-            'material_id'     => 'nullable|exists:materials,id',
+            'cutting_plan_id' => 'required|exists:cutting_plans,id',
+            'bpm_no'          => 'required|string|max:255',
             'specification'   => 'nullable|string',
-            'total'          => 'nullable|numeric',
-            'unit'           => 'nullable|string|max:50',
-            'request_date'   => 'nullable|date',
-            'bprm_no'        => 'nullable|string|max:255',
-            'brpm_date'      => 'nullable|date',
-            'bprm_total'     => 'nullable|numeric',
-            'stock'          => 'nullable|string|max:255',
+            'total'           => 'nullable|numeric',
+            'unit'            => 'nullable|string|max:50',
+            'request_date'    => 'nullable|date',
+            'bprm_no'         => 'nullable|string|max:255',
+            'brpm_date'       => 'nullable|date',
+            'bprm_total'      => 'nullable|numeric',
+            'stock'           => 'nullable|string|max:255',
         ], [
             'cutting_plan_id.required' => 'Cutting Plan wajib dipilih.',
-            'cutting_plan_id.unique'   => 'Cutting Plan ini sudah memiliki BPM.',
-            'bpm_no.unique'            => 'No BPM sudah digunakan.',
+            'bpm_no.required'          => 'No BPM wajib diisi.',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        Bpm::create(array_merge($validator->validated(), [
-            'user_id' => Auth::id(),
-        ]));
+        $cuttingPlanId = $validator->validated()['cutting_plan_id'];
+        $bpmNo = $validator->validated()['bpm_no'];
+
+        // Find existing BPM by bpm_no or create new
+        $bpm = Bpm::where('bpm_no', $bpmNo)->first();
+        if (!$bpm) {
+            $bpm = Bpm::create(array_merge($validator->validated(), [
+                'user_id' => Auth::id(),
+            ]));
+        }
+
+        // Link Cutting Plan to BPM
+        CuttingPlan::where('id', $cuttingPlanId)->update(['bpm_id' => $bpm->id]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Bon Permintaan Material berhasil ditambahkan.',
+            'message' => 'Bon Permintaan Material berhasil disimpan.',
             'redirect' => route('bon-permintaan-material.index'),
         ]);
     }
@@ -93,23 +89,17 @@ class BpmController extends Controller
     private function baseQuery(Request $request)
     {
         $query = Bpm::query()
-            ->leftJoin('materials', 'bpms.material_id', '=', 'materials.id')
-            ->select(
-                'bpms.*',
-                'materials.deskripsi as material_name',
-                'materials.spesifikasi as material_spec'
-            );
+            ->with('cuttingPlans')
+            ->select('bpms.*');
 
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('bpms.bpm_no', 'LIKE', "%{$search}%")
-                    ->orWhere('materials.deskripsi', 'LIKE', "%{$search}%")
-                    ->orWhere('materials.spesifikasi', 'LIKE', "%{$search}%")
+                    ->orWhere('bpms.specification', 'LIKE', "%{$search}%")
                     ->orWhere('bpms.total', 'LIKE', "%{$search}%")
                     ->orWhere('bpms.unit', 'LIKE', "%{$search}%")
                     ->orWhere('bpms.bprm_no', 'LIKE', "%{$search}%")
-                    ->orWhere('bpms.specification', 'LIKE', "%{$search}%")
                     ->orWhere('bpms.stock', 'LIKE', "%{$search}%");
             });
         }
@@ -121,12 +111,10 @@ class BpmController extends Controller
     {
         return [
             'bpm_no'        => 'No BPM',
-            'material_name' => 'Material',
-            'material_spec' => 'Spesification',
+            'specification' => 'Keterangan',
             'total'         => 'Jumlah',
             'unit'          => 'Unit',
             'request_date'  => 'Tanggal Permintaan',
-            'specification' => 'Keterangan',
             'bprm_no'       => 'Nomor BPRM',
             'brpm_date'     => 'Tanggal BPRM',
             'bprm_total'    => 'Jumlah BPRM',
@@ -179,6 +167,8 @@ class BpmController extends Controller
 
     public function destroy(Bpm $bpm)
     {
+        // Unlink all cutting plans from this BPM
+        CuttingPlan::where('bpm_id', $bpm->id)->update(['bpm_id' => null]);
         $bpm->delete();
 
         return response()->json(['success' => true, 'message' => 'Data berhasil dihapus.']);
@@ -195,6 +185,8 @@ class BpmController extends Controller
             return response()->json(['success' => false, 'message' => 'Tidak ada data yang dipilih.'], 422);
         }
 
+        // Unlink all cutting plans from these BPMs
+        CuttingPlan::whereIn('bpm_id', $ids)->update(['bpm_id' => null]);
         Bpm::whereIn('id', $ids)->delete();
 
         return response()->json(['success' => true, 'message' => 'Data terpilih berhasil dihapus.']);

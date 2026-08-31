@@ -23,7 +23,7 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label for="cutting_plan_id" class="form-label">Cutting Plan</label>
-                        <select class="form-select" id="cutting_plan_id" name="cutting_plan_id">
+                        <select class="form-select" id="cutting_plan_id" name="cutting_plan_id" required>
                             @if (!$selectedId)
                                 <option value="">-- Pilih Cutting Plan --</option>
                             @endif
@@ -36,21 +36,14 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="material_id" class="form-label">Material</label>
-                        <select class="form-select" id="material_id" name="material_id">
-                            <option value="">-- Pilih Cutting Plan terlebih dahulu --</option>
-                        </select>
-                        <div class="form-text">Material diambil otomatis dari Cutting Plan yang dipilih.</div>
+                        <label for="bpm_no" class="form-label">No BPM <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="bpm_no" name="bpm_no" required>
+                        <div class="form-text">Jika No BPM sudah ada, Cutting Plan akan ditambahkan ke BPM tersebut.</div>
                     </div>
 
                     <div class="col-md-6">
                         <label for="request_date" class="form-label">Tanggal Permintaan</label>
                         <input type="date" class="form-control" id="request_date" name="request_date">
-                    </div>
-
-                    <div class="col-md-6">
-                        <label for="bpm_no" class="form-label">No BPM</label>
-                        <input type="text" class="form-control" id="bpm_no" name="bpm_no">
                     </div>
 
                     <div class="col-md-6">
@@ -104,8 +97,7 @@
         window.BPM = {
             routes: {
                 store: "{{ route('bon-permintaan-material.store') }}"
-            },
-            cpMaterials: @json($cpMaterials)
+            }
         };
     </script>
     <script type="module" src="{{ asset('js/bon-permintaan-material/create.js') }}"></script>
