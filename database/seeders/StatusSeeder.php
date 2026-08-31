@@ -29,6 +29,14 @@ class StatusSeeder extends Seeder
                 'name' => 'Proses BPM',
                 'description' => 'Proses BPM oleh dalmat'
             ],
+            [
+                'name' => 'WI Dikirim',
+                'description' => 'Dokumen Work Instruction dikirim ke pengendalian produksi'
+            ],
+            [
+                'name' => 'WI Diterima',
+                'description' => 'Dokumen Work Instruction diterima oleh pengendalian produksi'
+            ],
         ];
 
         foreach ($statuses as $status) {
