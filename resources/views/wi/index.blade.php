@@ -59,8 +59,8 @@
                     <div class="modal-body">
                         <div id="formError" class="alert alert-danger d-none"></div>
                         <div class="mb-3">
-                            <label for="no_wi" class="form-label">No WI</label>
-                            <input type="text" class="form-control" id="no_wi" disabled>
+                            <label for="work_instruction_number" class="form-label">No WI</label>
+                            <input type="text" class="form-control" id="work_instruction_number" name="work_instruction_number">
                         </div>
                         <div class="mb-3">
                             <label for="cutting_plan_id" class="form-label">Cutting Plan</label>
@@ -165,7 +165,7 @@
                 $('#crudForm')[0].reset();
                 $('#_method').val('POST');
                 $('#crudForm').attr('action', "{{ route('wi.store') }}");
-                $('#no_wi').val('');
+                $('#work_instruction_number').val('');
                 $('#formModalLabel').text('Tambah Work Instruction');
                 $('#formError').addClass('d-none').text('');
                 $('#btnSubmit').prop('disabled', false).text('Simpan');
@@ -177,7 +177,7 @@
                 $('#formError').addClass('d-none').text('');
                 $('#_method').val('PUT');
                 $('#crudForm').attr('action', "{{ route('wi.update', '__ID__') }}".replace('__ID__', row.id));
-                $('#no_wi').val(row.id);
+                $('#work_instruction_number').val(row.id);
                 $('#cutting_plan_id').val(row.cutting_plan_id || '');
                 $('#keterangan').val(row.keterangan);
                 $('#rev').val(row.rev);

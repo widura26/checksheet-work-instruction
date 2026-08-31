@@ -44,6 +44,7 @@ class WiController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'cutting_plan_id' => 'nullable|exists:cutting_plans,id',
+            'work_instruction_number' => 'required|string',
             'keterangan' => 'nullable|string',
             'rev' => 'nullable|integer',
             'estimasi' => 'nullable|date',
