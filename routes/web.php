@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BagianController;
 use App\Http\Controllers\BarcodeController;
+use App\Http\Controllers\BomController;
 use App\Http\Controllers\BpmController;
 use App\Http\Controllers\CheckSheetController;
 use App\Http\Controllers\CuttingPlanController;
@@ -236,5 +237,9 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::post('/distribusi/upload-bast', [DistribusiController::class, 'uploadBast'])->name('distribusi.upload-bast')->middleware('client.request.id');
         // unduh file bast ttd
         Route::get('/distribusi/unduh-bast-ttd/{distribusiTool}', [DistribusiController::class, 'downloadBastFile'])->name('distribusi.unduh-bast-ttd');
+    });
+
+    Route::prefix('bill-of-material')->group(function(){
+        Route::get('/', [BomController::class, 'index'])->name('bill-of-material.index');
     });
 });

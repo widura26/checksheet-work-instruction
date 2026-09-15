@@ -23,6 +23,13 @@
             'label' => 'Grafik'
         ])
 
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-item',
+            'route' => 'bill-of-material.index',
+            'icon' => 'cil-chart-line',
+            'label' => 'Bill Of Material'
+        ])
+
         <li class="nav-title">Master Data</li>
 
         @include('components.parts.sidebar-list-item', [
