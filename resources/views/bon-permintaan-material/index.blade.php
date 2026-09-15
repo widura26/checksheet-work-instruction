@@ -50,7 +50,7 @@
                         <th>No</th>
                         <th>No BPM</th>
                         <th>Cutting Plans</th>
-                        <th>Spesification</th>
+                        <th>Specification</th>
                         <th>Jumlah</th>
                         <th>Unit</th>
                         <th>Tanggal Permintaan</th>
