@@ -25,4 +25,9 @@ class BillOfMaterial extends Model
             }
         });
     }
+
+    public function revisions()
+    {
+        return $this->hasMany(BillOfMaterialRevision::class, 'bom_id');
+    }
 }

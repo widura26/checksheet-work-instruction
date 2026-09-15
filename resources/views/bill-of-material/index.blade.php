@@ -156,6 +156,9 @@
                             <th>No</th>
                             <th>Kode Proyek</th>
                             <th>Nama</th>
+                            <th>Nomor</th>
+                            <th>Published Date</th>
+                            <th>Revise</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -230,6 +233,18 @@
                             name: 'name'
                         },
                         {
+                            data: 'number',
+                            name: 'number'
+                        },
+                        {
+                            data: 'published_date',
+                            name: 'published_date'
+                        },
+                        {
+                            data: 'revise',
+                            name: 'revise'
+                        },
+                        {
                             data: 'id',
                             name: 'action',
                             orderable: false,
@@ -238,11 +253,8 @@
                             render: function (data, type, row) {
                                 return `
                                     <div>
-                                        <a href="/project-code/${data}/edit" class="btn btn-sm btn-primary">
+                                        <a href="/bill-of-material/${data}/edit" class="btn btn-sm btn-primary">
                                             Edit
-                                        </a>
-                                        <a href="/project-code/${data}/delete" class="btn btn-sm btn-primary">
-                                            Hapus
                                         </a>
                                     </div>
                                 `

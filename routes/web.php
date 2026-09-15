@@ -244,5 +244,7 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::get('/data', [BomController::class, 'getData'])->name('bill-of-material.data');
         Route::get('/create', [BomController::class, 'create'])->name('bill-of-material.create');
         Route::post('/', [BomController::class, 'store'])->name('bill-of-material.store');
+        Route::get('/{id}/edit', [BomController::class, 'edit'])->name('bill-of-material.edit');
+        Route::put('/{id}', [BomController::class, 'update'])->name('bill-of-material.update');
     });
 });
