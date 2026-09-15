@@ -119,6 +119,11 @@
                         <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"></path></svg>
                         Import Excel
                     </button>
+                    <button type="button" class="btn btn-success text-white" data-coreui-toggle="modal"
+                        data-coreui-target="#importExcelModal">
+                        <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"></path></svg>
+                        Tambah
+                    </button>
                 </div>
             @endif
         </div>
@@ -232,8 +237,16 @@
                             searchable: false,
                             className: 'text-center',
                             render: function (data, type, row) {
-                                return '<a href="/project-code/' + data + '/edit" class="btn btn-sm btn-primary">' +
-                                    '<i class="fas fa-edit me-1"></i> Edit</a>';
+                                return `
+                                    <div>
+                                        <a href="/project-code/${data}/edit" class="btn btn-sm btn-primary">
+                                            Edit
+                                        </a>
+                                        <a href="/project-code/${data}/delete" class="btn btn-sm btn-primary">
+                                            Hapus
+                                        </a>
+                                    </div>
+                                `
                             }
                         }
                     ]
