@@ -17,7 +17,7 @@
             <a href="{{ route('bill-of-material.index') }}" class="btn btn-secondary">Kembali</a>
         </div>
         <div class="card-body">
-            <form id="bomForm" action="{{ route('bill-of-material.store') }}" method="POST">
+            <form id="bomForm" action="{{ route('bill-of-material.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
                 <div class="row g-3">
@@ -67,6 +67,26 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Dokumen BOM</label>
+                        <div id="documents-container">
+                            <div class="input-group mb-2">
+                                <input type="file" class="form-control" name="documents[]" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">
+                                <button type="button" class="btn btn-outline-danger btn-remove-document" title="Hapus">
+                                    <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-success" id="btn-add-document">
+                            <svg class="icon me-1" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"/></svg>
+                            Tambah Dokumen
+                        </button>
+                        <div class="form-text">Format: PDF, DOC, DOCX, XLS, XLSX, PNG, JPG (maks 5MB per file).</div>
+                        @error('documents.*')
+                            <div class="text-danger small mt-1">{{ $message }}</div>
+                        @enderror
+                    </div>
                 </div>
 
                 @if ($errors->any())
@@ -86,3 +106,28 @@
         </div>
     </div>
 @endsection
+
+@push('js')
+    <script>
+        document.getElementById('btn-add-document').addEventListener('click', function () {
+            var container = document.getElementById('documents-container');
+            var row = document.createElement('div');
+            row.className = 'input-group mb-2';
+            row.innerHTML =
+                '<input type="file" class="form-control" name="documents[]" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">' +
+                '<button type="button" class="btn btn-outline-danger btn-remove-document" title="Hapus">' +
+                '<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>' +
+                '</button>';
+            container.appendChild(row);
+        });
+
+        document.getElementById('documents-container').addEventListener('click', function (e) {
+            var btn = e.target.closest('.btn-remove-document');
+            if (!btn) return;
+            var container = document.getElementById('documents-container');
+            if (container.children.length > 1) {
+                btn.closest('.input-group').remove();
+            }
+        });
+    </script>
+@endpush
