@@ -6,11 +6,59 @@ use App\Models\BillOfMaterial;
 use App\Models\BillOfMaterialRevision;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BomController extends Controller
 {
     public function index(Request $request){
         return view('bill-of-material.index');
+    }
+
+    public function getData(Request $request){
+        if (! $request->ajax()) {
+            abort(404);
+        }
+
+        $query = BillOfMaterial::select('bill_of_materials.*')
+            ->leftJoin('projects', 'projects.id', '=', 'bill_of_materials.project_id')
+            ->select(
+                'bill_of_materials.id',
+                'bill_of_materials.number',
+                'bill_of_materials.name',
+                'bill_of_materials.published_date',
+                'bill_of_materials.revise',
+                'projects.project_id as project_code',
+                'projects.name_project'
+            );
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('bill_of_materials.number', 'LIKE', "%{$search}%")
+                    ->orWhere('bill_of_materials.name', 'LIKE', "%{$search}%")
+                    ->orWhere('projects.project_id', 'LIKE', "%{$search}%")
+                    ->orWhere('projects.name_project', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $perPage = (int) $request->get('per_page', 10);
+        $bom = $query->orderBy('bill_of_materials.created_at', 'desc')->paginate($perPage);
+
+        $bom->setCollection(
+            $bom->getCollection()->map(function ($item) {
+                return [
+                    'id'             => $item->id,
+                    'number'         => $item->number,
+                    'name'           => $item->name,
+                    'published_date' => $item->published_date ? \Carbon\Carbon::parse($item->published_date)->format('d-m-Y') : null,
+                    'revise'         => $item->revise,
+                    'project_code'   => $item->project_code,
+                    'project_name'   => $item->name_project,
+                ];
+            })
+        );
+
+        return response()->json($bom);
     }
 
     public function create(){

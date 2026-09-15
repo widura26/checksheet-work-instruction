@@ -198,7 +198,7 @@
                     scrollX: true,
                     scrollCollapse: true,
                     ajax: function (data, callback, settings) {
-                        $.get("{{ route('project-code.data') }}", {
+                        $.get("{{ route('bill-of-material.data') }}", {
                             page: (data.start / data.length) + 1,
                             per_page: data.length,
                             search: data.search.value
