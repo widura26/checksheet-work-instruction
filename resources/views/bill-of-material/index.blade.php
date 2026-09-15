@@ -114,15 +114,14 @@
             </div>
             @if (Auth::user()->hasRole('admin'))
                 <div class="d-flex gap-2 flex-wrap">
+                    <a href="{{ route('bill-of-material.create') }}" class="btn btn-primary text-white">
+                        <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"></path></svg>
+                        Tambah BOM
+                    </a>
                     <button type="button" class="btn btn-success text-white" data-coreui-toggle="modal"
                         data-coreui-target="#importExcelModal">
                         <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"></path></svg>
                         Import Excel
-                    </button>
-                    <button type="button" class="btn btn-success text-white" data-coreui-toggle="modal"
-                        data-coreui-target="#importExcelModal">
-                        <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"></path></svg>
-                        Tambah
                     </button>
                 </div>
             @endif

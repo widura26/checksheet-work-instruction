@@ -241,5 +241,7 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
 
     Route::prefix('bill-of-material')->group(function(){
         Route::get('/', [BomController::class, 'index'])->name('bill-of-material.index');
+        Route::get('/create', [BomController::class, 'create'])->name('bill-of-material.create');
+        Route::post('/', [BomController::class, 'store'])->name('bill-of-material.store');
     });
 });
