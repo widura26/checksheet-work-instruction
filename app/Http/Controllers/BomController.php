@@ -87,6 +87,7 @@ class BomController extends Controller
         if ($request->hasFile('documents')) {
             $files = $request->file('documents');
             $versions = $request->input('revision_versions', []);
+
             foreach ($files as $index => $file) {
                 $path = $file->store('bill-of-material-revisions', 'public');
                 BillOfMaterialRevision::create([
