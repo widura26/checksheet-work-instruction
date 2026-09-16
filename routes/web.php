@@ -3,6 +3,7 @@
 use App\Http\Controllers\BagianController;
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\BomController;
+use App\Http\Controllers\BomDocumentRevisionController;
 use App\Http\Controllers\BpmController;
 use App\Http\Controllers\CheckSheetController;
 use App\Http\Controllers\CuttingPlanController;
@@ -247,5 +248,11 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::get('/{id}/edit', [BomController::class, 'edit'])->name('bill-of-material.edit');
         Route::put('/{id}', [BomController::class, 'update'])->name('bill-of-material.update');
         Route::delete('/{id}/delete', [BomController::class, 'delete'])->name('bill-of-material.delete');
+
+        Route::prefix('document')->group(function(){
+            Route::get('/{id}', [BomDocumentRevisionController::class, 'show'])->name('bom-document-revision.index');
+            Route::get('/{id}/delete', [BomDocumentRevisionController::class, 'delete'])->name('bom-document-revision.delete');
+            Route::get('/{id}/download', [BomDocumentRevisionController::class, 'download'])->name('bom-document-revision.download');
+        });
     });
 });

@@ -157,8 +157,8 @@
                             <th>Kode Proyek</th>
                             <th>Nama</th>
                             <th>Nomor</th>
-                            <th>Published Date</th>
-                            <th>Revise</th>
+                            <th>Tanggal Terbit</th>
+                            <th>Revisi</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>

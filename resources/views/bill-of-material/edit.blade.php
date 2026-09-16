@@ -96,9 +96,15 @@
                                                 @foreach ($docs as $doc)
                                                     <div class="document-item">
                                                         <span class="file-name">{{ $doc->original_name_file }}</span>
-                                                        <a href="{{ asset('storage/' . $doc->path_file) }}" target="_blank" class="btn btn-sm btn-outline-secondary" title="Lihat">
+                                                        <a href="{{ route('bom-document-revision.index', $doc->id) }}" target="_blank" class="btn btn-sm btn-outline-secondary" title="Lihat">
                                                             <svg class="icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
                                                         </a>
+                                                        <a href="{{ route('bom-document-revision.download', $doc->id) }}" class="btn btn-sm btn-outline-primary" title="Download">
+                                                            <svg class="icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                                                        </a>
+                                                        <button type="button" class="btn btn-sm btn-outline-danger btn-delete-document" data-url="{{ route('bom-document-revision.delete', $doc->id) }}" title="Hapus">
+                                                            <svg class="icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                                                        </button>
                                                     </div>
                                                 @endforeach
                                             </div>
@@ -144,7 +150,6 @@
                     <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
             </form>
-        </div>
     </div>
 @endsection
 
@@ -170,6 +175,26 @@
             if (container.children.length > 0) {
                 btn.closest('.document-item').remove();
             }
+        });
+
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('.btn-delete-document');
+            if (!btn) return;
+            var url = btn.dataset.url;
+            Swal.fire({
+                title: 'Hapus dokumen?',
+                text: "Dokumen akan dihapus secara permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            });
         });
     </script>
 @endpush
