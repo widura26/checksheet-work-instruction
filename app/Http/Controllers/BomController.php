@@ -6,7 +6,6 @@ use App\Models\BillOfMaterial;
 use App\Models\BillOfMaterialRevision;
 use App\Models\Project;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class BomController extends Controller
 {
@@ -116,8 +115,6 @@ class BomController extends Controller
             'revise'          => 'nullable|string|max:255',
             'documents'       => 'nullable|array',
             'documents.*'     => 'file|mimes:pdf,doc,docx,xls,xlsx,png,jpg,jpeg|max:5120',
-            'delete_documents'=> 'nullable|array',
-            'delete_documents.*'=> 'integer|exists:bill_of_material_revisions,id',
         ]);
 
         $bom->update([
@@ -127,16 +124,6 @@ class BomController extends Controller
             'published_date' => $validated['published_date'],
             'revise'         => $validated['revise'] ?? '0',
         ]);
-
-        if (! empty($validated['delete_documents'])) {
-            foreach ($validated['delete_documents'] as $revisionId) {
-                $revision = BillOfMaterialRevision::find($revisionId);
-                if ($revision && $revision->bom_id === $bom->id) {
-                    Storage::disk('public')->delete($revision->path_file);
-                    $revision->delete();
-                }
-            }
-        }
 
         if ($request->hasFile('documents')) {
             foreach ($request->file('documents') as $file) {

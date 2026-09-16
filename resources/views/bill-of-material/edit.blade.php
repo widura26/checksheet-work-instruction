@@ -90,16 +90,12 @@
                             <div class="mb-2">
                                 @foreach ($bom->revisions as $revision)
                                     <div class="document-item">
-                                        <input type="checkbox" class="form-check-input" name="delete_documents[]" value="{{ $revision->id }}" id="doc_{{ $revision->id }}">
-                                        <label class="form-check-label file-name" for="doc_{{ $revision->id }}">
-                                            {{ basename($revision->path_file) }}
-                                        </label>
+                                        <span class="file-name">{{ basename($revision->path_file) }}</span>
                                         <a href="{{ asset('storage/' . $revision->path_file) }}" target="_blank" class="btn btn-sm btn-outline-secondary" title="Lihat">
                                             <svg class="icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
                                         </a>
                                     </div>
                                 @endforeach
-                                <div class="form-text text-muted">Centang dokumen yang ingin dihapus.</div>
                             </div>
                         @else
                             <div class="text-muted mb-2" style="font-size: 0.9rem;">Belum ada dokumen.</div>
