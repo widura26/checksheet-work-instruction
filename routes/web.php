@@ -246,5 +246,6 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::post('/', [BomController::class, 'store'])->name('bill-of-material.store');
         Route::get('/{id}/edit', [BomController::class, 'edit'])->name('bill-of-material.edit');
         Route::put('/{id}', [BomController::class, 'update'])->name('bill-of-material.update');
+        Route::delete('/{id}/delete', [BomController::class, 'delete'])->name('bill-of-material.delete');
     });
 });

@@ -6,7 +6,6 @@ use App\Models\BillOfMaterial;
 use App\Models\BillOfMaterialRevision;
 use App\Models\Project;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class BomController extends Controller
@@ -99,13 +98,14 @@ class BomController extends Controller
         return redirect()->route('bill-of-material.index')->with('success', 'Bill Of Material berhasil ditambahkan.');
     }
 
-    public function edit($id){
+    public function edit(string $id){
         $bom = BillOfMaterial::with('revisions')->findOrFail($id);
         $projects = Project::orderBy('project_id')->get();
+
         return view('bill-of-material.edit', compact('bom', 'projects'));
     }
 
-    public function update(Request $request, $id){
+    public function update(Request $request, string $id){
         $bom = BillOfMaterial::findOrFail($id);
 
         $validated = $request->validate([

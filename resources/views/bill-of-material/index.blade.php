@@ -252,9 +252,12 @@
                             className: 'text-center',
                             render: function (data, type, row) {
                                 return `
-                                    <div>
+                                    <div class="d-flex items-center gap-1">
                                         <a href="/bill-of-material/${data}/edit" class="btn btn-sm btn-primary">
                                             Edit
+                                        </a>
+                                        <a href="/bill-of-material/${data}/edit" class="btn btn-sm btn-primary">
+                                            Hapus
                                         </a>
                                     </div>
                                 `
