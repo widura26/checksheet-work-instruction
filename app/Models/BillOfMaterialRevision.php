@@ -10,7 +10,7 @@ class BillOfMaterialRevision extends Model
 {
     use HasFactory;
 
-     protected $table = 'bill_of_material_revisions';
+    protected $table = 'bill_of_material_revisions';
     protected $guarded = ['id'];
     public $incrementing = false;
     protected $keyType = 'string';

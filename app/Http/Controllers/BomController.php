@@ -28,7 +28,7 @@ class BomController extends Controller
                 'bill_of_materials.published_date',
                 'projects.project_id as project_code',
                 'projects.name_project'
-            );
+            )->with('latestRevision');
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -50,7 +50,7 @@ class BomController extends Controller
                     'number'         => $item->number,
                     'name'           => $item->name,
                     'published_date' => $item->published_date ? \Carbon\Carbon::parse($item->published_date)->format('d-m-Y') : null,
-                    'revise'         => $item->revise,
+                    'revise'         => $item->latestRevision->revision_version,
                     'project_code'   => $item->project_code,
                     'project_name'   => $item->name_project,
                 ];

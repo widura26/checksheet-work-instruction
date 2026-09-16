@@ -30,4 +30,12 @@ class BillOfMaterial extends Model
     {
         return $this->hasMany(BillOfMaterialRevision::class, 'bom_id');
     }
+
+    public function latestRevision()
+    {
+        return $this->hasOne(
+            BillOfMaterialRevision::class,
+            'bom_id'
+        )->latestOfMany('created_at');
+    }
 }
