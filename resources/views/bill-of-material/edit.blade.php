@@ -151,8 +151,8 @@
             var btn = e.target.closest('.btn-remove-document');
             if (!btn) return;
             var container = document.getElementById('documents-container');
-            if (container.children.length > 1) {
-                btn.closest('.input-group').remove();
+            if (container.children.length > 0) {
+                btn.closest('.document-item').remove();
             }
         });
     </script>
