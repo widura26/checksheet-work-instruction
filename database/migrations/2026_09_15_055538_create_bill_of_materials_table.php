@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('number')->nullable();
             $table->string('name')->nullable();
             $table->date('published_date');
-            $table->string('revise')->default('0');
             $table->timestamps();
         });
     }

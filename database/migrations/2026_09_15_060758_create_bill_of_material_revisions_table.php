@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('bill_of_material_revisions', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('bom_id');
+            $table->string('original_name_file');
             $table->string('path_file');
+            $table->string('revision_version')->default(0);
             $table->timestamps();
         });
     }
