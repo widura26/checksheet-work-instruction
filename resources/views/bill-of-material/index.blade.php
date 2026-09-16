@@ -171,24 +171,22 @@
 @push('js')
     <script type="module">
         document.addEventListener('click', function(e) {
-            let button = e.target.closest('.btn-close-project');
+            let button = e.target.closest('.btn-delete-bom');
             if (!button) return;
             let form = button.closest('form');
-            if (button.dataset.submitted === "true") return;
             Swal.fire({
-                title: 'Apakah Anda Yakin ?',
-                text: "Project akan ditutup dan tidak bisa dikembalikan!",
+                title: 'Apakah Anda Yakin?',
+                text: "Data BOM dan seluruh dokumen terkait akan dihapus!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Ya, tutup!',
+                confirmButtonText: 'Ya, hapus!',
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    button.dataset.submitted = "true";
                     button.disabled = true;
-                    button.innerHTML = 'Processing...';
+                    button.innerHTML = 'Hapus...';
                     form.submit();
                 }
             });
@@ -252,13 +250,17 @@
                             className: 'text-center',
                             render: function (data, type, row) {
                                 return `
-                                    <div class="d-flex items-center gap-1">
+                                    <div class="d-flex items-center gap-1 justify-content-center">
                                         <a href="/bill-of-material/${data}/edit" class="btn btn-sm btn-primary">
                                             Edit
                                         </a>
-                                        <a href="/bill-of-material/${data}/edit" class="btn btn-sm btn-primary">
-                                            Hapus
-                                        </a>
+                                        <form action="/bill-of-material/${data}/delete" method="POST" class="d-inline delete-form">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" class="btn btn-sm btn-danger btn-delete-bom" title="Hapus">
+                                                Hapus
+                                            </button>
+                                        </form>
                                     </div>
                                 `
                             }

@@ -6,6 +6,7 @@ use App\Models\BillOfMaterial;
 use App\Models\BillOfMaterialRevision;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class BomController extends Controller
 {
@@ -143,5 +144,18 @@ class BomController extends Controller
         }
 
         return redirect()->route('bill-of-material.index')->with('success', 'Bill Of Material berhasil diperbarui.');
+    }
+
+    public function delete(string $id){
+        $bom = BillOfMaterial::with('revisions')->findOrFail($id);
+
+        foreach ($bom->revisions as $revision) {
+            Storage::disk('public')->delete($revision->path_file);
+            $revision->delete();
+        }
+
+        $bom->delete();
+
+        return redirect()->route('bill-of-material.index')->with('success', 'Bill Of Material berhasil dihapus.');
     }
 }

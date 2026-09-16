@@ -76,15 +76,7 @@
 
                     <div class="col-12">
                         <label class="form-label">Dokumen BOM</label>
-                        <div id="documents-container">
-                            <div class="document-item">
-                                <input type="file" class="form-control" name="documents[]" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">
-                                <input type="text" class="form-control" name="revision_versions[]" placeholder="Rev" style="width: 100px;">
-                                <button type="button" class="btn btn-outline-danger btn-remove-document" title="Hapus">
-                                    <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-                                </button>
-                            </div>
-                        </div>
+                        <div id="documents-container"></div>
                         <button type="button" class="btn btn-sm btn-success" id="btn-add-document">
                             <svg class="icon me-1" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"/></svg>
                             Tambah Dokumen
