@@ -51,7 +51,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="number" class="form-label">Nomor <span class="text-danger">*</span></label>
+                        <label for="number" class="form-label">Nomor BOM <span class="text-danger">*</span></label>
                         <input type="text" class="form-control @error('number') is-invalid @enderror" id="number" name="number" value="{{ old('number') }}" required>
                         @error('number')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -59,7 +59,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
+                        <label for="name" class="form-label">Nama <span class="text-danger">*</span></label>
                         <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
                         @error('name')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -67,7 +67,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="published_date" class="form-label">Published Date <span class="text-danger">*</span></label>
+                        <label for="published_date" class="form-label">Tanggal Terbit <span class="text-danger">*</span></label>
                         <input type="date" class="form-control @error('published_date') is-invalid @enderror" id="published_date" name="published_date" value="{{ old('published_date', date('Y-m-d')) }}" required>
                         @error('published_date')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -75,8 +75,16 @@
                     </div>
 
                     <div class="col-12">
-                        <label class="form-label">Dokumen BOM</label>
-                        <div id="documents-container"></div>
+                        <label class="form-label">Dokumen BOM <span class="text-danger">*</span></label>
+                        <div id="documents-container">
+                            <div class="document-item">
+                                <input type="file" class="form-control" name="documents[]" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg" required>
+                                <input type="text" class="form-control" name="revision_versions[]" placeholder="Rev" style="width: 100px;">
+                                <button type="button" class="btn btn-outline-danger btn-remove-document" title="Hapus">
+                                    <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                                </button>
+                            </div>
+                        </div>
                         <button type="button" class="btn btn-sm btn-success" id="btn-add-document">
                             <svg class="icon me-1" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"/></svg>
                             Tambah Dokumen
@@ -113,7 +121,7 @@
             var row = document.createElement('div');
             row.className = 'document-item';
             row.innerHTML =
-                '<input type="file" class="form-control" name="documents[]" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">' +
+                '<input type="file" class="form-control" name="documents[]" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg" required>' +
                 '<input type="text" class="form-control" name="revision_versions[]" placeholder="Rev" style="width: 100px;">' +
                 '<button type="button" class="btn btn-outline-danger btn-remove-document" title="Hapus">' +
                 '<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>' +

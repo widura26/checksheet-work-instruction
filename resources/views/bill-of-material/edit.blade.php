@@ -52,7 +52,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="number" class="form-label">Nomor <span class="text-danger">*</span></label>
+                        <label for="number" class="form-label">Nomor BOM <span class="text-danger">*</span></label>
                         <input type="text" class="form-control @error('number') is-invalid @enderror" id="number" name="number" value="{{ old('number', $bom->number) }}" required>
                         @error('number')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -60,7 +60,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
+                        <label for="name" class="form-label">Nama <span class="text-danger">*</span></label>
                         <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $bom->name) }}" required>
                         @error('name')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -68,7 +68,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="published_date" class="form-label">Published Date <span class="text-danger">*</span></label>
+                        <label for="published_date" class="form-label">Tanggal Terbit <span class="text-danger">*</span></label>
                         <input type="date" class="form-control @error('published_date') is-invalid @enderror" id="published_date" name="published_date" value="{{ old('published_date', $bom->published_date ? \Carbon\Carbon::parse($bom->published_date)->format('Y-m-d') : '') }}" required>
                         @error('published_date')
                             <div class="invalid-feedback">{{ $message }}</div>

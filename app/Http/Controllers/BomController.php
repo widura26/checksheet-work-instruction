@@ -71,7 +71,7 @@ class BomController extends Controller
             'number'             => 'required|string|max:255',
             'name'               => 'required|string|max:255',
             'published_date'     => 'required|date',
-            'documents'          => 'nullable|array',
+            'documents'          => 'required|array',
             'documents.*'        => 'file|mimes:pdf,xls,xlsx|max:5120',
             'revision_versions'  => 'nullable|array',
             'revision_versions.*'=> 'nullable|string|max:255',
