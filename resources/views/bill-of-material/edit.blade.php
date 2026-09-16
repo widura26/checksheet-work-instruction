@@ -78,15 +78,31 @@
                     <div class="col-12">
                         <label class="form-label">Dokumen BOM</label>
 
-                        @if ($bom->revisions->count())
+                        @php
+                            $grouped = $bom->revisions->groupBy('revision_version');
+                        @endphp
+
+                        @if ($grouped->count())
                             <div class="mb-2">
-                                @foreach ($bom->revisions as $revision)
-                                    <div class="document-item">
-                                        <span class="file-name">{{ $revision->original_name_file  }}</span>
-                                        <input type="text" class="form-control form-control-sm" style="width: 100px;" value="{{ $revision->revision_version }}" readonly>
-                                        <a href="{{ asset('storage/' . $revision->path_file) }}" target="_blank" class="btn btn-sm btn-outline-secondary" title="Lihat">
-                                            <svg class="icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-                                        </a>
+                                @foreach ($grouped as $version => $docs)
+                                    <div class="card mb-2">
+                                        <div class="card-header py-2 d-flex align-items-center" style="cursor: pointer;" data-coreui-toggle="collapse" data-coreui-target="#rev-{{ $version }}">
+                                            <svg class="icon me-2" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+                                            <strong>Revisi {{ $version }}</strong>
+                                            <span class="badge bg-secondary ms-2">{{ $docs->count() }} dokumen</span>
+                                        </div>
+                                        <div class="collapse" id="rev-{{ $version }}">
+                                            <div class="card-body py-2">
+                                                @foreach ($docs as $doc)
+                                                    <div class="document-item">
+                                                        <span class="file-name">{{ $doc->original_name_file }}</span>
+                                                        <a href="{{ asset('storage/' . $doc->path_file) }}" target="_blank" class="btn btn-sm btn-outline-secondary" title="Lihat">
+                                                            <svg class="icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                                                        </a>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
                                     </div>
                                 @endforeach
                             </div>

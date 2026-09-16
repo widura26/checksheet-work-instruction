@@ -89,12 +89,13 @@ class BomController extends Controller
             $versions = $request->input('revision_versions', []);
 
             foreach ($files as $index => $file) {
-                $path = $file->store('bill-of-material-revisions', 'public');
+                $rev = $versions[$index] ?? '0';
+                $path = $file->store('bill-of-material-revisions/rev-' . $rev, 'public');
                 BillOfMaterialRevision::create([
                     'bom_id'            => $bom->id,
                     'original_name_file'=> $file->getClientOriginalName(),
                     'path_file'         => $path,
-                    'revision_version'  => $versions[$index] ?? '0',
+                    'revision_version'  => $rev,
                 ]);
             }
         }
@@ -134,12 +135,13 @@ class BomController extends Controller
             $files = $request->file('documents');
             $versions = $request->input('revision_versions', []);
             foreach ($files as $index => $file) {
-                $path = $file->store('bill-of-material-revisions', 'public');
+                $rev = $versions[$index] ?? '0';
+                $path = $file->store('bill-of-material-revisions/rev-' . $rev, 'public');
                 BillOfMaterialRevision::create([
                     'bom_id'            => $bom->id,
                     'original_name_file'=> $file->getClientOriginalName(),
                     'path_file'         => $path,
-                    'revision_version'  => $versions[$index] ?? '0',
+                    'revision_version'  => $rev,
                 ]);
             }
         }
