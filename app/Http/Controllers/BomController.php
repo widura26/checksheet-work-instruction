@@ -25,7 +25,6 @@ class BomController extends Controller
                 'bill_of_materials.number',
                 'bill_of_materials.name',
                 'bill_of_materials.published_date',
-                'bill_of_materials.revise',
                 'projects.project_id as project_code',
                 'projects.name_project'
             );
@@ -67,13 +66,14 @@ class BomController extends Controller
 
     public function store(Request $request){
         $validated = $request->validate([
-            'project_id'      => 'required',
-            'number'          => 'required|string|max:255',
-            'name'            => 'required|string|max:255',
-            'published_date'  => 'required|date',
-            'revise'          => 'nullable|string|max:255',
-            'documents'       => 'nullable|array',
-            'documents.*'     => 'file|mimes:pdf,doc,docx,xls,xlsx,png,jpg,jpeg|max:5120',
+            'project_id'         => 'required',
+            'number'             => 'required|string|max:255',
+            'name'               => 'required|string|max:255',
+            'published_date'     => 'required|date',
+            'documents'          => 'nullable|array',
+            'documents.*'        => 'file|mimes:pdf,xls,xlsx|max:5120',
+            'revision_versions'  => 'nullable|array',
+            'revision_versions.*'=> 'nullable|string|max:255',
         ]);
 
         $bom = BillOfMaterial::create([
@@ -81,15 +81,18 @@ class BomController extends Controller
             'number'         => $validated['number'],
             'name'           => $validated['name'],
             'published_date' => $validated['published_date'],
-            'revise'         => $validated['revise'] ?? '0',
         ]);
 
         if ($request->hasFile('documents')) {
-            foreach ($request->file('documents') as $file) {
+            $files = $request->file('documents');
+            $versions = $request->input('revision_versions', []);
+            foreach ($files as $index => $file) {
                 $path = $file->store('bill-of-material-revisions', 'public');
                 BillOfMaterialRevision::create([
-                    'bom_id'     => $bom->id,
-                    'path_file'  => $path,
+                    'bom_id'            => $bom->id,
+                    'original_name_file'=> $file->getClientOriginalName(),
+                    'path_file'         => $path,
+                    'revision_version'  => $versions[$index] ?? '0',
                 ]);
             }
         }
@@ -108,13 +111,14 @@ class BomController extends Controller
         $bom = BillOfMaterial::findOrFail($id);
 
         $validated = $request->validate([
-            'project_id'      => 'required',
-            'number'          => 'required|string|max:255',
-            'name'            => 'required|string|max:255',
-            'published_date'  => 'required|date',
-            'revise'          => 'nullable|string|max:255',
-            'documents'       => 'nullable|array',
-            'documents.*'     => 'file|mimes:pdf,doc,docx,xls,xlsx,png,jpg,jpeg|max:5120',
+            'project_id'         => 'required',
+            'number'             => 'required|string|max:255',
+            'name'               => 'required|string|max:255',
+            'published_date'     => 'required|date',
+            'documents'          => 'nullable|array',
+            'documents.*'        => 'file|mimes:pdf,xls,xlsx|max:5120',
+            'revision_versions'  => 'nullable|array',
+            'revision_versions.*'=> 'nullable|string|max:255',
         ]);
 
         $bom->update([
@@ -122,15 +126,18 @@ class BomController extends Controller
             'number'         => $validated['number'],
             'name'           => $validated['name'],
             'published_date' => $validated['published_date'],
-            'revise'         => $validated['revise'] ?? '0',
         ]);
 
         if ($request->hasFile('documents')) {
-            foreach ($request->file('documents') as $file) {
+            $files = $request->file('documents');
+            $versions = $request->input('revision_versions', []);
+            foreach ($files as $index => $file) {
                 $path = $file->store('bill-of-material-revisions', 'public');
                 BillOfMaterialRevision::create([
-                    'bom_id'     => $bom->id,
-                    'path_file'  => $path,
+                    'bom_id'            => $bom->id,
+                    'original_name_file'=> $file->getClientOriginalName(),
+                    'path_file'         => $path,
+                    'revision_version'  => $versions[$index] ?? '0',
                 ]);
             }
         }

@@ -7,6 +7,20 @@
         .icon {
             vertical-align: middle;
         }
+        .document-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .document-item:last-child {
+            border-bottom: none;
+        }
+        .document-item .file-name {
+            flex: 1;
+            font-size: 0.9rem;
+        }
     </style>
 @endpush
 
@@ -60,19 +74,12 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-6">
-                        <label for="revise" class="form-label">Revise</label>
-                        <input type="text" class="form-control @error('revise') is-invalid @enderror" id="revise" name="revise" value="{{ old('revise', '0') }}">
-                        @error('revise')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
                     <div class="col-12">
                         <label class="form-label">Dokumen BOM</label>
                         <div id="documents-container">
-                            <div class="input-group mb-2">
+                            <div class="document-item">
                                 <input type="file" class="form-control" name="documents[]" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">
+                                <input type="text" class="form-control" name="revision_versions[]" placeholder="Rev" style="width: 100px;">
                                 <button type="button" class="btn btn-outline-danger btn-remove-document" title="Hapus">
                                     <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                                 </button>
@@ -82,7 +89,7 @@
                             <svg class="icon me-1" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"/></svg>
                             Tambah Dokumen
                         </button>
-                        <div class="form-text">Format: PDF, DOC, DOCX, XLS, XLSX, PNG, JPG (maks 5MB per file).</div>
+                        <div class="form-text">Format: PDF, XLS, XLSX (maks 5MB per file).</div>
                         @error('documents.*')
                             <div class="text-danger small mt-1">{{ $message }}</div>
                         @enderror
@@ -112,9 +119,10 @@
         document.getElementById('btn-add-document').addEventListener('click', function () {
             var container = document.getElementById('documents-container');
             var row = document.createElement('div');
-            row.className = 'input-group mb-2';
+            row.className = 'document-item';
             row.innerHTML =
                 '<input type="file" class="form-control" name="documents[]" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">' +
+                '<input type="text" class="form-control" name="revision_versions[]" placeholder="Rev" style="width: 100px;">' +
                 '<button type="button" class="btn btn-outline-danger btn-remove-document" title="Hapus">' +
                 '<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>' +
                 '</button>';

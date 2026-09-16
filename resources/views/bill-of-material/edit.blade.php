@@ -75,14 +75,6 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-6">
-                        <label for="revise" class="form-label">Revise</label>
-                        <input type="text" class="form-control @error('revise') is-invalid @enderror" id="revise" name="revise" value="{{ old('revise', $bom->revise) }}">
-                        @error('revise')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
                     <div class="col-12">
                         <label class="form-label">Dokumen BOM</label>
 
@@ -90,7 +82,8 @@
                             <div class="mb-2">
                                 @foreach ($bom->revisions as $revision)
                                     <div class="document-item">
-                                        <span class="file-name">{{ basename($revision->path_file) }}</span>
+                                        <span class="file-name">{{ $revision->original_name_file  }}</span>
+                                        <input type="text" class="form-control form-control-sm" style="width: 100px;" value="{{ $revision->revision_version }}" readonly>
                                         <a href="{{ asset('storage/' . $revision->path_file) }}" target="_blank" class="btn btn-sm btn-outline-secondary" title="Lihat">
                                             <svg class="icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
                                         </a>
@@ -102,8 +95,9 @@
                         @endif
 
                         <div id="documents-container">
-                            <div class="input-group mb-2">
+                            <div class="document-item">
                                 <input type="file" class="form-control" name="documents[]" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">
+                                <input type="text" class="form-control" name="revision_versions[]" placeholder="Rev" style="width: 100px;">
                                 <button type="button" class="btn btn-outline-danger btn-remove-document" title="Hapus">
                                     <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                                 </button>
@@ -113,7 +107,7 @@
                             <svg class="icon me-1" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"/></svg>
                             Tambah Dokumen
                         </button>
-                        <div class="form-text">Format: PDF, DOC, DOCX, XLS, XLSX, PNG, JPG (maks 5MB per file).</div>
+                        <div class="form-text">Format: PDF, XLS, XLSX (maks 5MB per file).</div>
                         @error('documents.*')
                             <div class="text-danger small mt-1">{{ $message }}</div>
                         @enderror
@@ -143,9 +137,10 @@
         document.getElementById('btn-add-document').addEventListener('click', function () {
             var container = document.getElementById('documents-container');
             var row = document.createElement('div');
-            row.className = 'input-group mb-2';
+            row.className = 'document-item';
             row.innerHTML =
                 '<input type="file" class="form-control" name="documents[]" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">' +
+                '<input type="text" class="form-control" name="revision_versions[]" placeholder="Rev" style="width: 100px;">' +
                 '<button type="button" class="btn btn-outline-danger btn-remove-document" title="Hapus">' +
                 '<svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>' +
                 '</button>';
