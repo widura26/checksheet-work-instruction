@@ -31,6 +31,14 @@ return new class extends Migration
             $table->string('po_delivered_date');
             $table->string('created_by');
             $table->string('request_by');
+            $table->string('wbs_elem')->nullable();
+            $table->string('tracking_no')->nullable();
+            $table->string('matl_group')->nullable();
+            $table->string('rel')->nullable();
+            $table->string('item')->nullable();
+            $table->string('pgr')->nullable();
+            $table->string('plnt')->nullable();
+            $table->string('rel_stat')->nullable();
             $table->timestamps();
         });
     }

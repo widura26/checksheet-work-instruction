@@ -10,7 +10,7 @@ class MaterialPlanning extends Model
 {
     use HasFactory;
 
-    protected $table = 'material_plannigs';
+    protected $table = 'material_plannings';
     protected $guarded = ['id'];
     public $incrementing = false;
     protected $keyType = 'string';

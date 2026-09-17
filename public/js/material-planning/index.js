@@ -200,3 +200,66 @@ pieChart2.render()
 barChart.render()
 barChart1.render()
 barChart2.render()
+
+/* Import Purchase Requisition */
+const importModal = new coreui.Modal(document.getElementById('importExcelModal'));
+
+$('#btnImport').on('click', function () {
+    const form = document.getElementById('importForm');
+    const fileInput = document.getElementById('importFile');
+    const resultDiv = $('#importResult');
+    const progressDiv = $('#importProgress');
+    const btn = $(this);
+
+    if (!fileInput.files.length) {
+        resultDiv.removeClass('d-none').html(
+            '<div class="alert alert-warning">Pilih file terlebih dahulu.</div>'
+        );
+        return;
+    }
+
+    btn.prop('disabled', true).text('Mengimpor...');
+    progressDiv.removeClass('d-none');
+    resultDiv.addClass('d-none').html('');
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+    formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+
+    $.ajax({
+        url: '/material-planning/import',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (res) {
+            progressDiv.addClass('d-none');
+            btn.prop('disabled', false).text('Import');
+
+            if (res.success) {
+                let html = '<div class="alert alert-success">' + res.message + '</div>';
+                if (res.errors && res.errors.length > 0) {
+                    html += '<div class="alert alert-warning"><strong>Error:</strong><ul class="mb-0 mt-1">';
+                    res.errors.forEach(function (err) {
+                        html += '<li>' + err + '</li>';
+                    });
+                    html += '</ul></div>';
+                }
+                resultDiv.removeClass('d-none').html(html);
+                form.reset();
+            } else {
+                resultDiv.removeClass('d-none').html(
+                    '<div class="alert alert-danger">' + res.message + '</div>'
+                );
+            }
+        },
+        error: function (xhr) {
+            progressDiv.addClass('d-none');
+            btn.prop('disabled', false).text('Import');
+            const msg = xhr.responseJSON?.message || 'Terjadi kesalahan saat import.';
+            resultDiv.removeClass('d-none').html(
+                '<div class="alert alert-danger">' + msg + '</div>'
+            );
+        }
+    });
+});

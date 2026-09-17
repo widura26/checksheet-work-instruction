@@ -84,6 +84,38 @@
                 </button>
             </div>
 
+            <!-- Import Excel Modal -->
+            <div class="modal fade" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="importExcelModalLabel">Import Purchase Requisition</h5>
+                            <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="importForm" enctype="multipart/form-data">
+                                @csrf
+                                <div class="mb-3">
+                                    <label for="importFile" class="form-label">Pilih File Excel</label>
+                                    <input type="file" class="form-control" id="importFile" name="file" accept=".xlsx,.xls,.csv" required>
+                                    <div class="form-text">Format: .xlsx, .xls, atau .csv</div>
+                                </div>
+                            </form>
+                            <div id="importProgress" class="d-none">
+                                <div class="progress mb-2">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%">Loading...</div>
+                                </div>
+                            </div>
+                            <div id="importResult" class="d-none"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-coreui-dismiss="modal">Tutup</button>
+                            <button type="button" class="btn btn-success" id="btnImport">Import</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="row mb-4">
                 <div class="col-lg-3 col-sm-6">
                     <div class="card" style="border-top: 3px solid var(--cui-primary);">

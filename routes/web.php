@@ -243,6 +243,7 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
 
     Route::prefix('material-planning')->group(function(){
         Route::get('/', [materialPlanningController::class, 'materialPlanning'])->name('material-planning.index');
+        Route::post('/import', [materialPlanningController::class, 'import'])->name('material-planning.import');
     });
 
     Route::prefix('bill-of-material')->group(function(){
