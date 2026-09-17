@@ -14,7 +14,7 @@ use App\Http\Controllers\DistribusiController;
 use App\Http\Controllers\ExpedisiController;
 use App\Http\Controllers\GrafikController;
 use App\Http\Controllers\KodeMaterialController;
-use App\Http\Controllers\materialPlanningController;
+use App\Http\Controllers\MaterialPlanningController;
 use App\Http\Controllers\MdController;
 use App\Http\Controllers\OkaController;
 use App\Http\Controllers\ProjectCodeController;
@@ -242,8 +242,9 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
     });
 
     Route::prefix('material-planning')->group(function(){
-        Route::get('/', [materialPlanningController::class, 'materialPlanning'])->name('material-planning.index');
-        Route::post('/import', [materialPlanningController::class, 'import'])->name('material-planning.import');
+        Route::get('/', [MaterialPlanningController::class, 'materialPlanning'])->name('material-planning.index');
+        Route::post('/import', [MaterialPlanningController::class, 'import'])->name('material-planning.import');
+        Route::post('/delete', [MaterialPlanningController::class, 'delete'])->name('material-planning.delete');
     });
 
     Route::prefix('bill-of-material')->group(function(){

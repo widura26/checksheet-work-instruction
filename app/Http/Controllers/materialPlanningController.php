@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Imports\MaterialPlanningImport;
+use App\Models\MaterialPlanning;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\DB;
 
-class materialPlanningController extends Controller
+class MaterialPlanningController extends Controller
 {
     public function materialPlanning()
     {
@@ -22,24 +24,29 @@ class materialPlanningController extends Controller
             'file.required' => 'File wajib dipilih.',
             'file.extensions' => 'File harus berformat xlsx, xls, atau csv.',
         ]);
+        set_time_limit(300);
+        DB::disableQueryLog();
 
         try {
             $import = new MaterialPlanningImport();
             Excel::import($import, $request->file('file'));
 
             $errors = $import->getErrors();
+            $importedCount = $import->getImportedCount();
 
             if (!empty($errors)) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'Import selesai dengan beberapa error.',
+                    'message' => "Import selesai. {$importedCount} baris berhasil diimpor, dengan beberapa error.",
+                    'imported_count' => $importedCount,
                     'errors' => $errors,
                 ]);
             }
 
             return response()->json([
                 'success' => true,
-                'message' => 'Data Purchase Requisition berhasil diimpor.',
+                'message' => "Berhasil mengimpor {$importedCount} baris data Purchase Requisition.",
+                'imported_count' => $importedCount,
             ]);
         } catch (\Throwable $e) {
             Log::error('Error importing material planning: ' . $e->getMessage());
@@ -48,5 +55,10 @@ class materialPlanningController extends Controller
                 'message' => 'Gagal mengimpor data: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function delete(){
+        MaterialPlanning::truncate();
+        return redirect()->back();
     }
 }

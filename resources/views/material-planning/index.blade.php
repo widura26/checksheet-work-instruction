@@ -72,6 +72,10 @@
     <div class="card mb-4">
         <div class="p-3">
             <div class="buttons">
+                <form method="POST" action="{{ route("material-planning.delete") }}">
+                    @csrf
+                    <button>Delete</button>
+                </form>
                 <button type="button" class="btn btn-primary text-white" data-coreui-toggle="modal"
                     data-coreui-target="#importExcelModal">
                     <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"></path></svg>

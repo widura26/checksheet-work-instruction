@@ -257,6 +257,7 @@ $('#btnImport').on('click', function () {
             progressDiv.addClass('d-none');
             btn.prop('disabled', false).text('Import');
             const msg = xhr.responseJSON?.message || 'Terjadi kesalahan saat import.';
+            console.log(xhr.responseJSON?.message)
             resultDiv.removeClass('d-none').html(
                 '<div class="alert alert-danger">' + msg + '</div>'
             );
