@@ -243,6 +243,7 @@ const barChart1 = new Chart(document.getElementById('canvas-8'), {
         ]
     },
     options: {
+        indexAxis: 'y',
         showTooltips: false,
         plugins: {
             legend: {
@@ -262,11 +263,12 @@ const barChart1 = new Chart(document.getElementById('canvas-8'), {
 const barChart2 = new Chart(document.getElementById('canvas-9'), {
     type: 'bar',
     data: {
-        labels: ['Purchase Requisition', 'Purchase Order'],
+        labels: ['Bill Of Material', 'Purchase Requisition'],
         datasets: [
             {
                 label: 'My First Dataset',
-                data: [65, 59],
+                data: [30, 70],
+                fill: false,
                 backgroundColor: [
                     'rgba(255, 99, 132, 0.2)',
                     'rgba(255, 159, 64, 0.2)'
@@ -280,6 +282,7 @@ const barChart2 = new Chart(document.getElementById('canvas-9'), {
         ]
     },
     options: {
+        indexAxis: 'y',
         showTooltips: false,
         plugins: {
             legend: {

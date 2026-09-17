@@ -156,13 +156,19 @@
                     </div>
                 </div>
                 <div class="pie-charts">
-                    <div class="pie-chart-pr-po">
-                        <canvas id="canvas-8"></canvas>
+                    <div class="" style="width: 100%;">
+                        <h5>Deviasi Bill Of Material & Purchase Requisition</h5>
+                        <div class="pie-chart-pr-po">
+                            <canvas id="canvas-8" style="width: 100%"></canvas>
+                        </div>
                     </div>
                 </div>
                 <div class="pie-charts">
-                    <div class="pie-chart-pr-po">
-                        <canvas id="canvas-9"></canvas>
+                    <div class="" style="width: 100%;">
+                        <h5>Deviasi Purchase Requisition & Purchase Order</h5>
+                        <div class="pie-chart-pr-po">
+                            <canvas id="canvas-9" style="width: 100%"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
