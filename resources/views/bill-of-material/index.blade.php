@@ -155,7 +155,8 @@
                         <tr>
                             <th>No</th>
                             <th>Kode Proyek</th>
-                            <th>Nama</th>
+                            <th>Nama Proyek</th>
+                            <th>Nama BOM</th>
                             <th>Nomor</th>
                             <th>Tanggal Terbit</th>
                             <th>Revisi</th>
@@ -225,6 +226,10 @@
                         {
                             data: 'project_code',
                             name: 'project_code'
+                        },
+                        {
+                            data: 'name_project',
+                            name: 'name_project'
                         },
                         {
                             data: 'name',

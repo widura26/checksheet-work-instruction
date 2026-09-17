@@ -49,6 +49,7 @@ class BomController extends Controller
                     'id'             => $item->id,
                     'number'         => $item->number,
                     'name'           => $item->name,
+                    'name_project'   => $item->name_project,
                     'published_date' => $item->published_date ? \Carbon\Carbon::parse($item->published_date)->format('d-m-Y') : null,
                     'revise'         => $item->latestRevision->revision_version,
                     'project_code'   => $item->project_code,
