@@ -19,6 +19,37 @@
             width: 24px;
             height: 24px;
         }
+
+        #charts {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .pie-charts {
+            padding: 20px;
+            display: flex;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+
+        .bar-charts {
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+
+        .chartjs-tooltip {
+            display: none;
+        }
+
+        .buttons {
+            display: flex;
+            align-items: center;
+            justify-content: end;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
     </style>
 @endpush
 
@@ -26,6 +57,18 @@
 
     <div class="card mb-4">
         <div class="p-3">
+            <div class="buttons">
+                <button type="button" class="btn btn-primary text-white" data-coreui-toggle="modal"
+                    data-coreui-target="#importExcelModal">
+                    <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"></path></svg>
+                    Import Bill Of Material (.xls)
+                </button>
+                <button type="button" class="btn btn-success text-white" data-coreui-toggle="modal"
+                    data-coreui-target="#importExcelModal">
+                    <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"></path></svg>
+                    Import Purchase Requisition (.xls)
+                </button>
+            </div>
             {{-- Analytics Container --}}
             <div class="row mb-4">
                 <div class="col-lg-3 col-sm-6">
@@ -98,12 +141,32 @@
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header">Distribusi BOM per Proyek</div>
-                <div class="card-body">
-                    <div id="bom-distribusi-chart"></div>
+            <div id="charts">
+                <div class="pie-charts">
+                    <div class="pie-chart-pr-po">
+                        <canvas id="canvas-5"></canvas>
+                    </div>
+                    <div class="pie-chart-pr-po">
+                        <canvas id="canvas-6"></canvas>
+                    </div>
+                </div>
+                <div class="bar-charts">
+                    <div class="bar-chart-pr-po">
+                        <canvas id="canvas-7"></canvas>
+                    </div>
+                </div>
+                <div class="pie-charts">
+                    <div class="pie-chart-pr-po">
+                        <canvas id="canvas-8"></canvas>
+                    </div>
+                </div>
+                <div class="pie-charts">
+                    <div class="pie-chart-pr-po">
+                        <canvas id="canvas-9"></canvas>
+                    </div>
                 </div>
             </div>
+
         </div>
     </div>
 
