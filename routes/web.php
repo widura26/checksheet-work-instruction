@@ -14,6 +14,7 @@ use App\Http\Controllers\DistribusiController;
 use App\Http\Controllers\ExpedisiController;
 use App\Http\Controllers\GrafikController;
 use App\Http\Controllers\KodeMaterialController;
+use App\Http\Controllers\materialPlanningController;
 use App\Http\Controllers\MdController;
 use App\Http\Controllers\OkaController;
 use App\Http\Controllers\ProjectCodeController;
@@ -238,6 +239,10 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::post('/distribusi/upload-bast', [DistribusiController::class, 'uploadBast'])->name('distribusi.upload-bast')->middleware('client.request.id');
         // unduh file bast ttd
         Route::get('/distribusi/unduh-bast-ttd/{distribusiTool}', [DistribusiController::class, 'downloadBastFile'])->name('distribusi.unduh-bast-ttd');
+    });
+
+    Route::prefix('material-planning')->group(function(){
+        Route::get('/', [materialPlanningController::class, 'materialPlanning'])->name('material-planning.index');
     });
 
     Route::prefix('bill-of-material')->group(function(){

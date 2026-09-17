@@ -24,10 +24,21 @@
         ])
 
         @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'bill-of-material.index',
-            'icon' => 'cil-chart-line',
-            'label' => 'Bill Of Material'
+            'navtype' => 'nav-group',
+            'icon' => 'cil-print',
+            'label' => 'Material Planning',
+            'subitems' => [
+                [
+                    'navtype' => 'nav-item',
+                    'route' => 'material-planning.index',
+                    'label' => 'Dashboard',
+                ],
+                [
+                    'navtype' => 'nav-item',
+                    'route' => 'bill-of-material.index',
+                    'label' => 'Bill Of Material',
+                ],
+            ]
         ])
 
         <li class="nav-title">Master Data</li>
