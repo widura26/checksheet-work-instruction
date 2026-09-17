@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('pr_delivered_date')->nullable();
             $table->string('changed_on_date')->nullable();
             $table->string('material_code')->nullable();
-            $table->string('material_description')->nullable();
+            $table->text('material_description')->nullable();
             $table->string('spesification')->nullable();
             $table->string('requested_quantity')->nullable();
             $table->string('unit')->nullable();

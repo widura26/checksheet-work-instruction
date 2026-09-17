@@ -126,8 +126,8 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between">
                                 <div>
-                                    <h6 class="text-muted mb-1">Total BOM</h6>
-                                    <h3 class="mb-0" id="total-bom">-</h3>
+                                    <h6 class="text-muted mb-1">Total Purchase Requisition</h6>
+                                    <h3 class="mb-0" id="total-bom">{{ count($prtotals) }}</h3>
                                 </div>
                                 <div class="align-self-center">
                                     <div class="avatar avatar-lg bg-primary bg-opacity-10 text-primary">

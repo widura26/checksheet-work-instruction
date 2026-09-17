@@ -13,11 +13,11 @@ class MaterialPlanningController extends Controller
 {
     public function materialPlanning()
     {
-        return view('material-planning.index');
+        $prtotals = MaterialPlanning::all();
+        return view('material-planning.index', compact('prtotals'));
     }
 
-    public function import(Request $request)
-    {
+    public function import(Request $request){
         $request->validate([
             'file' => 'required|file|extensions:xlsx,xls,csv',
         ], [
@@ -29,23 +29,46 @@ class MaterialPlanningController extends Controller
         DB::disableQueryLog();
 
         $file = $request->file('file');
-        $handle = fopen($file->getRealPath(), 'r');
+        $content = file_get_contents($file->getRealPath());
+        $content = mb_convert_encoding($content, 'UTF-8', mb_detect_encoding($content, 'ASCII, ISO-8859-1, Windows-1252, UTF-8', true));
+        $tempFile = tempnam(sys_get_temp_dir(), 'csv_');
+        file_put_contents($tempFile, $content);
+        $handle = fopen($tempFile, 'r');
 
-        $header = fgetcsv($handle, 0, ',');
+        $firstLine = fgets($handle);
+        rewind($handle);
+        if (str_contains($firstLine, "\t")) {
+            $delimiter = "\t";
+        } elseif (substr_count($firstLine, ';') > substr_count($firstLine, ',')) {
+            $delimiter = ';';
+        } else {
+            $delimiter = ',';
+        }
+        $header = fgetcsv($handle, 0, $delimiter);
+
+        Log::info('Delimiter: ' . ($delimiter === "\t" ? "TAB" : "COMMA"));
+        Log::info('Header count: ' . count($header));
+        Log::info('Header:', $header);
+
         $headerMap = $this->buildHeaderMap($header);
 
         $totalImported = 0;
+        $totalSkipped = 0;
         $errors = [];
 
         try {
-            LazyCollection::make(function () use ($handle) {
-                while (($row = fgetcsv($handle, 0, ',')) !== false) {
+            LazyCollection::make(function () use ($handle, $header, $delimiter) {
+                $colCount = count($header);
+                while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
                     if (empty($row) || !isset($row[0])) continue;
+                    if (count($row) === $colCount + 1 && trim($row[0]) === '') {
+                        array_shift($row);
+                    }
                     yield $row;
                 }
                 fclose($handle);
             })
-            ->each(function ($row) use ($headerMap, &$totalImported, &$errors) {
+            ->each(function ($row) use ($headerMap, &$totalImported, &$totalSkipped, &$errors) {
                 $mapped = $this->mapRow($row, $headerMap);
 
                 $isEmpty = true;
@@ -55,9 +78,15 @@ class MaterialPlanningController extends Controller
                         break;
                     }
                 }
-                if ($isEmpty) return;
+                if ($isEmpty) {
+                    $totalSkipped++;
+                    return;
+                }
 
-                if (empty($mapped['wbs_elem']) && empty($mapped['material_code'])) return;
+                if (empty($mapped['wbs_elem']) && empty($mapped['material_code'])) {
+                    $totalSkipped++;
+                    return;
+                }
 
                 try {
                     $mapped['id'] = (string) Str::uuid();
@@ -67,20 +96,28 @@ class MaterialPlanningController extends Controller
                     $totalImported++;
                 } catch (\Throwable $e) {
                     $errors[] = $e->getMessage();
+                    Log::error('Import row error: ' . $e->getMessage());
                 }
             });
 
-            $msg = "Berhasil mengimpor {$totalImported} baris data Purchase Requisition.";
+            $msg = "Berhasil mengimpor {$totalImported} baris data.";
+            if ($totalSkipped > 0) {
+                $msg .= " {$totalSkipped} baris dilewati (kosong/tidak valid).";
+            }
             if (!empty($errors)) {
-                $msg .= " (" . count($errors) . " baris gagal)";
+                $msg .= " (" . count($errors) . " baris gagal insert)";
             }
 
+            @unlink($tempFile);
             return response()->json([
                 'success' => true,
                 'message' => $msg,
                 'imported_count' => $totalImported,
+                'skipped_count' => $totalSkipped,
+                'errors' => array_slice($errors, 0, 5),
             ]);
         } catch (\Throwable $e) {
+            @unlink($tempFile);
             Log::error('Error importing material planning: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
@@ -89,8 +126,7 @@ class MaterialPlanningController extends Controller
         }
     }
 
-    private function buildHeaderMap(array $header): array
-    {
+    private function buildHeaderMap(array $header): array {
         $aliases = [
             'wbs_description'   => ['wbs description', 'wbs_description', 'wbsdescription'],
             'pr_number'         => ['purch.req.', 'purchreq', 'pr_number', 'prnumber', 'purch req'],
@@ -110,7 +146,7 @@ class MaterialPlanningController extends Controller
             'po_delivered_date' => ['po deliv. dat', 'po_deliv_dat', 'podelivdat', 'po deliv dat', 'po deliv. dat'],
             'created_by'        => ['created by', 'created_by', 'createdby', 'created.by'],
             'request_by'        => ['requested by', 'requested_by', 'requestedby', 'requested.by'],
-            'wbs_elem'          => ['wbs elem', 'wbs_elem', 'wbselem', 'wbs.elem'],
+            'wbs_elem'          => ['wbs elem', 'wbs_elem', 'wbselem', 'wbs.elem', 'WBS Elem'],
             'tracking_no'       => ['trackingno', 'tracking_no', 'tracking no'],
             'matl_group'        => ['matl group', 'matl_group', 'matlgroup', 'matl.group'],
             'rel'               => ['rel'],
@@ -133,8 +169,7 @@ class MaterialPlanningController extends Controller
         return $map;
     }
 
-    private function mapRow(array $row, array $headerMap): array
-    {
+    private function mapRow(array $row, array $headerMap): array {
         $result = [];
         foreach ($headerMap as $index => $dbCol) {
             $result[$dbCol] = $row[$index] ?? '-';
