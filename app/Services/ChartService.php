@@ -17,7 +17,13 @@ class ChartService {
     }
 
     public function getPurchaseOrderData(){
+        $belumPO = MaterialPlanning::where('po_number', '')->where('status', 'valid')->get();
+        $sudahPO = MaterialPlanning::where('po_number', '!=', '')->where('status', 'valid')->get();
 
+        return [
+            'belum_po' => count($belumPO),
+            'sudah_po' => count($sudahPO),
+        ];
     }
 }
 

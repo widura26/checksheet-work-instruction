@@ -34,7 +34,7 @@ function initBomAnalytics() {
     });
 }
 
-let pieChart1 = async (data) => {
+const pieChart1 = async (data) => {
     const piechart = new Chart(document.getElementById('canvas-5'), {
         type: 'doughnut',
         data: {
@@ -52,20 +52,24 @@ let pieChart1 = async (data) => {
     piechart.render()
 }
 
-const pieChart2 = new Chart(document.getElementById('canvas-6'), {
-    type: 'doughnut',
-    data: {
-        labels: ['Sudah PO', 'Belum PO'],
-        datasets: [{
-            data: [300, 50],
-            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-            hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
-        }]
-    },
-    options: {
-        responsive: true
-    }
-});
+const pieChart2 = async (data) => {
+    const piechart = new Chart(document.getElementById('canvas-6'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Belum PO', 'Sudah PO'],
+            datasets: [{
+                data: [data.belum_po, data.sudah_po],
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+
+    piechart.render()
+}
 
 const labels = ['Purchase Requisition', 'Purchase Order'];
 const data = {
@@ -198,7 +202,6 @@ const barChart2 = new Chart(document.getElementById('canvas-9'), {
     }
 });
 
-pieChart2.render()
 barChart.render()
 barChart1.render()
 barChart2.render()
@@ -272,8 +275,14 @@ const getPurchaseRequisitionData = async () => {
     return response.data.jenis_pr;
 }
 
+const getPurchaseOrderData = async () => {
+    const response = await axios.get('/charts/purchase-order');
+    return response.data.jenis_po
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
-    const prdata = await getPurchaseRequisitionData()
-    console.log(prdata);
+    const prdata = await getPurchaseRequisitionData();
+    const podata = await getPurchaseOrderData();
     pieChart1(prdata)
+    pieChart2(podata)
 })

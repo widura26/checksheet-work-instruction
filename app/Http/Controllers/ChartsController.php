@@ -13,4 +13,13 @@ class ChartsController extends Controller
             "jenis_pr" => $chatService->getPurchaseRequistionData()
         ]);
     }
+
+    public function purchaseOrder(){
+        $chatService = new ChartService();
+
+        return response()->json([
+            "success" => true,
+            "jenis_po" => $chatService->getPurchaseOrderData()
+        ]);
+    }
 }
