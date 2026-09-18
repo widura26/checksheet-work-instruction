@@ -39,6 +39,7 @@ return new class extends Migration
             $table->string('pgr')->nullable();
             $table->string('plnt')->nullable();
             $table->string('rel_stat')->nullable();
+            $table->enum('status', ['valid', 'invalid'])->nullable();
             $table->timestamps();
         });
     }

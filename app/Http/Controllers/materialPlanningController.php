@@ -11,8 +11,7 @@ use Illuminate\Support\Str;
 
 class MaterialPlanningController extends Controller
 {
-    public function materialPlanning()
-    {
+    public function materialPlanning(){
         $prtotals = MaterialPlanning::all();
         return view('material-planning.index', compact('prtotals'));
     }
@@ -27,6 +26,7 @@ class MaterialPlanningController extends Controller
 
         set_time_limit(300);
         DB::disableQueryLog();
+        $startTime = microtime(true);
 
         $file = $request->file('file');
         $content = file_get_contents($file->getRealPath());
@@ -53,22 +53,25 @@ class MaterialPlanningController extends Controller
         $headerMap = $this->buildHeaderMap($header);
 
         $totalImported = 0;
-        $totalSkipped = 0;
+        $totalInvalid = 0;
+        $totalShifted = 0;
         $errors = [];
 
         try {
-            LazyCollection::make(function () use ($handle, $header, $delimiter) {
+            LazyCollection::make(function () use ($handle, $header, $delimiter, &$totalShifted) {
                 $colCount = count($header);
                 while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
                     if (empty($row) || !isset($row[0])) continue;
                     if (count($row) === $colCount + 1 && trim($row[0]) === '') {
+                        Log::info('Row shifted, fixed: ' . $row[1]);
                         array_shift($row);
+                        $totalShifted++;
                     }
                     yield $row;
                 }
                 fclose($handle);
             })
-            ->each(function ($row) use ($headerMap, &$totalImported, &$totalSkipped, &$errors) {
+            ->each(function ($row) use ($headerMap, &$totalImported, &$totalSkipped, &$totalInvalid, &$errors) {
                 $mapped = $this->mapRow($row, $headerMap);
 
                 $isEmpty = true;
@@ -78,31 +81,54 @@ class MaterialPlanningController extends Controller
                         break;
                     }
                 }
-                if ($isEmpty) {
-                    $totalSkipped++;
-                    return;
-                }
 
-                if (empty($mapped['wbs_elem']) && empty($mapped['material_code'])) {
-                    $totalSkipped++;
-                    return;
-                }
+                $isInvalid = $isEmpty || (empty($mapped['wbs_elem']) && empty($mapped['material_code']));
 
                 try {
                     $mapped['id'] = (string) Str::uuid();
                     $mapped['created_at'] = now();
                     $mapped['updated_at'] = now();
+                    $mapped['status'] = $isInvalid ? 'invalid' : 'valid';
+
+                    if ($isInvalid) {
+                        foreach ($mapped as $key => $val) {
+                            if (is_string($val) && $key !== 'id') {
+                                $mapped[$key] = mb_substr($val, 0, 255);
+                            }
+                        }
+                    }
+
                     DB::table('material_plannings')->insert($mapped);
-                    $totalImported++;
+                    if ($isInvalid) {
+                        $totalInvalid++;
+                    } else {
+                        $totalImported++;
+                    }
                 } catch (\Throwable $e) {
-                    $errors[] = $e->getMessage();
-                    Log::error('Import row error: ' . $e->getMessage());
+                    try {
+                        $mapped['id'] = (string) Str::uuid();
+                        $mapped['created_at'] = now();
+                        $mapped['updated_at'] = now();
+                        $mapped['status'] = 'invalid';
+                        foreach ($mapped as $key => $val) {
+                            if (is_string($val) && $key !== 'id') {
+                                $mapped[$key] = mb_substr($val, 0, 255);
+                            }
+                        }
+                        DB::table('material_plannings')->insert($mapped);
+                        $totalInvalid++;
+                    } catch (\Throwable $e2) {
+                        $errors[] = $e2->getMessage();
+                        Log::error('Import row error: ' . $e2->getMessage());
+                    }
                 }
             });
 
-            $msg = "Berhasil mengimpor {$totalImported} baris data.";
-            if ($totalSkipped > 0) {
-                $msg .= " {$totalSkipped} baris dilewati (kosong/tidak valid).";
+            $elapsed = round(microtime(true) - $startTime, 2);
+            $totalAll = $totalImported + $totalInvalid;
+            $msg = "Berhasil mengimpor {$totalAll} baris data ({$totalImported} valid, {$totalInvalid} invalid). Waktu: {$elapsed} detik.";
+            if ($totalShifted > 0) {
+                $msg .= " {$totalShifted} baris di-shift (koreksi posisi kolom).";
             }
             if (!empty($errors)) {
                 $msg .= " (" . count($errors) . " baris gagal insert)";
@@ -112,8 +138,10 @@ class MaterialPlanningController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => $msg,
-                'imported_count' => $totalImported,
-                'skipped_count' => $totalSkipped,
+                'imported_count' => $totalAll,
+                'valid_count' => $totalImported,
+                'invalid_count' => $totalInvalid,
+                'elapsed' => $elapsed,
                 'errors' => array_slice($errors, 0, 5),
             ]);
         } catch (\Throwable $e) {
@@ -177,8 +205,7 @@ class MaterialPlanningController extends Controller
         return $result;
     }
 
-    public function delete()
-    {
+    public function delete(){
         MaterialPlanning::truncate();
         return redirect()->back();
     }
