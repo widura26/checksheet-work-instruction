@@ -213,4 +213,65 @@ class MaterialPlanningController extends Controller
         MaterialPlanning::truncate();
         return redirect()->back();
     }
+
+    public function deviation(Request $request){
+        if (! $request->ajax()) {
+            abort(404);
+        }
+
+        $query = MaterialPlanning::select(
+            'pr_number',
+            DB::raw('MIN(wbs_elem) as wbs_elem'),
+            DB::raw('MIN(wbs_description) as wbs_description'),
+            DB::raw('MIN(material_code) as material_code'),
+            DB::raw('MIN(material_description) as material_description'),
+            DB::raw('MIN(unit) as unit'),
+            DB::raw('MIN(po_number) as po_number'),
+            DB::raw('MIN(created_by) as created_by'),
+            DB::raw('COUNT(*) as total_records'),
+            DB::raw('SUM(CAST(REPLACE(requested_quantity, ",", ".") AS DECIMAL(15,2))) as total_requested'),
+            DB::raw('SUM(CAST(REPLACE(ordered_quantity, ",", ".") AS DECIMAL(15,2))) as total_ordered'),
+            DB::raw('SUM(CAST(REPLACE(requested_quantity, ",", ".") AS DECIMAL(15,2))) - SUM(CAST(REPLACE(ordered_quantity, ",", ".") AS DECIMAL(15,2))) as selisih')
+        )
+        ->groupBy('pr_number')
+        ->havingRaw('SUM(CAST(REPLACE(requested_quantity, ",", ".") AS DECIMAL(15,2))) != SUM(CAST(REPLACE(ordered_quantity, ",", ".") AS DECIMAL(15,2)))');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('pr_number', 'LIKE', "%{$search}%")
+                    ->orWhere('wbs_description', 'LIKE', "%{$search}%")
+                    ->orWhere('material_description', 'LIKE', "%{$search}%")
+                    ->orWhereIn('pr_number', function ($sub) use ($search) {
+                        $sub->select('pr_number')
+                            ->from('material_plannings')
+                            ->where('material_code', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        $perPage = (int) $request->get('per_page', 10);
+        $data = $query->orderBy('pr_number')->paginate($perPage);
+
+        $data->setCollection(
+            $data->getCollection()->map(function ($item) {
+                return [
+                    'pr_number'            => $item->pr_number,
+                    'wbs_elem'             => $item->wbs_elem,
+                    'wbs_description'      => $item->wbs_description,
+                    'material_code'        => $item->material_code,
+                    'material_description' => $item->material_description,
+                    'unit'                 => $item->unit,
+                    'po_number'            => $item->po_number,
+                    'created_by'           => $item->created_by,
+                    'total_records'        => $item->total_records,
+                    'total_requested'      => number_format($item->total_requested, 2, ',', '.'),
+                    'total_ordered'        => number_format($item->total_ordered, 2, ',', '.'),
+                    'selisih'              => number_format($item->selisih, 2, ',', '.'),
+                ];
+            })
+        );
+
+        return response()->json($data);
+    }
 }

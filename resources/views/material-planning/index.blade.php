@@ -229,6 +229,58 @@
 
         </div>
     </div>
+    <div class="card mb-4">
+        <div class="p-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h5 class="card-title mb-0">Deviasi</h5>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (session('success'))
+                <div id="success-alert" class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+            @if (session('error'))
+                <div id="error-alert" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-coreui-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+            @if ($errors->any())
+                <div id="error-alert" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <div class="table-responsive">
+                <table id="deviasi-table" class="table table-bordered table-hover" style="width: 100%;">
+                    <thead class="text-center">
+                        <tr>
+                            <th>No</th>
+                            <th>PR Number</th>
+                            <th>WBS Elem</th>
+                            <th>WBS Description</th>
+                            <th>Material Code</th>
+                            <th>Material Description</th>
+                            <th>Total Records</th>
+                            <th>Total Requested</th>
+                            <th>Total Ordered</th>
+                            <th>Selisih</th>
+                            <th>Unit</th>
+                            <th>PO Number</th>
+                            <th>Created By</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
 
 @endsection
 

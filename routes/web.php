@@ -246,6 +246,7 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::get('/', [MaterialPlanningController::class, 'materialPlanning'])->name('material-planning.index');
         Route::post('/import', [MaterialPlanningController::class, 'import'])->name('material-planning.import');
         Route::post('/delete', [MaterialPlanningController::class, 'delete'])->name('material-planning.delete');
+        Route::get('/deviation', [MaterialPlanningController::class, 'deviation'])->name('material-planning.deviation');
     });
 
     Route::prefix('charts')->group(function(){

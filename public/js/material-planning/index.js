@@ -33,40 +33,6 @@ const data = {
     ]
 };
 
-function initBomAnalytics() {
-    $.get("/project-code/data", { per_page: 1000 }).done(function (json) {
-        const data = json.data || [];
-        const total = json.total || 0;
-
-        const projectCounts = {};
-        data.forEach(function (row) {
-            const name = row.name || row.project_code || 'Unknown';
-            projectCounts[name] = (projectCounts[name] || 0) + 1;
-        });
-
-        const labels = Object.keys(projectCounts);
-        const series = Object.values(projectCounts);
-
-        $('#total-bom').text(total);
-        $('#total-proyek').text(labels.length);
-
-        const chartEl = document.querySelector('#bom-distribusi-chart');
-        if (!chartEl || typeof ApexCharts === 'undefined') return;
-
-        const chart = new ApexCharts(chartEl, {
-            chart: { type: 'bar', height: 300, toolbar: { show: true } },
-            series: [{ name: 'Jumlah BOM', data: series }],
-            xaxis: { categories: labels, labels: { rotate: -45, style: { fontSize: '12px' } } },
-            colors: ['#2E93fA'],
-            plotOptions: { bar: { borderRadius: 4, horizontal: false, columnWidth: '60%' } },
-            dataLabels: { enabled: false },
-            grid: { borderColor: '#e7e9ed' },
-            tooltip: { y: { formatter: function (val) { return val + ' entri'; } } }
-        });
-        chart.render();
-    });
-}
-
 const pieChart1 = async (data) => {
     const piechart = new Chart(document.getElementById('canvas-5'), {
         type: 'doughnut',
@@ -344,3 +310,90 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     barChart(prpo)
 })
+
+$(function() {
+    $('#deviasi-table').DataTable({
+        processing: false,
+        serverSide: true,
+        responsive: false,
+        scrollX: true,
+        scrollCollapse: true,
+        ajax: function (data, callback, settings) {
+            $.get("/material-planning/deviation", {
+                page: (data.start / data.length) + 1,
+                per_page: data.length,
+                search: data.search.value
+            }).done(function (json) {
+                callback({
+                    draw: data.draw,
+                    recordsTotal: json.total,
+                    recordsFiltered: json.total,
+                    data: json.data
+                });
+            });
+        },
+        columns: [{
+                data: null,
+                name: 'DT_RowIndex',
+                orderable: false,
+                searchable: false,
+                className: 'text-center',
+                render: function (data, type, row, meta) {
+                    return meta.row + 1;
+                }
+            },
+            {
+                data: 'pr_number',
+                name: 'pr_number'
+            },
+            {
+                data: 'wbs_elem',
+                name: 'wbs_elem'
+            },
+            {
+                data: 'wbs_description',
+                name: 'wbs_description'
+            },
+            {
+                data: 'material_code',
+                name: 'material_code'
+            },
+            {
+                data: 'material_description',
+                name: 'material_description'
+            },
+            {
+                data: 'total_records',
+                name: 'total_records',
+                className: 'text-center'
+            },
+            {
+                data: 'total_requested',
+                name: 'total_requested',
+                className: 'text-end'
+            },
+            {
+                data: 'total_ordered',
+                name: 'total_ordered',
+                className: 'text-end'
+            },
+            {
+                data: 'selisih',
+                name: 'selisih',
+                className: 'text-end'
+            },
+            {
+                data: 'unit',
+                name: 'unit'
+            },
+            {
+                data: 'po_number',
+                name: 'po_number'
+            },
+            {
+                data: 'created_by',
+                name: 'created_by'
+            }
+        ]
+    });
+});
