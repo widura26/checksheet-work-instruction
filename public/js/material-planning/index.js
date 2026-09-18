@@ -1,5 +1,38 @@
 const random = () => Math.round(Math.random() * 100);
 
+const labels = ['Purchase Requisition', 'Purchase Order'];
+const data = {
+    labels: labels,
+    datasets: [
+        {
+            label: 'My First Dataset',
+            data: [65, 59],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 159, 64, 0.2)',
+            ],
+            borderColor: [
+                'rgb(255, 99, 132)',
+                'rgb(255, 159, 64)',
+            ],
+            borderWidth: 1
+        },
+        {
+            label: 'My First Dataset',
+            data: [65, 59],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(255, 159, 64, 0.2)',
+            ],
+            borderColor: [
+                'rgb(255, 99, 132)',
+                'rgb(255, 159, 64)',
+            ],
+            borderWidth: 1
+        },
+    ]
+};
+
 function initBomAnalytics() {
     $.get("/project-code/data", { per_page: 1000 }).done(function (json) {
         const data = json.data || [];
@@ -71,97 +104,102 @@ const pieChart2 = async (data) => {
     piechart.render()
 }
 
-const labels = ['Purchase Requisition', 'Purchase Order'];
-const data = {
-    labels: labels,
-    datasets: [
-        {
-            label: 'My First Dataset',
-            data: [65, 59],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(255, 159, 64, 0.2)',
-            ],
-            borderColor: [
-                'rgb(255, 99, 132)',
-                'rgb(255, 159, 64)',
-            ],
-            borderWidth: 1
-        },
-        {
-            label: 'My First Dataset',
-            data: [65, 59],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(255, 159, 64, 0.2)',
-            ],
-            borderColor: [
-                'rgb(255, 99, 132)',
-                'rgb(255, 159, 64)',
-            ],
-            borderWidth: 1
-        },
-    ]
-};
-
-const barChart = new Chart(document.getElementById('canvas-7'), {
-    type: 'bar',
-    data: data,
-    options: {
-        showTooltips: false,
-        plugins: {
-            legend: {
-                display: false,
-                labels: {
-                    color: 'rgb(255, 99, 132)'
+const barChart = async (data) => {
+    const { prdata, podata } = data;
+    const c = new Chart(document.getElementById('canvas-7'), {
+        type: 'bar',
+        data: {
+            labels: ['Purchase Requisition', 'Purchase Order'],
+            datasets: [
+                {
+                    label: 'My First Dataset',
+                    data: [prdata.belum_pr, prdata.sudah_pr],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                    ],
+                    borderColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(255, 159, 64)',
+                    ],
+                    borderWidth: 1
                 },
-                position: 'top'
-            },
-            tooltip: {
-                enabled: true
+                {
+                    label: 'My First Dataset',
+                    data: [podata.belum_po, podata.sudah_po],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                    ],
+                    borderColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(255, 159, 64)',
+                    ],
+                    borderWidth: 1
+                },
+            ]
+        },
+        options: {
+            showTooltips: false,
+            plugins: {
+                legend: {
+                    display: false,
+                    labels: {
+                        color: 'rgb(255, 99, 132)'
+                    },
+                    position: 'top'
+                },
+                tooltip: {
+                    enabled: true
+                }
             }
         }
-    }
-});
+    });
+    c.render()
+}
 
-const barChart1 = new Chart(document.getElementById('canvas-8'), {
-    type: 'bar',
-    data: {
-        labels: ['Bill Of Material', 'Purchase Requisition'],
-        datasets: [
-            {
-                label: 'My First Dataset',
-                data: [30, 70],
-                fill: false,
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgb(255, 99, 132)',
-                    'rgb(255, 159, 64)'
-                ],
-                borderWidth: 1
-            },
-        ]
-    },
-    options: {
-        indexAxis: 'y',
-        showTooltips: false,
-        plugins: {
-            legend: {
-                display: false,
-                labels: {
-                    color: 'rgb(255, 99, 132)'
+const barChart1 = async (data) => {
+    const c = new Chart(document.getElementById('canvas-8'), {
+        type: 'bar',
+        data: {
+            labels: ['Bill Of Material', 'Purchase Requisition'],
+            datasets: [
+                {
+                    label: 'My First Dataset',
+                    data: [data.bom, data.pr],
+                    fill: false,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(255, 159, 64)'
+                    ],
+                    borderWidth: 1
                 },
-                position: 'top'
-            },
-            tooltip: {
-                enabled: true
+            ]
+        },
+        options: {
+            indexAxis: 'y',
+            showTooltips: false,
+            plugins: {
+                legend: {
+                    display: false,
+                    labels: {
+                        color: 'rgb(255, 99, 132)'
+                    },
+                    position: 'top'
+                },
+                tooltip: {
+                    enabled: true
+                }
             }
         }
-    }
-});
+    });
+    c.render()
+}
+
 
 const barChart2 = new Chart(document.getElementById('canvas-9'), {
     type: 'bar',
@@ -202,8 +240,6 @@ const barChart2 = new Chart(document.getElementById('canvas-9'), {
     }
 });
 
-barChart.render()
-barChart1.render()
 barChart2.render()
 
 /* Import Purchase Requisition */
@@ -280,9 +316,23 @@ const getPurchaseOrderData = async () => {
     return response.data.jenis_po
 }
 
+const getBomPrData = async () => {
+    const response = await axios.get('/charts/bompr');
+    return response.data.bompr
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     const prdata = await getPurchaseRequisitionData();
     const podata = await getPurchaseOrderData();
+    const bomprdata = await getBomPrData();
+
     pieChart1(prdata)
     pieChart2(podata)
+    barChart1(bomprdata)
+
+    const prpo = {
+        "prdata": prdata,
+        "podata": podata
+    }
+    barChart(prpo)
 })

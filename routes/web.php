@@ -251,6 +251,7 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
     Route::prefix('charts')->group(function(){
         Route::get('/purchase-requisitions', [ChartsController::class, 'purchaseRequisition'])->name('purchase-requisition-chart-data');
         Route::get('/purchase-order', [ChartsController::class, 'purchaseOrder'])->name('purchase-order-chart-data');
+        Route::get('/bompr', [ChartsController::class, 'bomprdifference'])->name('bompr-chart-data');
     });
 
     Route::prefix('bill-of-material')->group(function(){

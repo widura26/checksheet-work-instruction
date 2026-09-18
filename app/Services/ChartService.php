@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\BillOfMaterial;
 use App\Models\MaterialPlanning;
 
 class ChartService {
@@ -23,6 +24,16 @@ class ChartService {
         return [
             'belum_po' => count($belumPO),
             'sudah_po' => count($sudahPO),
+        ];
+    }
+
+    public function getBompr(){
+        $boms = BillOfMaterial::select('name')->get();
+        $prs = MaterialPlanning::select('id')->where('pr_number', '!=', '')->where('status', 'valid')->get();
+
+        return [
+            'bom' => count($boms),
+            'pr' => count($prs)
         ];
     }
 }

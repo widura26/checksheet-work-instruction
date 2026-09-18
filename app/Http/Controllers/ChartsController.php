@@ -22,4 +22,13 @@ class ChartsController extends Controller
             "jenis_po" => $chatService->getPurchaseOrderData()
         ]);
     }
+
+    public function bomprdifference(){
+        $chatService = new ChartService();
+
+        return response()->json([
+            "success" => true,
+            "bompr" => $chatService->getBompr()
+        ]);
+    }
 }
