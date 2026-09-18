@@ -71,18 +71,22 @@ class MaterialPlanningController extends Controller
                 }
                 fclose($handle);
             })
-            ->each(function ($row) use ($headerMap, &$totalImported, &$totalSkipped, &$totalInvalid, &$errors) {
+            ->each(function ($row) use ($headerMap, &$totalImported, &$totalInvalid, &$errors) {
                 $mapped = $this->mapRow($row, $headerMap);
 
-                $isEmpty = true;
+                $totalCols = count($mapped);
+                $filledCols = 0;
                 foreach ($mapped as $v) {
                     if (!empty(trim((string) $v))) {
-                        $isEmpty = false;
-                        break;
+                        $filledCols++;
                     }
                 }
 
-                $isInvalid = $isEmpty || (empty($mapped['wbs_elem']) && empty($mapped['material_code']));
+                if ($filledCols <= $totalCols / 2) {
+                    return;
+                }
+
+                $isInvalid = empty($mapped['wbs_elem']) && empty($mapped['material_code']);
 
                 try {
                     $mapped['id'] = (string) Str::uuid();
