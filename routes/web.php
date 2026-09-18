@@ -5,6 +5,7 @@ use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\BomController;
 use App\Http\Controllers\BomDocumentRevisionController;
 use App\Http\Controllers\BpmController;
+use App\Http\Controllers\ChartsController;
 use App\Http\Controllers\CheckSheetController;
 use App\Http\Controllers\CuttingPlanController;
 use App\Http\Controllers\DaftarKaryawanController;
@@ -245,6 +246,10 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::get('/', [MaterialPlanningController::class, 'materialPlanning'])->name('material-planning.index');
         Route::post('/import', [MaterialPlanningController::class, 'import'])->name('material-planning.import');
         Route::post('/delete', [MaterialPlanningController::class, 'delete'])->name('material-planning.delete');
+    });
+
+    Route::prefix('charts')->group(function(){
+        Route::get('/purchase-requisitions', [ChartsController::class, 'purchaseRequisition'])->name('purchase-requisition-chart-data');
     });
 
     Route::prefix('bill-of-material')->group(function(){

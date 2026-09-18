@@ -34,20 +34,23 @@ function initBomAnalytics() {
     });
 }
 
-const pieChart1 = new Chart(document.getElementById('canvas-5'), {
-    type: 'doughnut',
-    data: {
-        labels: ['Sudah PR', 'Belum PR'],
-        datasets: [{
-            data: [300, 50],
-            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-            hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
-        }]
-    },
-    options: {
-        responsive: true
-    }
-});
+let pieChart1 = async (data) => {
+    const piechart = new Chart(document.getElementById('canvas-5'), {
+        type: 'doughnut',
+        data: {
+            labels: ["Belum PR", "Sudah PR"],
+            datasets: [{
+                data: [data.belum_pr, data.sudah_pr],
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+    piechart.render()
+}
 
 const pieChart2 = new Chart(document.getElementById('canvas-6'), {
     type: 'doughnut',
@@ -195,7 +198,6 @@ const barChart2 = new Chart(document.getElementById('canvas-9'), {
     }
 });
 
-pieChart1.render()
 pieChart2.render()
 barChart.render()
 barChart1.render()
@@ -264,3 +266,14 @@ $('#btnImport').on('click', function () {
         }
     });
 });
+
+const getPurchaseRequisitionData = async () => {
+    const response = await axios.get('/charts/purchase-requisitions');
+    return response.data.jenis_pr;
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const prdata = await getPurchaseRequisitionData()
+    console.log(prdata);
+    pieChart1(prdata)
+})

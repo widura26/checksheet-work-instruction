@@ -7,9 +7,13 @@ use App\Models\MaterialPlanning;
 class ChartService {
 
     public function getPurchaseRequistionData(){
-        $data = MaterialPlanning::select('');
+        $belumPR = MaterialPlanning::where('pr_number', null)->where('status', 'valid')->get();
+        $sudahPR = MaterialPlanning::where('pr_number', '!=', '')->where('status', 'valid')->get();
 
-        return $data;
+        return [
+            'belum_pr' => count($belumPR),
+            'sudah_pr' => count($sudahPR),
+        ];
     }
 
     public function getPurchaseOrderData(){
