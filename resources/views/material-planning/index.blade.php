@@ -214,13 +214,13 @@
                     </div>
                 </div>
                 <div class="chart-section">
-                    <h5>Deviasi Bill Of Material & Purchase Requisition</h5>
+                    <h5>Bill Of Material & Purchase Requisition Difference</h5>
                     <div class="pie-chart-pr-po">
                         <canvas id="canvas-8" style="width: 100%"></canvas>
                     </div>
                 </div>
                 <div class="chart-section">
-                    <h5>Deviasi Purchase Requisition & Purchase Order</h5>
+                    <h5>Purchase Requisition & Purchase Order Difference</h5>
                     <div class="pie-chart-pr-po">
                         <canvas id="canvas-9" style="width: 100%"></canvas>
                     </div>

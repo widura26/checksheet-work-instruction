@@ -201,46 +201,47 @@ const barChart1 = async (data) => {
 }
 
 
-const barChart2 = new Chart(document.getElementById('canvas-9'), {
-    type: 'bar',
-    data: {
-        labels: ['Bill Of Material', 'Purchase Requisition'],
-        datasets: [
-            {
-                label: 'My First Dataset',
-                data: [30, 70],
-                fill: false,
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgb(255, 99, 132)',
-                    'rgb(255, 159, 64)'
-                ],
-                borderWidth: 1
-            },
-        ]
-    },
-    options: {
-        indexAxis: 'y',
-        showTooltips: false,
-        plugins: {
-            legend: {
-                display: false,
-                labels: {
-                    color: 'rgb(255, 99, 132)'
+const barChart2 = async (data) => {
+    const c = new Chart(document.getElementById('canvas-9'), {
+        type: 'bar',
+        data: {
+            labels: ['Purchase Requisition', 'Purchase Order'],
+            datasets: [
+                {
+                    label: 'My First Dataset',
+                    data: [data.pr, data.pos],
+                    fill: false,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(255, 159, 64)'
+                    ],
+                    borderWidth: 1
                 },
-                position: 'top'
-            },
-            tooltip: {
-                enabled: true
+            ]
+        },
+        options: {
+            indexAxis: 'y',
+            showTooltips: false,
+            plugins: {
+                legend: {
+                    display: false,
+                    labels: {
+                        color: 'rgb(255, 99, 132)'
+                    },
+                    position: 'top'
+                },
+                tooltip: {
+                    enabled: true
+                }
             }
         }
-    }
-});
-
-barChart2.render()
+    });
+    c.render()
+}
 
 /* Import Purchase Requisition */
 const importModal = new coreui.Modal(document.getElementById('importExcelModal'));
@@ -321,14 +322,21 @@ const getBomPrData = async () => {
     return response.data.bompr
 }
 
+const getPoPrData = async () => {
+    const response = await axios.get('/charts/popr')
+    return response.data.popr
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     const prdata = await getPurchaseRequisitionData();
     const podata = await getPurchaseOrderData();
     const bomprdata = await getBomPrData();
+    const PoPrData = await getPoPrData();
 
     pieChart1(prdata)
     pieChart2(podata)
     barChart1(bomprdata)
+    barChart2(PoPrData)
 
     const prpo = {
         "prdata": prdata,

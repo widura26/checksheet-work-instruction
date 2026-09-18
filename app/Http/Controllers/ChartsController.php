@@ -31,4 +31,13 @@ class ChartsController extends Controller
             "bompr" => $chatService->getBompr()
         ]);
     }
+
+    public function poprdifference(){
+        $chatService = new ChartService();
+
+        return response()->json([
+            "success" => true,
+            "popr" => $chatService->getPrPo()
+        ]);
+    }
 }

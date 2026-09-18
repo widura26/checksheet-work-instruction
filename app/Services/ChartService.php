@@ -36,6 +36,16 @@ class ChartService {
             'pr' => count($prs)
         ];
     }
+
+    public function getPrPo(){
+        $prs = MaterialPlanning::select('id')->where('pr_number', '!=', '')->where('status', 'valid')->get();
+        $pos = MaterialPlanning::select('id')->where('po_number', '!=', '')->where('status', 'valid')->get();
+
+        return [
+            'pr' => count($prs),
+            'pos' => count($pos)
+        ];
+    }
 }
 
 ?>
