@@ -245,6 +245,8 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
     Route::prefix('material-planning')->group(function(){
         Route::get('/', [MaterialPlanningController::class, 'materialPlanning'])->name('material-planning.index');
         Route::post('/import', [MaterialPlanningController::class, 'import'])->name('material-planning.import');
+        Route::post('/import-queue', [MaterialPlanningController::class, 'importQueue'])->name('material-planning.import-queue');
+        Route::get('/import-status/{importId}', [MaterialPlanningController::class, 'importStatus'])->name('material-planning.import-status');
         Route::post('/delete', [MaterialPlanningController::class, 'delete'])->name('material-planning.delete');
         Route::get('/deviation', [MaterialPlanningController::class, 'deviation'])->name('material-planning.deviation');
     });
