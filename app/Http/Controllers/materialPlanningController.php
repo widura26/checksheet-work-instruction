@@ -188,6 +188,16 @@ class MaterialPlanningController extends Controller
 
     public function importStatus(string $importId)
     {
+        if (!preg_match('/^[0-9a-f-]+$/i', $importId)) {
+            return response()->json([
+                'import_id' => $importId,
+                'status' => 'invalid',
+                'message' => 'Format import ID tidak valid.',
+            ], 422);
+        }
+
+        // NOTE: LIKE on serialized payload is fragile but intentional per spec design.
+        // The importId is a UUID embedded in the serialized job payload.
         $jobExists = DB::table('jobs')
             ->where('payload', 'LIKE', '%'.$importId.'%')
             ->exists();
