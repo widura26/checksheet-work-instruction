@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
+use App\Jobs\ImportMaterialPlanningJob;
+use Illuminate\Support\Facades\Storage;
 
 class MaterialPlanningController extends Controller
 {
@@ -156,6 +158,66 @@ class MaterialPlanningController extends Controller
                 'message' => 'Gagal mengimpor data: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function importQueue(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|extensions:xlsx,xls,csv',
+        ], [
+            'file.required' => 'File wajib dipilih.',
+            'file.extensions' => 'File harus berformat xlsx, xls, atau csv.',
+        ]);
+
+        $file = $request->file('file');
+        $importId = (string) Str::uuid();
+        $extension = $file->getClientOriginalExtension();
+        $fileName = $importId . '.' . $extension;
+
+        Storage::disk('local')->makeDirectory('imports');
+        $file->storeAs('imports', $fileName);
+
+        ImportMaterialPlanningJob::dispatch($fileName, $importId);
+
+        return response()->json([
+            'success' => true,
+            'import_id' => $importId,
+            'message' => 'Import diproses di background. Gunakan import_id untuk cek status.',
+        ]);
+    }
+
+    public function importStatus(string $importId)
+    {
+        $jobExists = DB::table('jobs')
+            ->where('payload', 'LIKE', '%'.$importId.'%')
+            ->exists();
+
+        $failedJob = DB::table('failed_jobs')
+            ->where('payload', 'LIKE', '%'.$importId.'%')
+            ->first();
+
+        if ($failedJob) {
+            return response()->json([
+                'import_id' => $importId,
+                'status' => 'failed',
+                'error' => $failedJob->exception,
+                'failed_at' => $failedJob->failed_at,
+            ]);
+        }
+
+        if ($jobExists) {
+            return response()->json([
+                'import_id' => $importId,
+                'status' => 'processing',
+                'message' => 'Job masih diproses oleh queue worker.',
+            ]);
+        }
+
+        return response()->json([
+            'import_id' => $importId,
+            'status' => 'completed',
+            'message' => 'Import telah selesai. Cek log untuk detail.',
+        ]);
     }
 
     private function buildHeaderMap(array $header): array {
