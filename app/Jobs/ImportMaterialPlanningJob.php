@@ -16,6 +16,8 @@ class ImportMaterialPlanningJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public int $timeout = 300;
+
     public function __construct(
         public string $filePath,
         public string $importId
@@ -86,20 +88,8 @@ class ImportMaterialPlanningJob implements ShouldQueue
             $isInvalid = empty($mapped['wbs_elem']) && empty($mapped['material_code']);
 
             try {
-                $mapped['id'] = (string) Str::uuid();
-                $mapped['created_at'] = now();
-                $mapped['updated_at'] = now();
-                $mapped['status'] = $isInvalid ? 'invalid' : 'valid';
-
-                if ($isInvalid) {
-                    foreach ($mapped as $key => $val) {
-                        if (is_string($val) && $key !== 'id') {
-                            $mapped[$key] = mb_substr($val, 0, 255);
-                        }
-                    }
-                }
-
-                DB::table('material_plannings')->insert($mapped);
+                $prepared = $this->prepareRow($mapped, $isInvalid ? 'invalid' : 'valid');
+                DB::table('material_plannings')->insert($prepared);
                 if ($isInvalid) {
                     $totalInvalid++;
                 } else {
@@ -107,16 +97,8 @@ class ImportMaterialPlanningJob implements ShouldQueue
                 }
             } catch (\Throwable $e) {
                 try {
-                    $mapped['id'] = (string) Str::uuid();
-                    $mapped['created_at'] = now();
-                    $mapped['updated_at'] = now();
-                    $mapped['status'] = 'invalid';
-                    foreach ($mapped as $key => $val) {
-                        if (is_string($val) && $key !== 'id') {
-                            $mapped[$key] = mb_substr($val, 0, 255);
-                        }
-                    }
-                    DB::table('material_plannings')->insert($mapped);
+                    $prepared = $this->prepareRow($mapped, 'invalid');
+                    DB::table('material_plannings')->insert($prepared);
                     $totalInvalid++;
                 } catch (\Throwable $e2) {
                     $errors[] = $e2->getMessage();
@@ -199,5 +181,23 @@ class ImportMaterialPlanningJob implements ShouldQueue
             $result[$dbCol] = $row[$index] ?? '-';
         }
         return $result;
+    }
+
+    private function prepareRow(array $mapped, string $status): array
+    {
+        $mapped['id'] = (string) Str::uuid();
+        $mapped['created_at'] = now();
+        $mapped['updated_at'] = now();
+        $mapped['status'] = $status;
+
+        if ($status === 'invalid') {
+            foreach ($mapped as $key => $val) {
+                if (is_string($val) && $key !== 'id') {
+                    $mapped[$key] = mb_substr($val, 0, 255);
+                }
+            }
+        }
+
+        return $mapped;
     }
 }
