@@ -30,7 +30,22 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    try {
+                        const json = JSON.parse(text);
+                        throw new Error(json.message || 'Upload failed');
+                    } catch (e) {
+                        if (e.message !== 'Upload failed') {
+                            throw new Error('Server error: ' + response.status);
+                        }
+                        throw e;
+                    }
+                });
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 currentImportId = data.import_id;
@@ -83,7 +98,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 sheets: selectedSheets
             })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    try {
+                        const json = JSON.parse(text);
+                        throw new Error(json.message || 'Preview failed');
+                    } catch (e) {
+                        if (e.message !== 'Preview failed') {
+                            throw new Error('Server error: ' + response.status);
+                        }
+                        throw e;
+                    }
+                });
+            }
+            return response.json();
+        })
         .then(data => {
             let html = '';
             for (const [sheetName, rows] of Object.entries(data.preview)) {
@@ -162,7 +192,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 sheets: sheets
             })
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    try {
+                        const json = JSON.parse(text);
+                        throw new Error(json.message || 'Import failed');
+                    } catch (e) {
+                        if (e.message !== 'Import failed') {
+                            throw new Error('Server error: ' + response.status);
+                        }
+                        throw e;
+                    }
+                });
+            }
+            return response.json();
+        })
         .then(data => {
             alert('Import dimulai! Gunakan import_id untuk cek status: ' + data.import_id);
             const importModal = new coreui.Modal(document.getElementById('importExcelModal'));

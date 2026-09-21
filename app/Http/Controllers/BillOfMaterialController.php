@@ -23,10 +23,10 @@ class BillOfMaterialController extends Controller
         Storage::disk('local')->makeDirectory('bom-imports');
         $file->storeAs('bom-imports', $fileName);
 
-        // Read sheet names
-        $reader = IOFactory::createReaderForFile(storage_path("app/bom-imports/{$fileName}"));
-        $spreadsheet = $reader->load(storage_path("app/bom-imports/{$fileName}"));
-        $sheets = $spreadsheet->getSheetNames();
+        // Read sheet names only (lightweight, no full load)
+        $filePath = storage_path("app/bom-imports/{$fileName}");
+        $reader = IOFactory::createReaderForFile($filePath);
+        $sheets = $reader->listWorksheetNames($filePath);
 
         return response()->json([
             'success' => true,
