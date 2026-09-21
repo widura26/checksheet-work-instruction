@@ -45,6 +45,10 @@ class BillOfMaterialController extends Controller
         ]);
 
         $tempFile = storage_path("app/bom-imports/{$request->file_name}");
+        if (!str_starts_with(realpath($tempFile) ?: $tempFile, storage_path("app/bom-imports"))) {
+            abort(400, 'Invalid file path');
+        }
+
         $reader = IOFactory::createReaderForFile($tempFile);
         $spreadsheet = $reader->load($tempFile);
 
@@ -52,8 +56,8 @@ class BillOfMaterialController extends Controller
         foreach ($request->sheets as $sheetName) {
             $sheet = $spreadsheet->getSheetByName($sheetName);
             if ($sheet) {
-                $rows = $sheet->toArray();
-                $preview[$sheetName] = array_slice($rows, 0, 6); // Header + 5 rows
+                $rows = $sheet->toArray(null, 0, 6); // Header + 5 rows
+                $preview[$sheetName] = $rows;
             }
         }
 
@@ -69,14 +73,20 @@ class BillOfMaterialController extends Controller
         ]);
 
         $tempFile = storage_path("app/bom-imports/{$request->file_name}");
+        if (!str_starts_with(realpath($tempFile) ?: $tempFile, storage_path("app/bom-imports"))) {
+            abort(400, 'Invalid file path');
+        }
 
+        $imported = [];
+        $skipped = [];
         foreach ($request->sheets as $sheetName) {
-            // Find matching config
             $config = $this->findSheetConfig($sheetName);
 
             if ($config) {
-                // Dispatch queued import with file path
                 BillOfMaterialImport::dispatch($request->import_id, $config, $tempFile);
+                $imported[] = $sheetName;
+            } else {
+                $skipped[] = $sheetName;
             }
         }
 
@@ -84,6 +94,8 @@ class BillOfMaterialController extends Controller
             'success' => true,
             'import_id' => $request->import_id,
             'message' => 'Import diproses di background',
+            'imported' => $imported,
+            'skipped' => $skipped,
         ]);
     }
 
