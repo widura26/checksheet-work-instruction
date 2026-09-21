@@ -4,6 +4,7 @@ use App\Http\Controllers\BagianController;
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\BomController;
 use App\Http\Controllers\BomDocumentRevisionController;
+use App\Http\Controllers\BillOfMaterialController;
 use App\Http\Controllers\BpmController;
 use App\Http\Controllers\ChartsController;
 use App\Http\Controllers\CheckSheetController;
@@ -272,5 +273,12 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
             Route::get('/{id}/delete', [BomDocumentRevisionController::class, 'delete'])->name('bom-document-revision.delete');
             Route::get('/{id}/download', [BomDocumentRevisionController::class, 'download'])->name('bom-document-revision.download');
         });
+    });
+
+    Route::prefix('bom')->name('bom.')->group(function () {
+        Route::post('/upload', [BillOfMaterialController::class, 'upload'])->name('upload');
+        Route::post('/preview', [BillOfMaterialController::class, 'preview'])->name('preview');
+        Route::post('/import-sheets', [BillOfMaterialController::class, 'importSheets'])->name('import-sheets');
+        Route::get('/import-status/{importId}', [BillOfMaterialController::class, 'importStatus'])->name('import-status');
     });
 });
