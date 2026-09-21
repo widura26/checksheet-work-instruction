@@ -1,9 +1,9 @@
 <!-- Modal Import BOM -->
-<div class="modal fade" id="bomImportModal" tabindex="-1" aria-labelledby="bomImportModalLabel" aria-hidden="true">
+<div class="modal fade" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="bomImportModalLabel">Import Bill of Material</h5>
+                <h5 class="modal-title" id="importExcelModalLabel">Import Bill of Material</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
