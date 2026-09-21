@@ -49,6 +49,7 @@ class BillOfMaterialImport implements ToCollection, WithChunkReading, WithStartR
             Log::info("Import {$this->importId} completed in {$elapsed}s");
         } catch (\Throwable $e) {
             Log::error("Import {$this->importId} error: " . $e->getMessage());
+            throw $e;
         }
     }
 
