@@ -230,7 +230,7 @@ const barChart2 = async (data) => {
 }
 
 /* Import Purchase Requisition */
-const importModal = new coreui.Modal(document.getElementById('importExcelModal'));
+const importModal = new coreui.Modal(document.getElementById('importPrModal'));
 
 $('#btnImport').on('click', function () {
     const form = document.getElementById('importForm');

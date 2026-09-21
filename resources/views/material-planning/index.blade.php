@@ -82,18 +82,18 @@
                     Import Bill Of Material (.xls)
                 </button>
                 <button type="button" class="btn btn-success text-white" data-coreui-toggle="modal"
-                    data-coreui-target="#importExcelModal">
+                    data-coreui-target="#importPrModal">
                     <svg class="icon me-1" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 11.25h-8.25v-8.25h-1.5v8.25h-8.25v1.5h8.25v8.25h1.5v-8.25h8.25z"></path></svg>
                     Import Purchase Requisition (.xls)
                 </button>
             </div>
 
-            <!-- Import Excel Modal -->
-            <div class="modal fade" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel" aria-hidden="true">
+            <!-- Import Purchase Requisition Modal -->
+            <div class="modal fade" id="importPrModal" tabindex="-1" aria-labelledby="importPrModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="importExcelModalLabel">Import Purchase Requisition</h5>
+                            <h5 class="modal-title" id="importPrModalLabel">Import Purchase Requisition</h5>
                             <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
@@ -115,6 +115,49 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-coreui-dismiss="modal">Tutup</button>
                             <button type="button" class="btn btn-success" id="btnImport">Import</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Import BOM -->
+            <div class="modal fade" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="importExcelModalLabel">Import Bill of Material</h5>
+                            <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Step 1: Upload File -->
+                            <div id="uploadSection">
+                                <div class="mb-3">
+                                    <label for="bomFile" class="form-label">Pilih File Excel</label>
+                                    <input type="file" class="form-control" id="bomFile" accept=".xlsx,.xls" required>
+                                    <div class="form-text">Format: .xlsx atau .xls</div>
+                                </div>
+                                <button type="button" class="btn btn-primary" id="btnUpload">Upload</button>
+                            </div>
+
+                            <!-- Step 2: Select Sheets -->
+                            <div id="sheetSelection" style="display: none;">
+                                <h6>Sheet tersedia:</h6>
+                                <div id="sheetList"></div>
+                                <div class="mt-3">
+                                    <button type="button" class="btn btn-info" id="btnPreview">Preview</button>
+                                    <button type="button" class="btn btn-success" id="btnImportSheets">Import Langsung</button>
+                                </div>
+                            </div>
+
+                            <!-- Step 3: Preview -->
+                            <div id="previewSection" style="display: none;">
+                                <h6 id="previewTitle">Preview</h6>
+                                <div id="previewContent"></div>
+                                <div class="mt-3">
+                                    <button type="button" class="btn btn-success" id="btnImportFromPreview">Import Sheet Ini</button>
+                                    <button type="button" class="btn btn-secondary" id="btnBack">Kembali</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -286,4 +329,5 @@
 
 @push('js')
     <script type="module" src="{{ asset('js/material-planning/index.js') }}"></script>
+    <script src="{{ asset('js/bom-import.js') }}"></script>
 @endpush
