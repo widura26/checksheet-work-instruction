@@ -8,8 +8,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
-use App\Jobs\ImportMaterialPlanningJob;
+use App\Imports\MaterialPlanningImport;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class MaterialPlanningController extends Controller
 {
@@ -177,7 +178,8 @@ class MaterialPlanningController extends Controller
         Storage::disk('local')->makeDirectory('imports');
         $file->storeAs('imports', $fileName);
 
-        ImportMaterialPlanningJob::dispatch($fileName, $importId);
+        $tempFile = storage_path('app/imports/' . $fileName);
+        Excel::import(new MaterialPlanningImport($importId), $tempFile);
 
         return response()->json([
             'success' => true,
@@ -232,8 +234,9 @@ class MaterialPlanningController extends Controller
 
     private function buildHeaderMap(array $header): array {
         $aliases = [
+            'wbs_elem'          => ['wbs elem', 'wbs_elem', 'wbselem', 'wbs.elem'],
             'wbs_description'   => ['wbs description', 'wbs_description', 'wbsdescription'],
-            'pr_number'         => ['purch.req.', 'purchreq', 'pr_number', 'prnumber', 'purch req'],
+            'pr_number'         => ['purch.req.', 'purchreq', 'pr_number', 'prnumber', 'purch req', 'purch. req.'],
             'del_indicator'     => ['del. indicator', 'del_indicator', 'delindicator', 'del indicator'],
             'pr_status'         => ['pr status', 'pr_status', 'prstatus'],
             'request_date'      => ['req.date', 'reqdate', 'request_date', 'requestdate', 'req date'],
@@ -242,15 +245,14 @@ class MaterialPlanningController extends Controller
             'material_code'     => ['material', 'material_code', 'materialcode'],
             'material_description' => ['mat. description', 'mat_description', 'matdescription', 'mat description'],
             'spesification'     => ['spesifikasi', 'spesification'],
-            'requested_quantity'=> ['qty requested', 'qty_requested', 'qtyrequested', 'qty.requested'],
+            'requested_quantity'=> ['qty requested', 'qty_requested', 'qtyrequested', 'qty.requested', 'qty. requested'],
             'unit'              => ['un', 'unit'],
             'ordered_quantity'  => ['ordered', 'ordered_quantity', 'orderedquantity'],
-            'po_number'         => ['po number', 'po_number', 'ponumber', 'po.number'],
-            'po_date'           => ['po date', 'po_date', 'podate', 'po.date'],
+            'po_number'         => ['po number', 'po_number', 'ponumber', 'po.number', 'po. number'],
+            'po_date'           => ['po date', 'po_date', 'podate', 'po.date', 'po. date'],
             'po_delivered_date' => ['po deliv. dat', 'po_deliv_dat', 'podelivdat', 'po deliv dat', 'po deliv. dat'],
             'created_by'        => ['created by', 'created_by', 'createdby', 'created.by'],
-            'request_by'        => ['requested by', 'requested_by', 'requestedby', 'requested.by'],
-            'wbs_elem'          => ['wbs elem', 'wbs_elem', 'wbselem', 'wbs.elem', 'WBS Elem'],
+            'request_by'        => ['requested by', 'requested_by', 'requestedby', 'requested.by', 'request by'],
             'tracking_no'       => ['trackingno', 'tracking_no', 'tracking no'],
             'matl_group'        => ['matl group', 'matl_group', 'matlgroup', 'matl.group'],
             'rel'               => ['rel'],

@@ -45,7 +45,17 @@ const pieChart1 = async (data) => {
             }]
         },
         options: {
-            responsive: true
+            responsive: true,
+            showTooltips: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                },
+                tooltip: {
+                    enabled: true
+                }
+            }
         }
     });
     piechart.render()
@@ -63,7 +73,17 @@ const pieChart2 = async (data) => {
             }]
         },
         options: {
-            responsive: true
+            responsive: true,
+            showTooltips: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                },
+                tooltip: {
+                    enabled: true
+                }
+            }
         }
     });
 
@@ -235,7 +255,7 @@ $('#btnImport').on('click', function () {
     formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
 
     $.ajax({
-        url: '/material-planning/import',
+        url: '/material-planning/import-queue',
         type: 'POST',
         data: formData,
         processData: false,
