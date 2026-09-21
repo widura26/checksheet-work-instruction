@@ -128,8 +128,11 @@
             </div>
         </div>
     </div>
+
+    @include('bill-of-material.import-modal')
 @endsection
 
 @push('js')
     <script type="module" src="{{ asset('js/bill-of-material/index.js') }}"></script>
+    <script src="{{ asset('js/bom-import.js') }}"></script>
 @endpush
