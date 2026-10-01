@@ -109,4 +109,47 @@ class BomDatasetImportParserTest extends TestCase
             'Data lama tidak boleh hilang saat import gagal'
         );
     }
+
+    public function test_single_line_unrecognized_header_fails_and_preserves_data(): void
+    {
+        $this->insertExistingRow('OLD-1');
+        file_put_contents($this->filePath, "Foo,Bar\n");
+
+        $caught = null;
+        try {
+            Excel::import(new BomDatasetImport((string) Str::uuid()), $this->filePath);
+        } catch (\RuntimeException $e) {
+            $caught = $e;
+        }
+
+        $this->assertNotNull($caught, 'File 1 baris tanpa Kode Material harus tetap gagal, tidak boleh wipe');
+        $this->assertStringContainsString('Kode Material', $caught->getMessage());
+        $this->assertNotNull(
+            DB::table('bill_of_material_dataset')->where('kode_material', 'OLD-1')->first(),
+            'Data lama tidak boleh hilang saat file format salah tanpa baris data'
+        );
+    }
+
+    public function test_header_only_file_with_valid_header_wipes_to_empty(): void
+    {
+        $this->insertExistingRow('OLD-1');
+        file_put_contents($this->filePath, "Nama Sheet Sumber,Kode Material\n");
+
+        Excel::import(new BomDatasetImport((string) Str::uuid()), $this->filePath);
+
+        $this->assertSame(0, DB::table('bill_of_material_dataset')->count());
+    }
+
+    public function test_zero_byte_file_is_noop(): void
+    {
+        $this->insertExistingRow('OLD-1');
+        file_put_contents($this->filePath, '');
+
+        Excel::import(new BomDatasetImport((string) Str::uuid()), $this->filePath);
+
+        $this->assertNotNull(
+            DB::table('bill_of_material_dataset')->where('kode_material', 'OLD-1')->first(),
+            'File 0 baris tidak boleh menghapus data'
+        );
+    }
 }

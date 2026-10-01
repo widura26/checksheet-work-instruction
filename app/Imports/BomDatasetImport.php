@@ -7,9 +7,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToCollection;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class BomDatasetImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
+class BomDatasetImport implements ToCollection, SkipsEmptyRows
 {
     protected string $importId;
 
@@ -20,21 +19,32 @@ class BomDatasetImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
 
     public function collection($rows): void
     {
-        $map = [];
-        if ($rows->isNotEmpty()) {
-            $map = BomColumnMapper::map(array_keys($rows->first()->toArray()));
+        if ($rows->isEmpty()) {
+            return;
+        }
 
-            if (!in_array('kode_material', $map, true)) {
-                throw new \RuntimeException('Header file tidak dikenali — kolom "Kode Material" tidak ditemukan');
+        $headerCells = $rows->first()->toArray();
+        $map = BomColumnMapper::map($headerCells);
+
+        if (!in_array('kode_material', $map, true)) {
+            throw new \RuntimeException('Header file tidak dikenali — kolom "Kode Material" tidak ditemukan');
+        }
+
+        $positionMap = [];
+        foreach ($headerCells as $index => $headerCell) {
+            $normalized = BomColumnMapper::normalize((string) $headerCell);
+            if (isset($map[$normalized])) {
+                $positionMap[$index] = $map[$normalized];
             }
         }
 
         $allData = [];
 
-        foreach ($rows as $row) {
+        foreach ($rows->slice(1) as $row) {
+            $rowCells = $row->toArray();
             $mapped = [];
-            foreach ($map as $sourceKey => $dbColumn) {
-                $value = $row[$sourceKey] ?? null;
+            foreach ($positionMap as $index => $dbColumn) {
+                $value = $rowCells[$index] ?? null;
                 $mapped[$dbColumn] = is_string($value) ? trim($value) : $value;
             }
 
