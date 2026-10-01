@@ -243,7 +243,7 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::get('/distribusi/unduh-bast-ttd/{distribusiTool}', [DistribusiController::class, 'downloadBastFile'])->name('distribusi.unduh-bast-ttd');
     });
 
-    Route::prefix('sap-dataset')->group(function(){
+    Route::prefix('material-planning')->group(function(){
         Route::get('/', [SapDatasetController::class, 'index'])->name('sap-dataset.index');
         Route::post('/import', [SapDatasetController::class, 'import'])->name('sap-dataset.import');
         Route::post('/import-queue', [SapDatasetController::class, 'importQueue'])->name('sap-dataset.import-queue');
@@ -276,9 +276,7 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
     });
 
     Route::prefix('bom')->name('bom.')->group(function () {
-        Route::post('/upload', [BillOfMaterialController::class, 'upload'])->name('upload');
-        Route::post('/preview', [BillOfMaterialController::class, 'preview'])->name('preview');
-        Route::post('/import-sheets', [BillOfMaterialController::class, 'importSheets'])->name('import-sheets');
-        Route::get('/import-status/{importId}', [BillOfMaterialController::class, 'importStatus'])->name('import-status');
+        Route::post('/import', [BillOfMaterialController::class, 'import'])->name('import');
+        Route::get('/status/{importId}', [BillOfMaterialController::class, 'status'])->name('status');
     });
 });
