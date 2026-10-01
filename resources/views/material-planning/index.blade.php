@@ -72,7 +72,7 @@
     <div class="card mb-4">
         <div class="p-3">
             <div class="buttons">
-                <form method="POST" action="{{ route("material-planning.delete") }}">
+                <form method="POST" action="{{ route("sap-dataset.delete") }}">
                     @csrf
                     <button>Delete</button>
                 </form>
@@ -316,6 +316,6 @@
 @endsection
 
 @push('js')
-    <script type="module" src="{{ asset('js/material-planning/index.js') }}"></script>
+    <script type="module" src="{{ asset('js/sap-dataset/index.js') }}"></script>
     <script src="{{ asset('js/bom-import.js') }}"></script>
 @endpush

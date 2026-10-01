@@ -170,7 +170,7 @@ $('#btnImport').on('click', function () {
     formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
 
     $.ajax({
-        url: '/material-planning/import-queue',
+        url: '/sap-dataset/import-queue',
         type: 'POST',
         data: formData,
         processData: false,
@@ -252,7 +252,7 @@ $(function() {
         scrollX: true,
         scrollCollapse: true,
         ajax: function (data, callback, settings) {
-            $.get("/material-planning/deviation", {
+            $.get("/sap-dataset/deviation", {
                 page: (data.start / data.length) + 1,
                 per_page: data.length,
                 search: data.search.value

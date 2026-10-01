@@ -30,7 +30,7 @@
             'subitems' => [
                 [
                     'navtype' => 'nav-item',
-                    'route' => 'material-planning.index',
+                    'route' => 'sap-dataset.index',
                     'label' => 'Dashboard',
                 ],
                 [

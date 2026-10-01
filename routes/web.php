@@ -16,7 +16,7 @@ use App\Http\Controllers\DistribusiController;
 use App\Http\Controllers\ExpedisiController;
 use App\Http\Controllers\GrafikController;
 use App\Http\Controllers\KodeMaterialController;
-use App\Http\Controllers\MaterialPlanningController;
+use App\Http\Controllers\SapDatasetController;
 use App\Http\Controllers\MdController;
 use App\Http\Controllers\OkaController;
 use App\Http\Controllers\ProjectCodeController;
@@ -243,13 +243,13 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::get('/distribusi/unduh-bast-ttd/{distribusiTool}', [DistribusiController::class, 'downloadBastFile'])->name('distribusi.unduh-bast-ttd');
     });
 
-    Route::prefix('material-planning')->group(function(){
-        Route::get('/', [MaterialPlanningController::class, 'materialPlanning'])->name('material-planning.index');
-        Route::post('/import', [MaterialPlanningController::class, 'import'])->name('material-planning.import');
-        Route::post('/import-queue', [MaterialPlanningController::class, 'importQueue'])->name('material-planning.import-queue');
-        Route::get('/import-status/{importId}', [MaterialPlanningController::class, 'importStatus'])->name('material-planning.import-status');
-        Route::post('/delete', [MaterialPlanningController::class, 'delete'])->name('material-planning.delete');
-        Route::get('/deviation', [MaterialPlanningController::class, 'deviation'])->name('material-planning.deviation');
+    Route::prefix('sap-dataset')->group(function(){
+        Route::get('/', [SapDatasetController::class, 'index'])->name('sap-dataset.index');
+        Route::post('/import', [SapDatasetController::class, 'import'])->name('sap-dataset.import');
+        Route::post('/import-queue', [SapDatasetController::class, 'importQueue'])->name('sap-dataset.import-queue');
+        Route::get('/import-status/{importId}', [SapDatasetController::class, 'importStatus'])->name('sap-dataset.import-status');
+        Route::post('/delete', [SapDatasetController::class, 'delete'])->name('sap-dataset.delete');
+        Route::get('/deviation', [SapDatasetController::class, 'deviation'])->name('sap-dataset.deviation');
     });
 
     Route::prefix('charts')->group(function(){

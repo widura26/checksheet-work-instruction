@@ -12,9 +12,9 @@ use App\Imports\SapDatasetImport;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
-class MaterialPlanningController extends Controller
+class SapDatasetController extends Controller
 {
-    public function materialPlanning(){
+    public function index(){
         $prtotals = SapDataset::all();
         return view('material-planning.index', compact('prtotals'));
     }
