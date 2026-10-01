@@ -153,7 +153,7 @@ class SapDatasetController extends Controller
             ]);
         } catch (\Throwable $e) {
             @unlink($tempFile);
-            Log::error('Error importing material planning: ' . $e->getMessage());
+            Log::error('Error importing SAP dataset: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal mengimpor data: ' . $e->getMessage(),
