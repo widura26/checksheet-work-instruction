@@ -144,91 +144,6 @@ const barChart = async (data) => {
     c.render()
 }
 
-const barChart1 = async (data) => {
-    const c = new Chart(document.getElementById('canvas-8'), {
-        type: 'bar',
-        data: {
-            labels: ['Bill Of Material', 'Purchase Requisition'],
-            datasets: [
-                {
-                    label: 'My First Dataset',
-                    data: [data.bom, data.pr],
-                    fill: false,
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgb(255, 99, 132)',
-                        'rgb(255, 159, 64)'
-                    ],
-                    borderWidth: 1
-                },
-            ]
-        },
-        options: {
-            indexAxis: 'y',
-            showTooltips: false,
-            plugins: {
-                legend: {
-                    display: false,
-                    labels: {
-                        color: 'rgb(255, 99, 132)'
-                    },
-                    position: 'top'
-                },
-                tooltip: {
-                    enabled: true
-                }
-            }
-        }
-    });
-    c.render()
-}
-
-
-const barChart2 = async (data) => {
-    const c = new Chart(document.getElementById('canvas-9'), {
-        type: 'bar',
-        data: {
-            labels: ['Purchase Requisition', 'Purchase Order'],
-            datasets: [
-                {
-                    label: 'My First Dataset',
-                    data: [data.pr, data.pos],
-                    fill: false,
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgb(255, 99, 132)',
-                        'rgb(255, 159, 64)'
-                    ],
-                    borderWidth: 1
-                },
-            ]
-        },
-        options: {
-            indexAxis: 'y',
-            showTooltips: false,
-            plugins: {
-                legend: {
-                    display: false,
-                    labels: {
-                        color: 'rgb(255, 99, 132)'
-                    },
-                    position: 'top'
-                },
-                tooltip: {
-                    enabled: true
-                }
-            }
-        }
-    });
-    c.render()
-}
-
 /* Import Purchase Requisition */
 const importModal = new coreui.Modal(document.getElementById('importPrModal'));
 
@@ -321,8 +236,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     pieChart1(prdata)
     pieChart2(podata)
-    barChart1(bomprdata)
-    barChart2(PoPrData)
 
     const prpo = {
         "prdata": prdata,
