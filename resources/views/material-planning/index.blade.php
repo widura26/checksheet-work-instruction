@@ -122,42 +122,31 @@
 
             <!-- Modal Import BOM -->
             <div class="modal fade" id="importExcelModal" tabindex="-1" aria-labelledby="importExcelModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
+                <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="importExcelModalLabel">Import Bill of Material</h5>
                             <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <!-- Step 1: Upload File -->
-                            <div id="uploadSection">
+                            <form id="bomImportForm" enctype="multipart/form-data">
+                                @csrf
                                 <div class="mb-3">
-                                    <label for="bomFile" class="form-label">Pilih File Excel</label>
-                                    <input type="file" class="form-control" id="bomFile" accept=".xlsx,.xls" required>
-                                    <div class="form-text">Format: .xlsx atau .xls</div>
+                                    <label for="bomFile" class="form-label">Pilih File Rekap</label>
+                                    <input type="file" class="form-control" id="bomFile" name="file" accept=".csv,.xlsx,.xls" required>
+                                    <div class="form-text">Format: .csv, .xlsx, atau .xls</div>
                                 </div>
-                                <button type="button" class="btn btn-primary" id="btnUpload">Upload</button>
-                            </div>
-
-                            <!-- Step 2: Select Sheets -->
-                            <div id="sheetSelection" style="display: none;">
-                                <h6>Sheet tersedia:</h6>
-                                <div id="sheetList"></div>
-                                <div class="mt-3">
-                                    <button type="button" class="btn btn-info" id="btnPreview">Preview</button>
-                                    <button type="button" class="btn btn-success" id="btnImportSheets">Import Langsung</button>
+                            </form>
+                            <div id="bomImportProgress" class="d-none">
+                                <div class="progress mb-2">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%">Loading...</div>
                                 </div>
                             </div>
-
-                            <!-- Step 3: Preview -->
-                            <div id="previewSection" style="display: none;">
-                                <h6 id="previewTitle">Preview</h6>
-                                <div id="previewContent"></div>
-                                <div class="mt-3">
-                                    <button type="button" class="btn btn-success" id="btnImportFromPreview">Import Sheet Ini</button>
-                                    <button type="button" class="btn btn-secondary" id="btnBack">Kembali</button>
-                                </div>
-                            </div>
+                            <div id="bomImportResult" class="d-none"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-coreui-dismiss="modal">Tutup</button>
+                            <button type="button" class="btn btn-success" id="btnBomImport">Import</button>
                         </div>
                     </div>
                 </div>

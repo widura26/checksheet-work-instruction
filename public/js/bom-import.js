@@ -1,234 +1,100 @@
-document.addEventListener('DOMContentLoaded', function() {
-    let currentImportId = null;
-    let currentFileName = null;
-
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+document.addEventListener('DOMContentLoaded', function () {
+    const POLL_INTERVAL_MS = 1500;
+    const MAX_POLL_ATTEMPTS = 80;
 
     function getCsrfToken() {
         return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     }
 
-    // Upload file
-    document.getElementById('btnUpload').addEventListener('click', function() {
-        const fileInput = document.getElementById('bomFile');
-        const file = fileInput.files[0];
-        if (!file) return;
+    function showResult(type, message) {
+        const resultDiv = document.getElementById('bomImportResult');
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-' + type;
+        alert.textContent = message;
+        resultDiv.innerHTML = '';
+        resultDiv.appendChild(alert);
+        resultDiv.classList.remove('d-none');
+    }
 
-        const btn = this;
-        btn.disabled = true;
-        btn.textContent = 'Uploading...';
+    function setBusy(busy) {
+        const btn = document.getElementById('btnBomImport');
+        const progress = document.getElementById('bomImportProgress');
+        btn.disabled = busy;
+        btn.textContent = busy ? 'Mengimpor...' : 'Import';
+        progress.classList.toggle('d-none', !busy);
+    }
+
+    function pollStatus(importId, attempt) {
+        fetch('/bom/status/' + encodeURIComponent(importId))
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error('Server error: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(function (data) {
+                if (data.status === 'completed') {
+                    setBusy(false);
+                    showResult('success', 'Import selesai — ' + data.imported + ' baris.');
+                } else if (data.status === 'failed') {
+                    setBusy(false);
+                    showResult('danger', 'Import gagal. Cek log server (import_id: ' + importId + ').');
+                } else if (attempt + 1 >= MAX_POLL_ATTEMPTS) {
+                    setBusy(false);
+                    showResult('warning', 'Masih diproses — coba lagi nanti.');
+                } else {
+                    setTimeout(function () {
+                        pollStatus(importId, attempt + 1);
+                    }, POLL_INTERVAL_MS);
+                }
+            })
+            .catch(function (error) {
+                setBusy(false);
+                showResult('danger', 'Gagal cek status import: ' + error.message);
+            });
+    }
+
+    document.getElementById('btnBomImport').addEventListener('click', function () {
+        const fileInput = document.getElementById('bomFile');
+        const resultDiv = document.getElementById('bomImportResult');
+
+        resultDiv.innerHTML = '';
+        resultDiv.classList.add('d-none');
+
+        if (!fileInput.files.length) {
+            showResult('warning', 'Pilih file terlebih dahulu.');
+            return;
+        }
+
+        setBusy(true);
 
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('file', fileInput.files[0]);
         formData.append('_token', getCsrfToken());
 
-        fetch('/bom/upload', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.text().then(text => {
-                    try {
-                        const json = JSON.parse(text);
-                        throw new Error(json.message || 'Upload failed');
-                    } catch (e) {
-                        if (e.message !== 'Upload failed') {
-                            throw new Error('Server error: ' + response.status);
-                        }
-                        throw e;
+        fetch('/bom/import', { method: 'POST', body: formData })
+            .then(function (response) {
+                return response.json().then(function (json) {
+                    if (!response.ok) {
+                        const message = json.message
+                            || Object.values(json).flat().join(' ')
+                            || 'Server error: ' + response.status;
+                        throw new Error(message);
                     }
+                    return json;
                 });
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                currentImportId = data.import_id;
-                currentFileName = data.file_name;
-
-                let html = '';
-                data.sheets.forEach(sheet => {
-                    html += `<div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="${escapeHtml(sheet)}" id="sheet-${escapeHtml(sheet)}">
-                        <label class="form-check-label" for="sheet-${escapeHtml(sheet)}">${escapeHtml(sheet)}</label>
-                    </div>`;
-                });
-                document.getElementById('sheetList').innerHTML = html;
-                document.getElementById('uploadSection').style.display = 'none';
-                document.getElementById('sheetSelection').style.display = 'block';
-            } else {
-                alert('Terjadi kesalahan: ' + (data.message || 'Unknown error'));
-            }
-        })
-        .catch(error => {
-            alert('Terjadi kesalahan: ' + error.message);
-        })
-        .finally(() => {
-            btn.disabled = false;
-            btn.textContent = 'Upload';
-        });
-    });
-
-    // Preview
-    document.getElementById('btnPreview').addEventListener('click', function() {
-        const selectedSheets = getSelectedSheets();
-        if (selectedSheets.length === 0) {
-            alert('Pilih minimal 1 sheet');
-            return;
-        }
-
-        const btn = this;
-        btn.disabled = true;
-        btn.textContent = 'Loading...';
-
-        fetch('/bom/preview', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': getCsrfToken()
-            },
-            body: JSON.stringify({
-                import_id: currentImportId,
-                file_name: currentFileName,
-                sheets: selectedSheets
             })
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.text().then(text => {
-                    try {
-                        const json = JSON.parse(text);
-                        throw new Error(json.message || 'Preview failed');
-                    } catch (e) {
-                        if (e.message !== 'Preview failed') {
-                            throw new Error('Server error: ' + response.status);
-                        }
-                        throw e;
-                    }
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            let html = '';
-            for (const [sheetName, rows] of Object.entries(data.preview)) {
-                html += `<h6>${escapeHtml(sheetName)}</h6>`;
-                html += '<table class="table table-sm table-bordered">';
-                rows.forEach((row, index) => {
-                    html += '<tr>';
-                    row.forEach(cell => {
-                        if (index === 0) {
-                            html += `<th>${escapeHtml(cell || '')}</th>`;
-                        } else {
-                            html += `<td>${escapeHtml(cell || '')}</td>`;
-                        }
-                    });
-                    html += '</tr>';
-                });
-                html += '</table>';
-            }
-            document.getElementById('previewContent').innerHTML = html;
-            document.getElementById('sheetSelection').style.display = 'none';
-            document.getElementById('previewSection').style.display = 'block';
-        })
-        .catch(error => {
-            alert('Terjadi kesalahan: ' + error.message);
-        })
-        .finally(() => {
-            btn.disabled = false;
-            btn.textContent = 'Preview';
-        });
-    });
-
-    // Import from preview
-    document.getElementById('btnImportFromPreview').addEventListener('click', function() {
-        const selectedSheets = getSelectedSheets();
-        if (selectedSheets.length === 0) {
-            alert('Pilih minimal 1 sheet');
-            return;
-        }
-        importSheets(selectedSheets);
-    });
-
-    // Import directly
-    document.getElementById('btnImportSheets').addEventListener('click', function() {
-        const selectedSheets = getSelectedSheets();
-        if (selectedSheets.length === 0) {
-            alert('Pilih minimal 1 sheet');
-            return;
-        }
-        importSheets(selectedSheets);
-    });
-
-    // Back to sheet selection
-    document.getElementById('btnBack').addEventListener('click', function() {
-        document.getElementById('previewSection').style.display = 'none';
-        document.getElementById('sheetSelection').style.display = 'block';
-    });
-
-    function importSheets(sheets) {
-        const btnImportFromPreview = document.getElementById('btnImportFromPreview');
-        const btnImportSheets = document.getElementById('btnImportSheets');
-
-        btnImportFromPreview.disabled = true;
-        btnImportFromPreview.textContent = 'Importing...';
-        btnImportSheets.disabled = true;
-        btnImportSheets.textContent = 'Importing...';
-
-        fetch('/bom/import-sheets', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': getCsrfToken()
-            },
-            body: JSON.stringify({
-                import_id: currentImportId,
-                file_name: currentFileName,
-                sheets: sheets
+            .then(function (data) {
+                if (data.success) {
+                    pollStatus(data.import_id, 0);
+                } else {
+                    setBusy(false);
+                    showResult('danger', data.message || 'Terjadi kesalahan saat import.');
+                }
             })
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.text().then(text => {
-                    try {
-                        const json = JSON.parse(text);
-                        throw new Error(json.message || 'Import failed');
-                    } catch (e) {
-                        if (e.message !== 'Import failed') {
-                            throw new Error('Server error: ' + response.status);
-                        }
-                        throw e;
-                    }
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            alert('Import dimulai! Gunakan import_id untuk cek status: ' + data.import_id);
-            const importModal = new coreui.Modal(document.getElementById('importExcelModal'));
-            importModal.hide();
-        })
-        .catch(error => {
-            alert('Terjadi kesalahan: ' + error.message);
-        })
-        .finally(() => {
-            btnImportFromPreview.disabled = false;
-            btnImportFromPreview.textContent = 'Import';
-            btnImportSheets.disabled = false;
-            btnImportSheets.textContent = 'Import';
-        });
-    }
-
-    function getSelectedSheets() {
-        const sheets = [];
-        document.querySelectorAll('#sheetList input:checked').forEach(checkbox => {
-            sheets.push(checkbox.value);
-        });
-        return sheets;
-    }
+            .catch(function (error) {
+                setBusy(false);
+                showResult('danger', error.message || 'Terjadi kesalahan saat import.');
+            });
+    });
 });
