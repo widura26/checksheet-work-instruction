@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MaterialPlanning;
+use App\Models\SapDataset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +15,7 @@ use Maatwebsite\Excel\Facades\Excel;
 class MaterialPlanningController extends Controller
 {
     public function materialPlanning(){
-        $prtotals = MaterialPlanning::all();
+        $prtotals = SapDataset::all();
         return view('material-planning.index', compact('prtotals'));
     }
 
@@ -105,7 +105,7 @@ class MaterialPlanningController extends Controller
                         }
                     }
 
-                    DB::table('material_plannings')->insert($mapped);
+                    DB::table('sap_datasets')->insert($mapped);
                     if ($isInvalid) {
                         $totalInvalid++;
                     } else {
@@ -122,7 +122,7 @@ class MaterialPlanningController extends Controller
                                 $mapped[$key] = mb_substr($val, 0, 255);
                             }
                         }
-                        DB::table('material_plannings')->insert($mapped);
+                        DB::table('sap_datasets')->insert($mapped);
                         $totalInvalid++;
                     } catch (\Throwable $e2) {
                         $errors[] = $e2->getMessage();
@@ -284,7 +284,7 @@ class MaterialPlanningController extends Controller
     }
 
     public function delete(){
-        MaterialPlanning::truncate();
+        SapDataset::truncate();
         return redirect()->back();
     }
 
@@ -293,7 +293,7 @@ class MaterialPlanningController extends Controller
             abort(404);
         }
 
-        $query = MaterialPlanning::select(
+        $query = SapDataset::select(
             'pr_number',
             DB::raw('MIN(wbs_elem) as wbs_elem'),
             DB::raw('MIN(wbs_description) as wbs_description'),
@@ -318,7 +318,7 @@ class MaterialPlanningController extends Controller
                     ->orWhere('material_description', 'LIKE', "%{$search}%")
                     ->orWhereIn('pr_number', function ($sub) use ($search) {
                         $sub->select('pr_number')
-                            ->from('material_plannings')
+                            ->from('sap_datasets')
                             ->where('material_code', 'LIKE', "%{$search}%");
                     });
             });

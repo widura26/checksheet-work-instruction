@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-class MaterialPlanning extends Model
+class SapDataset extends Model
 {
     use HasFactory;
 
-    protected $table = 'material_plannings';
+    protected $table = 'sap_datasets';
     protected $guarded = ['id'];
     public $incrementing = false;
     protected $keyType = 'string';

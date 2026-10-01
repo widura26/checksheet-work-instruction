@@ -74,7 +74,7 @@ class MaterialPlanningImport implements ToCollection, WithBatchInserts, WithChun
                 'updated_at'          => now(),
             ];
         }
-        DB::table('material_plannings')->insert($allData);
+        DB::table('sap_datasets')->insert($allData);
     }
 
     private function mapRow($row): array

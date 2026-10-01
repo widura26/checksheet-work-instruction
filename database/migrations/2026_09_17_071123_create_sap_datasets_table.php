@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('material_plannings', function (Blueprint $table) {
+        Schema::create('sap_datasets', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('wbs_description')->nullable();
             $table->string('pr_number')->nullable();
@@ -49,6 +49,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('material_plannings');
+        Schema::dropIfExists('sap_datasets');
     }
 };

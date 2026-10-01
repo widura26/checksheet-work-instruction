@@ -3,13 +3,13 @@
 namespace App\Services;
 
 use App\Models\BillOfMaterial;
-use App\Models\MaterialPlanning;
+use App\Models\SapDataset;
 
 class ChartService {
 
     public function getPurchaseRequistionData(){
-        $belumPR = MaterialPlanning::where('pr_number', null)->where('status', 'valid')->get();
-        $sudahPR = MaterialPlanning::where('pr_number', '!=', '')->where('status', 'valid')->get();
+        $belumPR = SapDataset::where('pr_number', null)->where('status', 'valid')->get();
+        $sudahPR = SapDataset::where('pr_number', '!=', '')->where('status', 'valid')->get();
 
         return [
             'belum_pr' => count($belumPR),
@@ -18,8 +18,8 @@ class ChartService {
     }
 
     public function getPurchaseOrderData(){
-        $belumPO = MaterialPlanning::where('po_number', '')->where('status', 'valid')->get();
-        $sudahPO = MaterialPlanning::where('po_number', '!=', '')->where('status', 'valid')->get();
+        $belumPO = SapDataset::where('po_number', '')->where('status', 'valid')->get();
+        $sudahPO = SapDataset::where('po_number', '!=', '')->where('status', 'valid')->get();
 
         return [
             'belum_po' => count($belumPO),
@@ -29,7 +29,7 @@ class ChartService {
 
     public function getBompr(){
         $boms = BillOfMaterial::select('name')->get();
-        $prs = MaterialPlanning::select('id')->where('pr_number', '!=', '')->where('status', 'valid')->get();
+        $prs = SapDataset::select('id')->where('pr_number', '!=', '')->where('status', 'valid')->get();
 
         return [
             'bom' => count($boms),
@@ -38,8 +38,8 @@ class ChartService {
     }
 
     public function getPrPo(){
-        $prs = MaterialPlanning::select('id')->where('pr_number', '!=', '')->where('status', 'valid')->get();
-        $pos = MaterialPlanning::select('id')->where('po_number', '!=', '')->where('status', 'valid')->get();
+        $prs = SapDataset::select('id')->where('pr_number', '!=', '')->where('status', 'valid')->get();
+        $pos = SapDataset::select('id')->where('po_number', '!=', '')->where('status', 'valid')->get();
 
         return [
             'pr' => count($prs),
