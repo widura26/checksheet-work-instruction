@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
-use App\Imports\MaterialPlanningImport;
+use App\Imports\SapDatasetImport;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -179,7 +179,7 @@ class MaterialPlanningController extends Controller
         $file->storeAs('imports', $fileName);
 
         $tempFile = storage_path('app/imports/' . $fileName);
-        Excel::import(new MaterialPlanningImport($importId), $tempFile);
+        Excel::import(new SapDatasetImport($importId), $tempFile);
 
         return response()->json([
             'success' => true,
