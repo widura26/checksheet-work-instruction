@@ -286,37 +286,6 @@
         @include('components.monitoring.table-section')
 
     </div>
-
-    <div class="modal fade" id="importPrModal" tabindex="-1" aria-labelledby="importPrModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content rounded-3 border-0 shadow">
-                <div class="modal-header border-bottom">
-                    <h5 class="modal-title fw-bold" id="importPrModalLabel" style="font-size: 16px;">Import Purchase Requisition</h5>
-                    <button type="button" class="btn-close" data-coreui-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <form id="importForm" enctype="multipart/form-data">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="importFile" class="form-label small fw-semibold">Pilih File Excel SAP</label>
-                            <input type="file" class="form-control" id="importFile" name="file" accept=".xlsx,.xls,.csv" required>
-                            <div class="form-text small">Format: .xlsx, .xls, atau .csv (Maksimal 25MB)</div>
-                        </div>
-                    </form>
-                    <div id="importProgress" class="d-none">
-                        <div class="progress mb-2" style="height: 6px;">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width: 100%"></div>
-                        </div>
-                    </div>
-                    <div id="importResult" class="d-none"></div>
-                </div>
-                <div class="modal-footer border-top bg-light">
-                    <button type="button" class="btn btn-sm btn-secondary" data-coreui-dismiss="modal">Tutup</button>
-                    <button type="button" class="btn btn-sm btn-success text-white px-3" id="btnImport">Import</button>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
 
 @push('js')
