@@ -1,10 +1,9 @@
-import { bomDataset } from './bom-data.js';
+let bomDataset = [];
 
 let chartGroupInstance = null;
 let chartStatusPrInstance = null;
 let bomDataTableInstance = null;
 
-// Filter state
 const filters = {
     proyek: 'Semua',
     group: 'Semua',
@@ -12,21 +11,45 @@ const filters = {
     selectedStatuses: new Set()
 };
 
-function getFilteredData() {
-    return bomDataset.filter(item => {
-        if (filters.proyek !== 'Semua' && item.proyek !== filters.proyek) return false;
-        if (filters.group !== 'Semua' && item.group !== filters.group) return false;
-        if (filters.trainset !== 'Semua' && item.trainset !== filters.trainset) return false;
-        if (filters.selectedStatuses.size > 0 && !filters.selectedStatuses.has(item.status_pr)) return false;
-        return true;
+let loadSeq = 0;
+async function loadData() {
+    const seq = ++loadSeq;
+    const params = new URLSearchParams({
+        proyek: filters.proyek,
+        group: filters.group,
+        trainset: filters.trainset
     });
+
+    $('#bomCountBadge').text('...');
+    let result = [];
+    try {
+        const res = await fetch('/material-planning/data?' + params, {
+            headers: { 'Accept': 'application/json' }
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        result = await res.json();
+    } catch (err) {
+        console.error(err);
+        if (seq === loadSeq) alert('Gagal memuat data: ' + err.message);
+    }
+
+    if (seq !== loadSeq) return;   // ada request yang lebih baru, abaikan yang ini
+    bomDataset = result;
+    applyFilters();
+}
+
+function getFilteredData() {
+    if (filters.selectedStatuses.size === 0) return bomDataset;
+    return bomDataset.filter(item => filters.selectedStatuses.has(item.status_pr));
 }
 
 function updateMetrics(data) {
     const total = data.length;
-    $('#kpi-total-item').text(total);
-    $('#kpi-jumlah-material').text(total);
-    $('#bomCountBadge').text(total);
+    const jumlahMaterial = new Set(data.map(d => d.kode_material)).size;
+
+    $('#kpi-total-item').text(total.toLocaleString('id-ID'));
+    $('#kpi-jumlah-material').text(jumlahMaterial.toLocaleString('id-ID'));
+    $('#bomCountBadge').text(total.toLocaleString('id-ID'));
 }
 
 function updateStatusPrTable(data) {
@@ -69,195 +92,163 @@ function updateStatusPrTable(data) {
     $('#sum-lain-piece').text(counts['STATUS LAIN / TIDAK DIKENAL'].piece);
 }
 
-function updateCharts(data) {
-    // 1. Group Chart Data
-    let piecePartCount = 0;
-    let komponenCount = 0;
-    data.forEach(item => {
-        if (item.group === 'KOMPONEN') komponenCount++;
-        else piecePartCount++;
-    });
+const createTooltipConfig = (unitName = 'item') => ({
+    enabled: true,
+    external: null,
+    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+    titleColor: '#ffffff',
+    titleFont: {
+        size: 13,
+        weight: '700',
+        family: "'Source Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    },
+    titleMarginBottom: 6,
+    bodyColor: '#e2e8f0',
+    bodyFont: {
+        size: 12,
+        weight: '500',
+        family: "'Source Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    },
+    bodySpacing: 5,
+    footerColor: '#94a3b8',
+    footerFont: {
+        size: 11,
+        weight: '400',
+        family: "'Source Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    },
+    footerMarginTop: 6,
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+    borderWidth: 1,
+    padding: {
+        top: 10,
+        bottom: 10,
+        left: 14,
+        right: 14
+    },
+    cornerRadius: 8,
+    displayColors: true,
+    boxWidth: 8,
+    boxHeight: 8,
+    boxPadding: 6,
+    usePointStyle: true,
+    callbacks: {
+        title: function(items) {
+            return items[0].label || '';
+        },
+        label: function(ctx) {
+            const val = ctx.raw || 0;
+            return ` Jumlah: ${val.toLocaleString('id-ID')} ${unitName}`;
+        },
+        afterLabel: function(ctx) {
+            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+            const val = ctx.raw || 0;
+            const pct = total > 0 ? ((val / total) * 100).toFixed(2) : '0.00';
+            return ` Proporsi: ${pct}%`;
+        },
+        footer: function(items) {
+            const total = items[0].dataset.data.reduce((a, b) => a + b, 0);
+            return `Total: ${total.toLocaleString('id-ID')} ${unitName}`;
+        }
+    }
+});
 
-    const groupLabels = ['PIECE PART', 'KOMPONEN'];
-    const groupValues = [piecePartCount, komponenCount];
-    const groupColors = ['#0068c9', '#83c9ff'];
-
-    const createTooltipConfig = (unitName = 'item') => ({
-        enabled: true,
-        external: null,
-        backgroundColor: 'rgba(15, 23, 42, 0.95)',
-        titleColor: '#ffffff',
-        titleFont: {
-            size: 13,
-            weight: '700',
-            family: "'Source Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-        },
-        titleMarginBottom: 6,
-        bodyColor: '#e2e8f0',
-        bodyFont: {
-            size: 12,
-            weight: '500',
-            family: "'Source Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-        },
-        bodySpacing: 5,
-        footerColor: '#94a3b8',
-        footerFont: {
-            size: 11,
-            weight: '400',
-            family: "'Source Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-        },
-        footerMarginTop: 6,
-        borderColor: 'rgba(255, 255, 255, 0.12)',
-        borderWidth: 1,
-        padding: {
-            top: 10,
-            bottom: 10,
-            left: 14,
-            right: 14
-        },
-        cornerRadius: 8,
-        displayColors: true,
-        boxWidth: 8,
-        boxHeight: 8,
-        boxPadding: 6,
+const sharedLegendConfig = {
+    display: true,
+    position: 'bottom',
+    labels: {
+        boxWidth: 10,
+        boxHeight: 10,
         usePointStyle: true,
-        callbacks: {
-            title: function(items) {
-                return items[0].label || '';
-            },
-            label: function(ctx) {
-                const val = ctx.raw || 0;
-                return ` Jumlah: ${val.toLocaleString('id-ID')} ${unitName}`;
-            },
-            afterLabel: function(ctx) {
-                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                const val = ctx.raw || 0;
-                const pct = total > 0 ? ((val / total) * 100).toFixed(2) : '0.00';
-                return ` Proporsi: ${pct}%`;
-            },
-            footer: function(items) {
-                const total = items[0].dataset.data.reduce((a, b) => a + b, 0);
-                return `Total: ${total.toLocaleString('id-ID')} ${unitName}`;
+        pointStyle: 'circle',
+        color: '#31333F',
+        font: {
+            size: 12,
+            family: "'Source Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+        },
+        padding: 15
+    }
+};
+
+const STATUS_PR_LABELS = ['BELUM PR', 'PR PARSIAL', 'SUDAH PR', 'STOK DAN PR', 'STOK', 'STATUS LAIN / TIDAK DIKENAL'];
+const STATUS_PR_COLORS = ['#EF553B', '#FFA15A', '#00CC96', '#636EFA', '#AB63FA', '#7F7F7F'];
+const GROUP_PALETTE    = ['#0068c9', '#83c9ff', '#ff2b2b', '#ffabab', '#29b09d', '#7defa1', '#ff8700', '#ffd16a'];
+
+function renderDoughnut(instance, canvasId, labels, values, colors, unitName) {
+    if (instance) {
+        instance.data.labels = labels;
+        instance.data.datasets[0].data = values;
+        instance.data.datasets[0].backgroundColor = colors;
+        instance.update();
+        return instance;
+    }
+
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return null;
+
+    const chart = new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+            labels,
+            datasets: [{
+                data: values,
+                backgroundColor: colors,
+                borderWidth: 2,
+                borderColor: '#ffffff',
+                hoverOffset: 10,
+                hoverBorderWidth: 2,
+                hoverBorderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '30%',
+            animation: { duration: 600 },
+            plugins: {
+                legend: sharedLegendConfig,
+                tooltip: createTooltipConfig(unitName)
             }
         }
     });
+    // Hapus tooltip CoreUI global dari main.js
+    canvas.parentNode.querySelectorAll('div.chartjs-tooltip').forEach(el => el.remove());
+    return chart;
+}
 
-    const sharedLegendConfig = {
-        display: true,
-        position: 'bottom',
-        labels: {
-            boxWidth: 10,
-            boxHeight: 10,
-            usePointStyle: true,
-            pointStyle: 'circle',
-            color: '#31333F',
-            font: {
-                size: 12,
-                family: "'Source Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
-            },
-            padding: 15
-        }
-    };
-
-    if (chartGroupInstance) {
-        chartGroupInstance.data.datasets[0].data = groupValues;
-        chartGroupInstance.update();
-    } else {
-        const ctxGroup = document.getElementById('chart-group');
-        if (ctxGroup) {
-            chartGroupInstance = new Chart(ctxGroup, {
-                type: 'doughnut',
-                data: {
-                    labels: groupLabels,
-                    datasets: [{
-                        data: groupValues,
-                        backgroundColor: groupColors,
-                        borderWidth: 2,
-                        borderColor: '#ffffff',
-                        hoverOffset: 10,
-                        hoverBorderWidth: 2,
-                        hoverBorderColor: '#ffffff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '30%',
-                    animation: {
-                        duration: 600
-                    },
-                    plugins: {
-                        legend: sharedLegendConfig,
-                        tooltip: createTooltipConfig('item')
-                    }
-                }
-            });
-            // Remove any CoreUI chartjs-tooltip div injected by main.js global external handler
-            ctxGroup.parentNode.querySelectorAll('div.chartjs-tooltip').forEach(el => el.remove());
-        }
-    }
-
-    const statusCounts = {
-        'SUDAH PR': 0,
-        'BELUM PR': 0,
-        'STOK': 0,
-        'STATUS LAIN / TIDAK DIKENAL': 0
-    };
-
+function updateCharts(data) {
+    // Chart Group: dinamis sesuai nilai 'group'
+    const groupCounts = {};
     data.forEach(item => {
-        if (statusCounts[item.status_pr] !== undefined) {
-            statusCounts[item.status_pr]++;
-        } else {
-            statusCounts['STATUS LAIN / TIDAK DIKENAL']++;
-        }
+        const g = item.group || '(kosong)';
+        groupCounts[g] = (groupCounts[g] || 0) + 1;
+    });
+    const groupLabels = Object.keys(groupCounts).sort();
+    const groupValues = groupLabels.map(g => groupCounts[g]);
+    const groupColors = groupLabels.map((_, i) => GROUP_PALETTE[i % GROUP_PALETTE.length]);
+
+    chartGroupInstance = renderDoughnut(
+        chartGroupInstance, 'chart-group', groupLabels, groupValues, groupColors, 'item'
+    );
+
+    // Chart Status PR: 6 status, hanya yang > 0
+    const statusCounts = Object.fromEntries(STATUS_PR_LABELS.map(s => [s, 0]));
+    data.forEach(item => {
+        const key = statusCounts[item.status_pr] !== undefined
+            ? item.status_pr
+            : 'STATUS LAIN / TIDAK DIKENAL';
+        statusCounts[key]++;
     });
 
-    const statusLabels = ['SUDAH PR', 'BELUM PR', 'STOK', 'STATUS LAIN / TIDAK DIKENAL'];
-    const statusValues = [
-        statusCounts['SUDAH PR'],
-        statusCounts['BELUM PR'],
-        statusCounts['STOK'],
-        statusCounts['STATUS LAIN / TIDAK DIKENAL']
-    ];
-    const statusColors = ['#00CC96', '#EF553B', '#AB63FA', '#7F7F7F'];
+    const visible = STATUS_PR_LABELS.filter(s => statusCounts[s] > 0);
 
-    if (chartStatusPrInstance) {
-        chartStatusPrInstance.data.datasets[0].data = statusValues;
-        chartStatusPrInstance.update();
-    } else {
-        const ctxStatus = document.getElementById('chart-status-pr');
-        if (ctxStatus) {
-            chartStatusPrInstance = new Chart(ctxStatus, {
-                type: 'doughnut',
-                data: {
-                    labels: statusLabels,
-                    datasets: [{
-                        data: statusValues,
-                        backgroundColor: statusColors,
-                        borderWidth: 2,
-                        borderColor: '#ffffff',
-                        hoverOffset: 10,
-                        hoverBorderWidth: 2,
-                        hoverBorderColor: '#ffffff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '30%',
-                    animation: {
-                        duration: 600
-                    },
-                    plugins: {
-                        legend: sharedLegendConfig,
-                        tooltip: createTooltipConfig('material')
-                    }
-                }
-            });
-            // Remove any CoreUI chartjs-tooltip div injected by main.js global external handler
-            ctxStatus.parentNode.querySelectorAll('div.chartjs-tooltip').forEach(el => el.remove());
-        }
-    }
+    chartStatusPrInstance = renderDoughnut(
+        chartStatusPrInstance,
+        'chart-status-pr',
+        visible,
+        visible.map(s => statusCounts[s]),
+        visible.map(s => STATUS_PR_COLORS[STATUS_PR_LABELS.indexOf(s)]),
+        'material'
+    );
 }
 
 function formatStatusBadge(status) {
@@ -296,14 +287,13 @@ function initBomTable(data) {
         columns: [
             {
                 data: null,
-                render: (data, type, row, meta) => meta.row + 1,
+                render: (d, type, row, meta) => meta.settings._iDisplayStart + meta.row + 1,
                 className: 'text-center text-muted fw-light'
             },
             { data: 'no', className: 'fw-semibold text-center' },
-            { data: 'kode_konversi' },
             { data: 'group' },
-            { data: 'tindak_lanjut' },
-            { data: 'deskripsi' },
+            { data: 'tindak_lanjut', render: $.fn.dataTable.render.text() },
+            { data: 'deskripsi',     render: $.fn.dataTable.render.text() },
             { data: 'kebutuhan', className: 'text-end' },
             { data: 'qty_pr', className: 'text-end' },
             { data: 'kode_material' },
@@ -314,6 +304,13 @@ function initBomTable(data) {
                 render: (data) => formatStatusBadge(data)
             }
         ],
+        drawCallback: function () {
+            const api = this.api();
+            const start = api.page.info().start;
+            api.column(0, { page: 'current' }).nodes().each(function (cell, i) {
+                cell.textContent = start + i + 1;
+            });
+        },
         language: {
             search: "_INPUT_",
             searchPlaceholder: "Cari material...",
@@ -334,47 +331,47 @@ function applyFilters() {
     initBomTable(data);
 }
 
-// Export BOM dataset to CSV
+function csvCell(v) {
+    return `"${String(v ?? '').replace(/"/g, '""')}"`;
+}
+
 function exportBomToCsv() {
     const data = getFilteredData();
     if (!data.length) {
         alert('Tidak ada data untuk diekspor.');
         return;
     }
+
     const headers = [
         'NO', 'Kode Material Konversi', 'Group', 'Tindak Lanjut',
         'Deskripsi Material', 'Kebutuhan', 'Qty PR (BOM)',
         'Kode Material', 'Trainset', 'Status PR', 'Proyek'
     ];
-    let csvContent = 'data:text/csv;charset=utf-8,' + headers.join(',') + '\n';
-    data.forEach(item => {
-        const row = [
-            item.no,
-            `"${item.kode_konversi}"`,
-            `"${item.group}"`,
-            `"${item.tindak_lanjut}"`,
-            `"${item.deskripsi}"`,
-            item.kebutuhan,
-            item.qty_pr,
-            `"${item.kode_material}"`,
-            `"${item.trainset}"`,
-            `"${item.status_pr}"`,
-            `"${item.proyek}"`
-        ];
-        csvContent += row.join(',') + '\n';
+
+    const lines = [headers.map(csvCell).join(',')];
+    data.forEach(i => {
+        lines.push([
+            i.no, i.kode_konversi, i.group, i.tindak_lanjut, i.deskripsi,
+            i.kebutuhan, i.qty_pr, i.kode_material, i.trainset, i.status_pr, i.proyek
+        ].map(csvCell).join(','));
     });
-    const encodedUri = encodeURI(csvContent);
+
+    // \uFEFF = BOM supaya Excel membaca UTF-8 dengan benar
+    const blob = new Blob(['\uFEFF' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', 'Dataset_BOM_Monitoring.csv');
+    link.href = url;
+    link.download = 'Dataset_BOM_Monitoring.csv';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Initial render of Streamlit Dashboard Components
-    applyFilters();
+    filters.trainset = $('#select-trainset').val();
+    loadData();
 
     // 2. Expander Accordion Toggle
     const expanderToggle = document.getElementById('expanderToggle');
@@ -392,17 +389,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Dropdown filter changes
     $('#select-proyek').on('change', function() {
         filters.proyek = $(this).val();
-        applyFilters();
+        loadData();
     });
 
     $('#select-group').on('change', function() {
         filters.group = $(this).val();
-        applyFilters();
+        loadData();
     });
 
     $('#select-trainset').on('change', function() {
         filters.trainset = $(this).val();
-        applyFilters();
+        loadData();
     });
 
     // 4. Status PR Switches
@@ -513,6 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(res => res.json())
             .then(data => {
                 if (data.status === 'completed') {
+                    loadData();
                     btnStreamlitGenerate.disabled = false;
                     btnStreamlitGenerate.innerHTML = '⚙️ Generate & Rekap Data';
                     $('#bomStreamlitProgress').addClass('d-none');

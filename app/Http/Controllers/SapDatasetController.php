@@ -17,23 +17,27 @@ use Illuminate\Support\Facades\Cache;
 
 class SapDatasetController extends Controller
 {
-    public function index(Request $request, DataProcessService $svc)
+    public function index(DataProcessService $svc)
     {
-        $options = Cache::remember('mp:options', 600, fn () => $svc->filterOptions($svc->prepare()));
+        $options = Cache::remember('mp:options:v' . Cache::get('mp:version', 1), 600,
+            fn () => $svc->filterOptions($svc->prepare()));
 
-        $wbs      = $request->input('wbs', 'Semua');
+        $defaultTrainset = in_array('TS 14', $options['trainset']) ? 'TS 14' : 'Semua';
+
+        return view('material-planning.index', compact('options','defaultTrainset'));
+    }
+
+    public function data(Request $request, DataProcessService $svc)
+    {
+        $proyek   = $request->input('proyek', 'Semua');
         $group    = $request->input('group', 'Semua');
-        $trainset = $request->input('trainset', in_array('TS 14', $options['trainset']) ? 'TS 14' : 'Semua');
+        $trainset = $request->input('trainset', 'Semua');
 
-        $key  = 'mp:dash:' . md5("$wbs|$group|$trainset");
-        $data = Cache::remember($key, 600, fn () => $svc->dashboard($wbs, $group, $trainset));
+        $key = 'mp:data:v' . Cache::get('mp:version', 1) . ':' . md5("$proyek|$group|$trainset");
 
-        $selected = (array) $request->input('status', []);
-        $detail = $selected
-            ? $data['frame']->whereIn($data['statusCol'], $selected)->values()
-            : $data['frame'];
-
-        return view('material-planning.index', compact('options', 'wbs', 'group', 'trainset', 'data', 'selected', 'detail'));
+        return response()->json(
+            Cache::remember($key, 600, fn () => $svc->dataset($proyek, $group, $trainset))
+        );
     }
 
     public function import(Request $request){

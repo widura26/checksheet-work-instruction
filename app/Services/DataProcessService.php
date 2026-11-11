@@ -43,13 +43,14 @@ class DataProcessService {
             ->map(function ($row) {
                 $r = $row->toArray();
                 $r['tindak_lanjut'] = self::STATUS_RENAME[$r['tindak_lanjut']] ?? $r['tindak_lanjut'];
+                $r['trainset'] = trim((string) ($r['lot'] ?? ''));
                 return $r;
             });
     }
 
     public function filterOptions(Collection $rows): array
     {
-        $opt = fn ($col) => $rows->pluck($col)->filter()->unique()->sort()->values()->all();
+        $opt = fn ($col) => $rows->pluck($col)->filter()->unique()->sort(SORT_NATURAL)->values()->all();
 
         return [
             'wbs'      => $opt('wbs'),
@@ -133,7 +134,6 @@ class DataProcessService {
 
                 return [
                     'no'                     => $first['no'],
-                    'kode_material' => $first['kode_material'],
                     'group'                  => $first['group'],
                     'tindak_lanjut'          => $tlJoined,
                     'deskripsi_material'     => $first['deskripsi_material'],
@@ -175,8 +175,27 @@ class DataProcessService {
 
     private function trainsetNo(string $t): int
     {
-        $p = preg_split('/\s+/', trim($t));
-        return (isset($p[1]) && ctype_digit($p[1])) ? (int) $p[1] : 0;
+        return preg_match('/\d+/', $t, $m) ? (int) $m[0] : 0;
+    }
+
+    public function dataset(string $wbs, string $group, string $trainset): array
+    {
+        return $this->dashboard($wbs, $group, $trainset)['frame']
+            ->map(fn ($r) => [
+                'no'            => $r['no'],
+                'group'         => $r['group'],
+                'tindak_lanjut' => $r['tindak_lanjut'],
+                'deskripsi'     => $r['deskripsi_material'],
+                'kebutuhan'     => $r['sum'] ?? $r['kebutuhan'] ?? 0,
+                'qty_pr'        => $r['qty_pr_bom'] ?? (($r['qty_pr_ve'] ?? 0) + ($r['qty_pr_ms'] ?? 0)),
+                'kode_material' => $r['kode_material'],
+                'trainset'      => $r['trainset'],
+                // mode baris mentah belum punya status_pr -> hitung dari tindak_lanjut-nya
+                'status_pr'     => $r['status_pr'] ?? $this->checkPrStatus($r['tindak_lanjut']),
+                'proyek'        => $wbs !== 'Semua' ? $wbs : ($r['wbs'] ?? ''),
+            ])
+            ->values()
+            ->all();
     }
 }
 
