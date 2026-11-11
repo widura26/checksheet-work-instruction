@@ -9,14 +9,31 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use App\Imports\SapDatasetImport;
+use App\Jobs\ImportExcelJob;
+use App\Services\DataProcessService;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Cache;
 
 class SapDatasetController extends Controller
 {
-    public function index(){
-        $prtotals = SapDataset::all();
-        return view('material-planning.index', compact('prtotals'));
+    public function index(Request $request, DataProcessService $svc)
+    {
+        $options = Cache::remember('mp:options', 600, fn () => $svc->filterOptions($svc->prepare()));
+
+        $wbs      = $request->input('wbs', 'Semua');
+        $group    = $request->input('group', 'Semua');
+        $trainset = $request->input('trainset', in_array('TS 14', $options['trainset']) ? 'TS 14' : 'Semua');
+
+        $key  = 'mp:dash:' . md5("$wbs|$group|$trainset");
+        $data = Cache::remember($key, 600, fn () => $svc->dashboard($wbs, $group, $trainset));
+
+        $selected = (array) $request->input('status', []);
+        $detail = $selected
+            ? $data['frame']->whereIn($data['statusCol'], $selected)->values()
+            : $data['frame'];
+
+        return view('material-planning.index', compact('options', 'wbs', 'group', 'trainset', 'data', 'selected', 'detail'));
     }
 
     public function import(Request $request){
@@ -347,5 +364,33 @@ class SapDatasetController extends Controller
         );
 
         return response()->json($data);
+    }
+
+    public function import_excel(Request $request){
+        try {
+            $request->validate([
+                'file' => 'required|file|mimes:xlsx|max:20480',
+            ]);
+
+            $path = $request->file('file')->store('imports');
+
+            set_time_limit(0);
+            ini_set('memory_limit', '512M');
+
+            ImportExcelJob::dispatchSync($path);
+
+            return response()->json([
+                "success" => true,
+                "message" => "Import Sukses"
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                "success" => false,
+                "message" => "Import Gagal"
+            ]);
+        }
+
+
+        return back()->with('success', 'Import selesai.');
     }
 }

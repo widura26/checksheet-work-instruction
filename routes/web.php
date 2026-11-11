@@ -250,6 +250,7 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::get('/import-status/{importId}', [SapDatasetController::class, 'importStatus'])->name('sap-dataset.import-status');
         Route::post('/delete', [SapDatasetController::class, 'delete'])->name('sap-dataset.delete');
         Route::get('/deviation', [SapDatasetController::class, 'deviation'])->name('sap-dataset.deviation');
+        Route::post('/import-excel', [SapDatasetController::class, 'import_excel'])->name('sap-dataset.import-excel');
     });
 
     Route::prefix('charts')->group(function(){

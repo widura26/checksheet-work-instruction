@@ -477,7 +477,7 @@ document.addEventListener('DOMContentLoaded', () => {
             $('#bomStreamlitResult').addClass('d-none').html('');
 
             $.ajax({
-                url: '/bom/import',
+                url: '/material-planning/import-excel',
                 type: 'POST',
                 data: formData,
                 processData: false,
