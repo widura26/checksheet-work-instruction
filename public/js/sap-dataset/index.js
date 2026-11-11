@@ -82,6 +82,83 @@ function updateCharts(data) {
     const groupValues = [piecePartCount, komponenCount];
     const groupColors = ['#0068c9', '#83c9ff'];
 
+    const createTooltipConfig = (unitName = 'item') => ({
+        enabled: true,
+        external: null,
+        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+        titleColor: '#ffffff',
+        titleFont: {
+            size: 13,
+            weight: '700',
+            family: "'Source Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+        },
+        titleMarginBottom: 6,
+        bodyColor: '#e2e8f0',
+        bodyFont: {
+            size: 12,
+            weight: '500',
+            family: "'Source Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+        },
+        bodySpacing: 5,
+        footerColor: '#94a3b8',
+        footerFont: {
+            size: 11,
+            weight: '400',
+            family: "'Source Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+        },
+        footerMarginTop: 6,
+        borderColor: 'rgba(255, 255, 255, 0.12)',
+        borderWidth: 1,
+        padding: {
+            top: 10,
+            bottom: 10,
+            left: 14,
+            right: 14
+        },
+        cornerRadius: 8,
+        displayColors: true,
+        boxWidth: 8,
+        boxHeight: 8,
+        boxPadding: 6,
+        usePointStyle: true,
+        callbacks: {
+            title: function(items) {
+                return items[0].label || '';
+            },
+            label: function(ctx) {
+                const val = ctx.raw || 0;
+                return ` Jumlah: ${val.toLocaleString('id-ID')} ${unitName}`;
+            },
+            afterLabel: function(ctx) {
+                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                const val = ctx.raw || 0;
+                const pct = total > 0 ? ((val / total) * 100).toFixed(2) : '0.00';
+                return ` Proporsi: ${pct}%`;
+            },
+            footer: function(items) {
+                const total = items[0].dataset.data.reduce((a, b) => a + b, 0);
+                return `Total: ${total.toLocaleString('id-ID')} ${unitName}`;
+            }
+        }
+    });
+
+    const sharedLegendConfig = {
+        display: true,
+        position: 'bottom',
+        labels: {
+            boxWidth: 10,
+            boxHeight: 10,
+            usePointStyle: true,
+            pointStyle: 'circle',
+            color: '#31333F',
+            font: {
+                size: 12,
+                family: "'Source Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+            },
+            padding: 15
+        }
+    };
+
     if (chartGroupInstance) {
         chartGroupInstance.data.datasets[0].data = groupValues;
         chartGroupInstance.update();
@@ -95,42 +172,28 @@ function updateCharts(data) {
                     datasets: [{
                         data: groupValues,
                         backgroundColor: groupColors,
-                        borderWidth: 1,
-                        borderColor: '#ffffff'
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                        hoverOffset: 10,
+                        hoverBorderWidth: 2,
+                        hoverBorderColor: '#ffffff'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     cutout: '30%',
+                    animation: {
+                        duration: 600
+                    },
                     plugins: {
-                        legend: {
-                            display: true,
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 12,
-                                boxHeight: 12,
-                                color: '#31333F',
-                                font: {
-                                    size: 12,
-                                    family: "'Source Sans', sans-serif"
-                                },
-                                padding: 15
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(ctx) {
-                                    const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                                    const val = ctx.raw;
-                                    const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
-                                    return ` ${ctx.label}: ${val} (${pct}%)`;
-                                }
-                            }
-                        }
+                        legend: sharedLegendConfig,
+                        tooltip: createTooltipConfig('item')
                     }
                 }
             });
+            // Remove any CoreUI chartjs-tooltip div injected by main.js global external handler
+            ctxGroup.parentNode.querySelectorAll('div.chartjs-tooltip').forEach(el => el.remove());
         }
     }
 
@@ -171,42 +234,28 @@ function updateCharts(data) {
                     datasets: [{
                         data: statusValues,
                         backgroundColor: statusColors,
-                        borderWidth: 1,
-                        borderColor: '#ffffff'
+                        borderWidth: 2,
+                        borderColor: '#ffffff',
+                        hoverOffset: 10,
+                        hoverBorderWidth: 2,
+                        hoverBorderColor: '#ffffff'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    cutout: '62%',
+                    cutout: '30%',
+                    animation: {
+                        duration: 600
+                    },
                     plugins: {
-                        legend: {
-                            display: true,
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 12,
-                                boxHeight: 12,
-                                color: '#31333F',
-                                font: {
-                                    size: 12,
-                                    family: "'Source Sans', sans-serif"
-                                },
-                                padding: 15
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(ctx) {
-                                    const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                                    const val = ctx.raw;
-                                    const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
-                                    return ` ${ctx.label}: ${val} (${pct}%)`;
-                                }
-                            }
-                        }
+                        legend: sharedLegendConfig,
+                        tooltip: createTooltipConfig('material')
                     }
                 }
             });
+            // Remove any CoreUI chartjs-tooltip div injected by main.js global external handler
+            ctxStatus.parentNode.querySelectorAll('div.chartjs-tooltip').forEach(el => el.remove());
         }
     }
 }
@@ -241,7 +290,9 @@ function initBomTable(data) {
         searching: true,
         info: true,
         autoWidth: false,
+        responsive: false,
         scrollX: true,
+        scrollCollapse: true,
         columns: [
             {
                 data: null,
@@ -334,7 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
         expanderToggle.addEventListener('click', () => {
             const isExpanded = expanderBody.style.display !== 'none';
             expanderBody.style.display = isExpanded ? 'none' : 'block';
-            expanderChevron.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
+            expanderChevron.style.transform = isExpanded ? 'rotate(-90deg)' : 'rotate(0deg)';
         });
     }
 

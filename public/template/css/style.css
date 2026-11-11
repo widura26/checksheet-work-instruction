@@ -258,7 +258,7 @@ body {
   background-color: var(--cui-body-bg);
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: rgba(8, 10, 12, 0);
-  background-color: var(--cui-tertiary-bg);
+  /* background-color: var(--cui-tertiary-bg); */
 }
 
 hr {

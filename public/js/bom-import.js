@@ -54,47 +54,50 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
-    document.getElementById('btnBomImport').addEventListener('click', function () {
-        const fileInput = document.getElementById('bomFile');
-        const resultDiv = document.getElementById('bomImportResult');
+    const btnBomImport = document.getElementById('btnBomImport');
+    if (btnBomImport) {
+        btnBomImport.addEventListener('click', function () {
+            const fileInput = document.getElementById('bomFile');
+            const resultDiv = document.getElementById('bomImportResult');
 
-        resultDiv.innerHTML = '';
-        resultDiv.classList.add('d-none');
+            resultDiv.innerHTML = '';
+            resultDiv.classList.add('d-none');
 
-        if (!fileInput.files.length) {
-            showResult('warning', 'Pilih file terlebih dahulu.');
-            return;
-        }
+            if (!fileInput.files.length) {
+                showResult('warning', 'Pilih file terlebih dahulu.');
+                return;
+            }
 
-        setBusy(true);
+            setBusy(true);
 
-        const formData = new FormData();
-        formData.append('file', fileInput.files[0]);
-        formData.append('_token', getCsrfToken());
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('_token', getCsrfToken());
 
-        fetch('/bom/import', { method: 'POST', body: formData })
-            .then(function (response) {
-                return response.json().then(function (json) {
-                    if (!response.ok) {
-                        const message = json.message
-                            || Object.values(json).flat().join(' ')
-                            || 'Server error: ' + response.status;
-                        throw new Error(message);
+            fetch('/bom/import', { method: 'POST', body: formData })
+                .then(function (response) {
+                    return response.json().then(function (json) {
+                        if (!response.ok) {
+                            const message = json.message
+                                || Object.values(json).flat().join(' ')
+                                || 'Server error: ' + response.status;
+                            throw new Error(message);
+                        }
+                        return json;
+                    });
+                })
+                .then(function (data) {
+                    if (data.success) {
+                        pollStatus(data.import_id, 0);
+                    } else {
+                        setBusy(false);
+                        showResult('danger', data.message || 'Terjadi kesalahan saat import.');
                     }
-                    return json;
-                });
-            })
-            .then(function (data) {
-                if (data.success) {
-                    pollStatus(data.import_id, 0);
-                } else {
+                })
+                .catch(function (error) {
                     setBusy(false);
-                    showResult('danger', data.message || 'Terjadi kesalahan saat import.');
-                }
-            })
-            .catch(function (error) {
-                setBusy(false);
-                showResult('danger', error.message || 'Terjadi kesalahan saat import.');
-            });
-    });
+                    showResult('danger', error.message || 'Terjadi kesalahan saat import.');
+                });
+        });
+    }
 });
