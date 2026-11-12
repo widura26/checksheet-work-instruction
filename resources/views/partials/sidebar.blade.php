@@ -6,9 +6,6 @@
         </a>
     </div>
     <ul class="sidebar-nav" data-coreui="navigation" data-simplebar="">
-
-        <li class="nav-title">Main Menu</li>
-
         @include('components.parts.sidebar-list-item', [
             'navtype' => 'nav-group',
             'icon' => 'cil-print',
@@ -26,8 +23,6 @@
                 ],
             ]
         ])
-
-        <li class="nav-title">Master Data</li>
 
         @include('components.parts.sidebar-list-item', [
             'navtype' => 'nav-item',
@@ -49,8 +44,6 @@
             'icon' => 'cil-storage',
             'label' => 'Kode Material'
         ])
-
-        <li class="nav-title">User Management</li>
 
         @include('components.parts.sidebar-list-item', [
             'navtype' => 'nav-group',
@@ -89,7 +82,6 @@
                 ],
             ]
         ])
-
     </ul>
     <div class="sidebar-footer border-top d-none d-md-flex">
         <button class="sidebar-toggler" type="button" data-coreui-toggle="unfoldable"></button>

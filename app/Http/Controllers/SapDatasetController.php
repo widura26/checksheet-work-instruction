@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Cache;
 class SapDatasetController extends Controller
 {
     public function index(DataProcessService $svc){
-        $options = Cache::remember('mp:options:v' . Cache::get('mp:version', 1), 600,
+        $options = Cache::remember('mp:options:v' . Cache::get('mp:version', 1), 300,
             fn () => $svc->filterOptions($svc->prepare()));
 
         $defaultTrainset = in_array('TS 14', $options['trainset']) ? 'TS 14' : 'Semua';
@@ -34,7 +34,7 @@ class SapDatasetController extends Controller
         $key = 'mp:data:v' . Cache::get('mp:version', 1) . ':' . md5("$proyek|$group|$trainset");
 
         return response()->json(
-            Cache::remember($key, 600, fn () => $svc->dataset($proyek, $group, $trainset))
+            Cache::remember($key, 300, fn () => $svc->dataset($proyek, $group, $trainset))
         );
     }
 
