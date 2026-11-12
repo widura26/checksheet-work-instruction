@@ -3,7 +3,7 @@
 
 <head>
     @include('partials.head')
-    @livewireStyles
+    {{-- @livewireStyles --}}
 </head>
 
 <body>
