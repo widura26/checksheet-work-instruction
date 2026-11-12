@@ -285,11 +285,11 @@ function initBomTable(data) {
         scrollX: true,
         scrollCollapse: true,
         columns: [
-            {
-                data: null,
-                render: (d, type, row, meta) => meta.settings._iDisplayStart + meta.row + 1,
-                className: 'text-center text-muted fw-light'
-            },
+            // {
+            //     data: null,
+            //     render: (d, type, row, meta) => meta.settings._iDisplayStart + meta.row + 1,
+            //     className: 'text-center text-muted fw-light'
+            // },
             { data: 'no', className: 'fw-semibold text-center' },
             { data: 'group' },
             { data: 'tindak_lanjut', render: $.fn.dataTable.render.text() },
