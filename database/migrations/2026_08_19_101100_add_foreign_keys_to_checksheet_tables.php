@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void {
 
+        Schema::table('okas', function (Blueprint $table) {
+            $table->foreign('project_id')->references('id')->on('projects')->cascadeOnUpdate()->restrictOnDelete();
+        });
+
         Schema::table('audit_logs', function (Blueprint $table) {
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnUpdate()->restrictOnDelete();
         });
