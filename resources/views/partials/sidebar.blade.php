@@ -50,36 +50,6 @@
             'label' => 'Kode Material'
         ])
 
-        <li class="nav-title">Transaksi</li>
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'md.index',
-            'icon' => 'cil-pencil',
-            'label' => 'Manufacture Drawing'
-        ])
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'cutting-plan.index',
-            'icon' => 'cil-calculator',
-            'label' => 'Cutting Plan'
-        ])
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'barcode.index',
-            'icon' => 'cil-barcode',
-            'label' => 'Barcode'
-        ])
-
-        @include('components.parts.sidebar-list-item', [
-            'navtype' => 'nav-item',
-            'route' => 'bon-permintaan-material.index',
-            'icon' => 'cil-list',
-            'label' => 'Bon Permintaan Material'
-        ])
-
         <li class="nav-title">User Management</li>
 
         @include('components.parts.sidebar-list-item', [

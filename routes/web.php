@@ -1,18 +1,14 @@
 <?php
 
 use App\Http\Controllers\BagianController;
-use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\BomController;
 use App\Http\Controllers\BomDocumentRevisionController;
 use App\Http\Controllers\BillOfMaterialController;
-use App\Http\Controllers\BpmController;
 use App\Http\Controllers\ChartsController;
-use App\Http\Controllers\CuttingPlanController;
 use App\Http\Controllers\DaftarKaryawanController;
 use App\Http\Controllers\DepartemenController;
 use App\Http\Controllers\DistribusiController;
 use App\Http\Controllers\KodeMaterialController;
-use App\Http\Controllers\MdController;
 use App\Http\Controllers\OkaController;
 use App\Http\Controllers\ProjectCodeController;
 use App\Http\Controllers\ProsesController;
@@ -45,18 +41,6 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::put('/{kodeMaterial}', [KodeMaterialController::class, 'update'])->name('kode-material.update');
         Route::delete('/{kodeMaterial}', [KodeMaterialController::class, 'destroy'])->name('kode-material.destroy');
     });
-    Route::prefix('barcode')->group(function () {
-        Route::get('/', [BarcodeController::class, 'index'])->name('barcode.index');
-        Route::get('/create', [BarcodeController::class, 'create'])->name('barcode.create');
-        Route::get('/data', [BarcodeController::class, 'data'])->name('barcode.data');
-        Route::get('/parts', [BarcodeController::class, 'parts'])->name('barcode.parts');
-        Route::get('/export', [BarcodeController::class, 'export'])->name('barcode.export');
-        Route::post('/', [BarcodeController::class, 'store'])->name('barcode.store');
-        Route::get('/{barcode}/edit', [BarcodeController::class, 'edit'])->name('barcode.edit');
-        Route::put('/{barcode}', [BarcodeController::class, 'update'])->name('barcode.update');
-        Route::delete('/bulk-destroy', [BarcodeController::class, 'bulkDestroy'])->name('barcode.bulk-destroy');
-        Route::delete('/{barcode}', [BarcodeController::class, 'destroy'])->name('barcode.destroy');
-    });
 
     Route::prefix('project-code')->group(function(){
         Route::get('/', [ProjectCodeController::class, 'index'])->name('project-code.index');
@@ -68,39 +52,6 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
     Route::prefix("processes")->group(function(){
         Route::get('/', [ProsesController::class, 'index'])->name('processes.index');
         Route::get('/data', [ProsesController::class, 'data'])->name('processes.data');
-    });
-
-    Route::prefix('manufacture-drawing')->group(function () {
-        Route::get('/', [MdController::class, 'index'])->name('md.index');
-        Route::get('/data', [MdController::class, 'data'])->name('md.data');
-        Route::post('/', [MdController::class, 'store'])->name('md.store');
-        Route::put('/{mdr}', [MdController::class, 'update'])->name('md.update');
-        Route::delete('/{mdr}', [MdController::class, 'destroy'])->name('md.destroy');
-    });
-
-    Route::prefix('cutting-plan')->group(function () {
-        Route::get('/', [CuttingPlanController::class, 'index'])->name('cutting-plan.index');
-        Route::get('/create', [CuttingPlanController::class, 'create'])->name('cutting-plan.create');
-        Route::get('/data', [CuttingPlanController::class, 'getData'])->name('cutting-plan.data');
-        Route::get('/export', [CuttingPlanController::class, 'export'])->name('cutting-plan.export');
-        Route::post('/', [CuttingPlanController::class, 'store'])->name('cutting-plan.store');
-        Route::put('/{cuttingPlan}', [CuttingPlanController::class, 'update'])->name('cutting-plan.update');
-        Route::delete('/bulk-destroy', [CuttingPlanController::class, 'bulkDestroy'])->name('cutting-plan.bulk-destroy');
-        Route::delete('/{cuttingPlan}', [CuttingPlanController::class, 'destroy'])->name('cutting-plan.destroy');
-        Route::get('/users', [CuttingPlanController::class, 'users'])->name('cutting-plan.users');
-        Route::get('/materials', [CuttingPlanController::class, 'materials'])->name('cutting-plan.materials');
-        Route::get('/projects', [CuttingPlanController::class, 'projects'])->name('cutting-plan.projects');
-        Route::get('/processes', [CuttingPlanController::class, 'processes'])->name('cutting-plan.processes');
-    });
-
-    Route::prefix('bon-permintaan-material')->group(function(){
-        Route::get('/', [BpmController::class, 'index'])->name('bon-permintaan-material.index');
-        Route::get('/create', [BpmController::class, 'create'])->name('bon-permintaan-material.create');
-        Route::post('/', [BpmController::class, 'store'])->name('bon-permintaan-material.store');
-        Route::get('/data', [BpmController::class, 'data'])->name('bon-permintaan-material.data');
-        Route::get('/export', [BpmController::class, 'export'])->name('bon-permintaan-material.export');
-        Route::delete('/bulk-destroy', [BpmController::class, 'bulkDestroy'])->name('bon-permintaan-material.bulk-destroy');
-        Route::delete('/{bpm}', [BpmController::class, 'destroy'])->name('bon-permintaan-material.destroy');
     });
 
     // User Management
