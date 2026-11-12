@@ -18,14 +18,11 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             ProjectSeeder::class,
-            ManufactureDrawingSeeder::class,
             ProsesSeeder::class,
             MaterialSeeder::class,
-            CuttingPlanSeeder::class,
             DepartemenSeeder::class,
             BagianSeeder::class,
             KaryawanSeeder::class,
-            StatusSeeder::class,
         ]);
         DB::table('kode_bagian_spm')->insert([
             'kode' => 4311,

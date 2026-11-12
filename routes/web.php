@@ -1,33 +1,21 @@
 <?php
 
 use App\Http\Controllers\BagianController;
-use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\BomController;
 use App\Http\Controllers\BomDocumentRevisionController;
 use App\Http\Controllers\BillOfMaterialController;
-use App\Http\Controllers\BpmController;
 use App\Http\Controllers\ChartsController;
-use App\Http\Controllers\CheckSheetController;
-use App\Http\Controllers\CuttingPlanController;
 use App\Http\Controllers\DaftarKaryawanController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartemenController;
 use App\Http\Controllers\DistribusiController;
-use App\Http\Controllers\ExpedisiController;
-use App\Http\Controllers\GrafikController;
 use App\Http\Controllers\KodeMaterialController;
-use App\Http\Controllers\MdController;
 use App\Http\Controllers\OkaController;
 use App\Http\Controllers\ProjectCodeController;
 use App\Http\Controllers\ProsesController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SapDatasetController;
-use App\Http\Controllers\SpmController;
 use App\Http\Controllers\StaffController;
-use App\Http\Controllers\SttpController;
 use App\Http\Controllers\UnitController;
-use App\Http\Controllers\WiController;
-use App\Http\Controllers\WiLapController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -45,8 +33,6 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'auth.active'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/grafik', [GrafikController::class, 'index'])->name('grafik.index');
     Route::get('/oka', [OkaController::class, 'index'])->name('oka.index');
     Route::prefix('kode-material')->group(function () {
         Route::get('/', [KodeMaterialController::class, 'index'])->name('kode-material.index');
@@ -54,18 +40,6 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::get('/{kodeMaterial}/edit', [KodeMaterialController::class, 'edit'])->name('kode-material.edit');
         Route::put('/{kodeMaterial}', [KodeMaterialController::class, 'update'])->name('kode-material.update');
         Route::delete('/{kodeMaterial}', [KodeMaterialController::class, 'destroy'])->name('kode-material.destroy');
-    });
-    Route::prefix('barcode')->group(function () {
-        Route::get('/', [BarcodeController::class, 'index'])->name('barcode.index');
-        Route::get('/create', [BarcodeController::class, 'create'])->name('barcode.create');
-        Route::get('/data', [BarcodeController::class, 'data'])->name('barcode.data');
-        Route::get('/parts', [BarcodeController::class, 'parts'])->name('barcode.parts');
-        Route::get('/export', [BarcodeController::class, 'export'])->name('barcode.export');
-        Route::post('/', [BarcodeController::class, 'store'])->name('barcode.store');
-        Route::get('/{barcode}/edit', [BarcodeController::class, 'edit'])->name('barcode.edit');
-        Route::put('/{barcode}', [BarcodeController::class, 'update'])->name('barcode.update');
-        Route::delete('/bulk-destroy', [BarcodeController::class, 'bulkDestroy'])->name('barcode.bulk-destroy');
-        Route::delete('/{barcode}', [BarcodeController::class, 'destroy'])->name('barcode.destroy');
     });
 
     Route::prefix('project-code')->group(function(){
@@ -78,82 +52,6 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
     Route::prefix("processes")->group(function(){
         Route::get('/', [ProsesController::class, 'index'])->name('processes.index');
         Route::get('/data', [ProsesController::class, 'data'])->name('processes.data');
-    });
-
-    Route::prefix('manufacture-drawing')->group(function () {
-        Route::get('/', [MdController::class, 'index'])->name('md.index');
-        Route::get('/data', [MdController::class, 'data'])->name('md.data');
-        Route::post('/', [MdController::class, 'store'])->name('md.store');
-        Route::put('/{mdr}', [MdController::class, 'update'])->name('md.update');
-        Route::delete('/{mdr}', [MdController::class, 'destroy'])->name('md.destroy');
-    });
-
-    Route::prefix('cutting-plan')->group(function () {
-        Route::get('/', [CuttingPlanController::class, 'index'])->name('cutting-plan.index');
-        Route::get('/create', [CuttingPlanController::class, 'create'])->name('cutting-plan.create');
-        Route::get('/data', [CuttingPlanController::class, 'getData'])->name('cutting-plan.data');
-        Route::get('/export', [CuttingPlanController::class, 'export'])->name('cutting-plan.export');
-        Route::post('/', [CuttingPlanController::class, 'store'])->name('cutting-plan.store');
-        Route::put('/{cuttingPlan}', [CuttingPlanController::class, 'update'])->name('cutting-plan.update');
-        Route::delete('/bulk-destroy', [CuttingPlanController::class, 'bulkDestroy'])->name('cutting-plan.bulk-destroy');
-        Route::delete('/{cuttingPlan}', [CuttingPlanController::class, 'destroy'])->name('cutting-plan.destroy');
-        Route::get('/users', [CuttingPlanController::class, 'users'])->name('cutting-plan.users');
-        Route::get('/materials', [CuttingPlanController::class, 'materials'])->name('cutting-plan.materials');
-        Route::get('/projects', [CuttingPlanController::class, 'projects'])->name('cutting-plan.projects');
-        Route::get('/processes', [CuttingPlanController::class, 'processes'])->name('cutting-plan.processes');
-    });
-
-    Route::prefix('bon-permintaan-material')->group(function(){
-        Route::get('/', [BpmController::class, 'index'])->name('bon-permintaan-material.index');
-        Route::get('/create', [BpmController::class, 'create'])->name('bon-permintaan-material.create');
-        Route::post('/', [BpmController::class, 'store'])->name('bon-permintaan-material.store');
-        Route::get('/data', [BpmController::class, 'data'])->name('bon-permintaan-material.data');
-        Route::get('/export', [BpmController::class, 'export'])->name('bon-permintaan-material.export');
-        Route::delete('/bulk-destroy', [BpmController::class, 'bulkDestroy'])->name('bon-permintaan-material.bulk-destroy');
-        Route::delete('/{bpm}', [BpmController::class, 'destroy'])->name('bon-permintaan-material.destroy');
-    });
-
-    Route::prefix('work-instruction')->group(function () {
-        Route::get('/', [WiController::class, 'index'])->name('wi.index');
-        Route::get('/data', [WiController::class, 'data'])->name('wi.data');
-        Route::put('/release/{id}', [WiController::class, 'release'])->name('wi.release');
-        Route::post('/', [WiController::class, 'store'])->name('wi.store');
-        Route::put('/{wiTrn}', [WiController::class, 'update'])->name('wi.update');
-        Route::delete('/{wiTrn}', [WiController::class, 'destroy'])->name('wi.destroy');
-    });
-
-    Route::prefix('spm')->name('spm.')->group(function () {
-        Route::get('/', [SpmController::class, 'index'])->name('index');
-        Route::get('/data', [SpmController::class, 'getData'])->name('getData');
-        Route::get('/projects', [SpmController::class, 'getProjects'])->name('getProjects');
-        Route::get('/statuses', [SpmController::class, 'getStatuses'])->name('getStatuses');
-        Route::get('/create', [SpmController::class, 'create'])->name('create');
-        Route::get('/{spm}', [SpmController::class, 'show'])->name('show');
-        Route::get('/{spm}/print', [SpmController::class, 'print'])->name('print');
-        Route::get('/{spm}/terima', [SpmController::class, 'terima'])->name('terima');
-        Route::post('/{spm}/cancel', [SpmController::class, 'cancelSpm'])->name('cancel');
-        Route::get('/{spm}/download', [SpmController::class, 'download'])->name('download');
-        Route::get('/{spm}/ajukan-ulang', [SpmController::class, 'ajukanUlang'])->name('ajukan-ulang');
-        Route::delete('/{spm}', [SpmController::class, 'destroy'])->name('destroy');
-    });
-
-    Route::get('/check-sheet', [CheckSheetController::class, 'index'])->name('check-sheet.index');
-
-    Route::prefix('surat-tanda-terima-penyerahan-produk')->group(function () {
-        Route::get('/', [SttpController::class, 'index'])->name('sttp.index');
-        Route::get('/data', [SttpController::class, 'data'])->name('sttp.data');
-    });
-
-    Route::prefix('ekspedisi')->group(function () {
-        Route::get('/', [ExpedisiController::class, 'index'])->name('ekspedisi.index');
-        Route::get('/data', [ExpedisiController::class, 'data'])->name('ekspedisi.data');
-    });
-
-    Route::prefix('laporan')->group(function () {
-        Route::get('/work-instruction', [WiLapController::class, 'index'])->name('laporan-work-instruction.index');
-        Route::get('/surat-permintaan-material', [WiLapController::class, 'index'])->name('laporan-surat-permintaan-material.index');
-        Route::get('/cutting-plan', [WiLapController::class, 'index'])->name('laporan-cutting-plan.index');
-        Route::get('/bon-permintaan-material', [WiLapController::class, 'index'])->name('laporan-bon-permintaan-material.index');
     });
 
     // User Management
