@@ -3,14 +3,15 @@
 
 <head>
     @include('partials.head')
-    @livewireStyles
+    {{-- @livewireStyles --}}
 </head>
 
 <body>
     @include('partials.offline-banner')
     @include('partials.sidebar')
+    <div class="sidebar-overlay-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
 
-    <div class="wrapper d-flex flex-column min-vh-100">
+    <div class="">
         @include('partials.header')
         <div class="grow">
             <div class="container-lg px-4">

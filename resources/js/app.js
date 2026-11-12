@@ -1,4 +1,6 @@
 import "./bootstrap";
+import "./sidebar";
+import "./sidebar-nav";
 
 import $ from "jquery";
 window.$ = window.jQuery = $;

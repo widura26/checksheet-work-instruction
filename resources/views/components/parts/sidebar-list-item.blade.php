@@ -17,7 +17,9 @@
 
     @if($hasSubitems)
 
-        <a class="nav-link nav-group-toggle {{ $isSubitemActive ? 'active' : '' }}" href="#">
+        <a class="nav-link nav-group-toggle {{ $isSubitemActive ? 'active' : '' }}" href="#"
+            aria-expanded="{{ $isSubitemActive ? 'true' : 'false' }}"
+            aria-controls="nav-group-{{ \Illuminate\Support\Str::slug($label) }}">
             @if(!empty($icon))
                 <svg class="nav-icon">
                     <use
@@ -28,16 +30,19 @@
             <span class="sidebar-label">{{ $label }}</span>
         </a>
 
-        <ul class="nav-group-items">
-            @foreach($subitems as $subItem)
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs($subItem['route']) ? 'active' : '' }}"
-                        href="{{ route($subItem['route']) }}">
-                        <span class="sidebar-label">{{ $subItem['label'] }}</span>
-                    </a>
-                </li>
-            @endforeach
-        </ul>
+        <div class="nav-group-items" id="nav-group-{{ \Illuminate\Support\Str::slug($label) }}"
+            @if(!$isSubitemActive) inert @endif>
+            <ul class="nav-group-items-list">
+                @foreach($subitems as $subItem)
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs($subItem['route']) ? 'active' : '' }}"
+                            href="{{ route($subItem['route']) }}">
+                            <span class="sidebar-label">{{ $subItem['label'] }}</span>
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
     @else
                 <a class="nav-link {{ $isActive ? 'active' : '' }}" href="{{ route($route) }}">
             @if(!empty($icon))

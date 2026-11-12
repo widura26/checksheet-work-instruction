@@ -255,7 +255,7 @@ body {
   line-height: var(--cui-body-line-height);
   color: var(--cui-body-color);
   text-align: var(--cui-body-text-align);
-  background-color: var(--cui-body-bg);
+  background-color: #ffffff;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: rgba(8, 10, 12, 0);
   /* background-color: var(--cui-tertiary-bg); */
@@ -7795,7 +7795,7 @@ textarea.form-control-lg {
   min-height: var(--cui-footer-min-height);
   padding: var(--cui-footer-padding-y) var(--cui-footer-padding-x);
   color: var(--cui-footer-color);
-  background: var(--cui-footer-bg);
+  background: #ffffff;
   border-top: var(--cui-footer-border);
   min-height: calc(3rem + 1px);
 }

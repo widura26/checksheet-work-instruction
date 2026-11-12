@@ -18,8 +18,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             ProjectSeeder::class,
-            ProsesSeeder::class,
-            MaterialSeeder::class,
+            // ProsesSeeder::class,
+            // MaterialSeeder::class,
             DepartemenSeeder::class,
             BagianSeeder::class,
             KaryawanSeeder::class,

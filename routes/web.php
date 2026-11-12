@@ -9,7 +9,6 @@ use App\Http\Controllers\DaftarKaryawanController;
 use App\Http\Controllers\DepartemenController;
 use App\Http\Controllers\DistribusiController;
 use App\Http\Controllers\KodeMaterialController;
-use App\Http\Controllers\OkaController;
 use App\Http\Controllers\ProjectCodeController;
 use App\Http\Controllers\ProsesController;
 use App\Http\Controllers\RoleController;
@@ -18,22 +17,12 @@ use App\Http\Controllers\StaffController;
 use App\Http\Controllers\UnitController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Berisi route untuk menu Checksheet Work Instruction.
-| Login / logout ditangani oleh Laravel Fortify.
-|
-*/
-
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
 Route::middleware(['auth', 'auth.active'])->group(function () {
-    Route::get('/oka', [OkaController::class, 'index'])->name('oka.index');
+
     Route::prefix('kode-material')->group(function () {
         Route::get('/', [KodeMaterialController::class, 'index'])->name('kode-material.index');
         Route::get('/data', [KodeMaterialController::class, 'data'])->name('kode-material.data');
@@ -54,7 +43,6 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::get('/data', [ProsesController::class, 'data'])->name('processes.data');
     });
 
-    // User Management
     Route::prefix('users')->name('staff.')->group(function () {
         Route::get('/', [StaffController::class, 'index'])->name('index');
         Route::get('/data', [StaffController::class, 'data'])->name('data');
@@ -122,22 +110,13 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::get('/datatable', 'datatable')->name('distribusi.datatable');
         Route::get('/export', 'exportExcel')->name('distribusi.export');
         Route::get('/{distribusiTool}', 'show')->name('distribusi.show');
-        // Penyerahan
-        // Route::get('/penyerahan/create', PenyerahanCreateForm::class)->name('distribusi.penyerahan.create');
         Route::post('/batalkan/{distribusiTool}/penyerahan', 'batalkanPenyerahan')->name('distribusi.batalkan-penyerahan')->middleware('client.request.id');
-        // Peminjaman
-        // Route::get('/peminjaman/create', CreateForm::class)->name('distribusi.peminjaman.create');
         Route::get('/peminjaman/{distribusiTool}/kembali', 'showPengembalian')->name('distribusi.peminjaman.kembali');
         Route::post('/peminjaman/{distribusiTool}/kembali', 'storePengembalian')->name('distribusi.peminjaman.storeKembali')->middleware('client.request.id');
-
-        // API routes
         Route::get('/api/bagian/{departemen_id}', 'getBagian')->name('distribusi.api.bagian');
         Route::get('/api/unit/{bagian_id}', 'getUnit')->name('distribusi.api.unit');
-        // cetak berita acara
         Route::get('/print/{distribusiTool}/berita-acara', 'beritaAcara')->name('distribusi.berita-acara');
-        // upload file bast
         Route::post('/distribusi/upload-bast', [DistribusiController::class, 'uploadBast'])->name('distribusi.upload-bast')->middleware('client.request.id');
-        // unduh file bast ttd
         Route::get('/distribusi/unduh-bast-ttd/{distribusiTool}', [DistribusiController::class, 'downloadBastFile'])->name('distribusi.unduh-bast-ttd');
     });
 
