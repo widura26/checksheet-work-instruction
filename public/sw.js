@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'ct-offline-v1';
+const CACHE_VERSION = 'ct-offline-v2';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -26,10 +26,17 @@ self.addEventListener('activate', (event) => {
     self.clients.claim();
 });
 
-const isStaticAsset = (url) => {
+// Vite build output uses content-hashed filenames, so cache-first is safe:
+// a changed file always gets a new URL.
+const isHashedBuildAsset = (url) => {
+    return url.pathname.startsWith('/build/');
+};
+
+// Template assets keep stable URLs (e.g. /template/css/style.css), so they
+// must be revalidated. Otherwise edits keep showing the old cached version.
+const isUnversionedAsset = (url) => {
     return (
         url.pathname.startsWith('/template/') ||
-        url.pathname.startsWith('/build/') ||
         url.pathname.startsWith('/manifest.json') ||
         url.pathname === '/favicon.ico'
     );
@@ -48,8 +55,8 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Static assets: cache-first, then network.
-    if (isStaticAsset(url)) {
+    // Hashed build assets: cache-first, then network.
+    if (isHashedBuildAsset(url)) {
         event.respondWith(
             caches.match(request).then((cached) => {
                 if (cached) {
@@ -63,6 +70,25 @@ self.addEventListener('fetch', (event) => {
                     return response;
                 });
             })
+        );
+        return;
+    }
+
+    // Unversioned static assets: network-first so file edits are picked up
+    // on a normal refresh, with a cached fallback for offline use.
+    if (isUnversionedAsset(url)) {
+        event.respondWith(
+            fetch(request, { cache: 'no-cache' })
+                .then((response) => {
+                    if (response.ok) {
+                        const clone = response.clone();
+                        caches.open(STATIC_CACHE).then((cache) => cache.put(request, clone));
+                    }
+                    return response;
+                })
+                .catch(() =>
+                    caches.match(request).then((cached) => cached || Response.error())
+                )
         );
         return;
     }

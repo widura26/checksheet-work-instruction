@@ -9,6 +9,7 @@
 <body>
     @include('partials.offline-banner')
     @include('partials.sidebar')
+    <div class="sidebar-overlay-backdrop" id="sidebar-backdrop"></div>
 
     <div class="wrapper d-flex flex-column min-vh-100">
         @include('partials.header')

@@ -114,6 +114,31 @@
   filter: var(--cui-sidebar-toggler-white-filter);
 }
 
+/* ===== Overlaid Sidebar ===== */
+/* Sidebar melayang di atas konten (tidak mendorong layout) dan
+   menampilkan backdrop gelap saat terbuka di layar desktop. */
+.sidebar-overlay-backdrop {
+  display: none;
+}
+
+@media (min-width: 992px) {
+  .sidebar-overlay-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1034; /* tepat di bawah --cui-sidebar-zindex (1035) */
+    background-color: rgba(15, 23, 42, 0.45);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .25s ease, visibility .25s ease;
+  }
+
+  .sidebar.show + .sidebar-overlay-backdrop {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
 /* ===== Modern Table Theme ===== */
 .table-responsive {
   border: 1px solid #eef0f4;

@@ -13,8 +13,13 @@
                     <a class="nav-link py-0 pe-0" data-coreui-toggle="dropdown" href="#" role="button"
                         aria-haspopup="true" aria-expanded="false">
                         <div class="avatar avatar-md">
-                            <img class="avatar-img"
-                                src="{{ asset('template/assets/img/Logo_INKA_-_Industri_Kereta_Api_Indonesia.svg') }}" />
+                            <svg xmlns="http://w3.org" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="5" r="2" />
+                                <circle cx="12" cy="12" r="2" />
+                                <circle cx="12" cy="19" r="2" />
+                            </svg>
+                            {{-- <img class="avatar-img"
+                                src="{{ asset('template/assets/img/Logo_INKA_-_Industri_Kereta_Api_Indonesia.svg') }}" /> --}}
                         </div>
                     </a>
 
