@@ -2,6 +2,33 @@
 @import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css';
 @import 'datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css';
 
+/* 1. Standard CSS (Firefox, Chrome 121+, Edge 121+, Safari 18.2+) */
+:root {
+  scrollbar-width: thin; /* Options: auto | thin | none */
+  scrollbar-color: #404040 #ffffff; /* Format: <thumb-color> <track-color> */
+}
+
+/* 2. WebKit / Blink Fallback & Custom Shapes (Older Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 8px;  /* Vertical scrollbar thickness */
+  height: 8px; /* Horizontal scrollbar thickness */
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #64748b;
+  border-radius: 4px;
+  border: 2px solid #f1f5f9; /* Creates padding around the thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
 /* Custom Sidebar Primary Theme */
 .sidebar-primary {
   --cui-body-color: #ffffff;
@@ -25,7 +52,7 @@
 
 .sidebar-primary .nav-link.active {
   background-color: rgba(255, 255, 255, 0.2);
-  color: #ffffff;
+  color: #000000;
 }
 
 /* ===== Modern Sidebar Theme ===== */
@@ -34,9 +61,7 @@
 }
 
 .sidebar.sidebar-dark {
-  background: linear-gradient(180deg, #1f2433 0%, #161a26 100%);
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.25);
+  background: #ffffff;
 }
 
 .sidebar.sidebar-dark .sidebar-header {
@@ -57,53 +82,61 @@
 
 .sidebar.sidebar-dark .sidebar-nav {
   padding-top: .5rem;
+  color: #000000 !important;
+
+  /* Tema sidebar sekarang terang: pastikan label grup yang terbuka dan
+     indikator panah tetap gelap, bukan mewarisi warna putih sidebar-dark. */
+  --cui-sidebar-nav-group-toggle-show-color: #000000;
+  --cui-sidebar-nav-group-indicator-color: #64748b;
+  --cui-sidebar-nav-group-indicator-hover-color: #000000;
 }
 
 .sidebar.sidebar-dark .nav-link {
-  color: rgba(255, 255, 255, 0.62);
-  border-radius: .55rem;
-  margin: .2rem .85rem;
-  padding: .7rem .9rem;
-  font-weight: 500;
-  letter-spacing: .2px;
-  transition: color .2s ease, background-color .2s ease, transform .15s ease;
+    color: #000000;
+    border-radius: .55rem;
+    margin: .2rem .85rem;
+    padding: .7rem .9rem;
+    font-weight: 500;
+    letter-spacing: .2px;
+    transition: color .2s ease, background-color .2s ease, transform .15s ease;
 }
 
 .sidebar.sidebar-dark .nav-link:hover {
-  color: #fff;
-  background-color: rgba(255, 255, 255, 0.07);
-  transform: translateX(2px);
+    color: #000000;
+    background-color: rgba(255, 255, 255, 0.07);
+    transform: translateX(2px);
 }
 
 .sidebar.sidebar-dark .nav-link .nav-icon {
-  color: rgba(255, 255, 255, 0.62);
-  transition: color .2s ease;
+    color: #000000;
+    transition: color .2s ease;
 }
 
 .sidebar.sidebar-dark .nav-link:hover .nav-icon,
 .sidebar.sidebar-dark .nav-link.active .nav-icon {
-  color: #fff;
+  color: #000000;
 }
 
 .sidebar.sidebar-dark .nav-link.active {
-  color: #fff;
+  color: #000000;
   background: linear-gradient(90deg, #3b82f6 0%, #6366f1 100%);
   box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35);
 }
 
 .sidebar.sidebar-dark .nav-group-items .nav-link {
-  margin-left: 1.9rem;
-  font-size: .875rem;
-  padding: .55rem 1rem;
-  border-left: 2px solid rgba(255, 255, 255, 0.08);
-  border-radius: 0 .5rem .5rem 0;
+    margin-left: 1.9rem;
+    font-size: .875rem;
+    padding: .55rem 1rem;
+    border-left: 2px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0 .5rem .5rem 0;
+    color: #000000;
 }
 
 .sidebar.sidebar-dark .nav-group-items .nav-link.active {
-  color: #fff;
-  background: transparent;
-  border-left-color: #3b82f6;
-  box-shadow: none;
+    color: #000000;
+    background: transparent;
+    border-left-color: #3b82f6;
+    box-shadow: none;
 }
 
 .sidebar.sidebar-dark .sidebar-footer {
@@ -114,28 +147,81 @@
   filter: var(--cui-sidebar-toggler-white-filter);
 }
 
-/* ===== Overlaid Sidebar ===== */
-/* Sidebar melayang di atas konten (tidak mendorong layout) dan
-   menampilkan backdrop gelap saat terbuka di layar desktop. */
-.sidebar-overlay-backdrop {
-  display: none;
+/* ===== Collapsible Sidebar (native JS/CSS) ===== */
+/* Sidebar selalu fixed dan melayang di atas konten. Buka/tutup dikontrol
+   lewat class `sidebar-open` pada <body>, tanpa API CoreUI. */
+#sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  inset-inline-start: 0;
+  z-index: var(--cui-sidebar-zindex, 1035);
+  margin-inline-start: 0 !important;
+  transform: translateX(-100%);
+  transition: transform .3s ease;
+  will-change: transform;
 }
 
-@media (min-width: 992px) {
-  .sidebar-overlay-backdrop {
-    display: block;
-    position: fixed;
-    inset: 0;
-    z-index: 1034; /* tepat di bawah --cui-sidebar-zindex (1035) */
-    background-color: rgba(15, 23, 42, 0.45);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity .25s ease, visibility .25s ease;
-  }
+body.sidebar-open #sidebar {
+  transform: translateX(0);
+}
 
-  .sidebar.show + .sidebar-overlay-backdrop {
-    opacity: 1;
-    visibility: visible;
+.sidebar-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--cui-sidebar-zindex, 1035) - 1);
+  background-color: rgba(15, 23, 42, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .25s ease, visibility .25s ease;
+}
+
+body.sidebar-open .sidebar-overlay-backdrop {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Kunci scroll halaman saat drawer terbuka di layar kecil. */
+@media (max-width: 991.98px) {
+  body.sidebar-open {
+    overflow: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #sidebar,
+  .sidebar-overlay-backdrop {
+    transition: none;
+  }
+}
+
+/* ===== Nav group collapsible (native JS/CSS) ===== */
+/* Animasi buka/tutup memakai grid-template-rows 0fr -> 1fr, sehingga
+   tinggi konten tidak perlu dihitung lewat JavaScript. */
+#sidebar .nav-group .nav-group-items {
+  display: grid;
+  grid-template-rows: 0fr;
+  overflow: hidden;
+  padding: 0;
+  transition: grid-template-rows .25s ease;
+}
+
+#sidebar .nav-group.show .nav-group-items {
+  grid-template-rows: 1fr;
+  color: #000000;
+}
+
+#sidebar .nav-group .nav-group-items-list {
+  min-height: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #sidebar .nav-group .nav-group-items {
+    transition: none;
   }
 }
 
@@ -239,7 +325,8 @@
 
 /* Sidebar: smaller font + ellipsis for long labels */
 .sidebar .nav-link {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
+  color: #000000;
 }
 .sidebar .nav-title {
   font-size: 0.6875rem;
