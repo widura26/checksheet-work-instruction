@@ -2,13 +2,13 @@
     <div class="col-md-6">
         <div class="st-metric-card">
             <div class="st-metric-label">Total Item</div>
-            <div class="st-metric-value" id="kpi-total-item">215</div>
+            <div class="st-metric-value" id="kpi-total-item"></div>
         </div>
     </div>
     <div class="col-md-6">
         <div class="st-metric-card">
             <div class="st-metric-label">Jumlah Material</div>
-            <div class="st-metric-value" id="kpi-jumlah-material">215</div>
+            <div class="st-metric-value" id="kpi-jumlah-material"></div>
         </div>
     </div>
 </div>
