@@ -12,7 +12,7 @@
 
     <div class="wrapper d-flex flex-column min-vh-100">
         @include('partials.header')
-        <div class="body grow">
+        <div class="grow">
             <div class="container-lg px-4">
                 @yield('content')
             </div>

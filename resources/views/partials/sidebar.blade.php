@@ -23,6 +23,24 @@
             'label' => 'Grafik'
         ])
 
+        @include('components.parts.sidebar-list-item', [
+            'navtype' => 'nav-group',
+            'icon' => 'cil-print',
+            'label' => 'Material Planning',
+            'subitems' => [
+                [
+                    'navtype' => 'nav-item',
+                    'route' => 'sap-dataset.index',
+                    'label' => 'Dashboard',
+                ],
+                [
+                    'navtype' => 'nav-item',
+                    'route' => 'bill-of-material.index',
+                    'label' => 'Bill Of Material',
+                ],
+            ]
+        ])
+
         <li class="nav-title">Master Data</li>
 
         @include('components.parts.sidebar-list-item', [

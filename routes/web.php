@@ -2,7 +2,11 @@
 
 use App\Http\Controllers\BagianController;
 use App\Http\Controllers\BarcodeController;
+use App\Http\Controllers\BomController;
+use App\Http\Controllers\BomDocumentRevisionController;
+use App\Http\Controllers\BillOfMaterialController;
 use App\Http\Controllers\BpmController;
+use App\Http\Controllers\ChartsController;
 use App\Http\Controllers\CheckSheetController;
 use App\Http\Controllers\CuttingPlanController;
 use App\Http\Controllers\DaftarKaryawanController;
@@ -17,6 +21,7 @@ use App\Http\Controllers\OkaController;
 use App\Http\Controllers\ProjectCodeController;
 use App\Http\Controllers\ProsesController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SapDatasetController;
 use App\Http\Controllers\SpmController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\SttpController;
@@ -236,5 +241,44 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::post('/distribusi/upload-bast', [DistribusiController::class, 'uploadBast'])->name('distribusi.upload-bast')->middleware('client.request.id');
         // unduh file bast ttd
         Route::get('/distribusi/unduh-bast-ttd/{distribusiTool}', [DistribusiController::class, 'downloadBastFile'])->name('distribusi.unduh-bast-ttd');
+    });
+
+    Route::prefix('material-planning')->group(function(){
+        Route::get('/', [SapDatasetController::class, 'index'])->name('sap-dataset.index');
+        Route::get('/data', [SapDatasetController::class, 'data'])->name('material-planning.data');
+        Route::post('/import', [SapDatasetController::class, 'import'])->name('sap-dataset.import');
+        Route::post('/import-queue', [SapDatasetController::class, 'importQueue'])->name('sap-dataset.import-queue');
+        Route::get('/import-status/{importId}', [SapDatasetController::class, 'importStatus'])->name('sap-dataset.import-status');
+        Route::post('/delete', [SapDatasetController::class, 'delete'])->name('sap-dataset.delete');
+        Route::get('/deviation', [SapDatasetController::class, 'deviation'])->name('sap-dataset.deviation');
+        Route::post('/import-excel', [SapDatasetController::class, 'import_excel'])->name('sap-dataset.import-excel');
+    });
+
+    Route::prefix('charts')->group(function(){
+        Route::get('/purchase-requisitions', [ChartsController::class, 'purchaseRequisition'])->name('purchase-requisition-chart-data');
+        Route::get('/purchase-order', [ChartsController::class, 'purchaseOrder'])->name('purchase-order-chart-data');
+        Route::get('/bompr', [ChartsController::class, 'bomprdifference'])->name('bompr-chart-data');
+        Route::get('/popr', [ChartsController::class, 'poprdifference'])->name('popr-chart-data');
+    });
+
+    Route::prefix('bill-of-material')->group(function(){
+        Route::get('/', [BomController::class, 'index'])->name('bill-of-material.index');
+        Route::get('/data', [BomController::class, 'getData'])->name('bill-of-material.data');
+        Route::get('/create', [BomController::class, 'create'])->name('bill-of-material.create');
+        Route::post('/', [BomController::class, 'store'])->name('bill-of-material.store');
+        Route::get('/{id}/edit', [BomController::class, 'edit'])->name('bill-of-material.edit');
+        Route::put('/{id}', [BomController::class, 'update'])->name('bill-of-material.update');
+        Route::delete('/{id}/delete', [BomController::class, 'delete'])->name('bill-of-material.delete');
+
+        Route::prefix('document')->group(function(){
+            Route::get('/{id}', [BomDocumentRevisionController::class, 'show'])->name('bom-document-revision.index');
+            Route::get('/{id}/delete', [BomDocumentRevisionController::class, 'delete'])->name('bom-document-revision.delete');
+            Route::get('/{id}/download', [BomDocumentRevisionController::class, 'download'])->name('bom-document-revision.download');
+        });
+    });
+
+    Route::prefix('bom')->name('bom.')->group(function () {
+        Route::post('/import', [BillOfMaterialController::class, 'import'])->name('import');
+        Route::get('/status/{importId}', [BillOfMaterialController::class, 'status'])->name('status');
     });
 });
