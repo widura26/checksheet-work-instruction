@@ -17,8 +17,7 @@ use Illuminate\Support\Facades\Cache;
 
 class SapDatasetController extends Controller
 {
-    public function index(DataProcessService $svc)
-    {
+    public function index(DataProcessService $svc){
         $options = Cache::remember('mp:options:v' . Cache::get('mp:version', 1), 600,
             fn () => $svc->filterOptions($svc->prepare()));
 
@@ -27,8 +26,7 @@ class SapDatasetController extends Controller
         return view('material-planning.index', compact('options','defaultTrainset'));
     }
 
-    public function data(Request $request, DataProcessService $svc)
-    {
+    public function data(Request $request, DataProcessService $svc){
         $proyek   = $request->input('proyek', 'Semua');
         $group    = $request->input('group', 'Semua');
         $trainset = $request->input('trainset', 'Semua');
@@ -182,8 +180,7 @@ class SapDatasetController extends Controller
         }
     }
 
-    public function importQueue(Request $request)
-    {
+    public function importQueue(Request $request){
         $request->validate([
             'file' => 'required|file|extensions:xlsx,xls,csv',
         ], [
@@ -209,8 +206,7 @@ class SapDatasetController extends Controller
         ]);
     }
 
-    public function importStatus(string $importId)
-    {
+    public function importStatus(string $importId){
         if (!preg_match('/^[0-9a-f-]+$/i', $importId)) {
             return response()->json([
                 'import_id' => $importId,
@@ -219,8 +215,6 @@ class SapDatasetController extends Controller
             ], 422);
         }
 
-        // NOTE: LIKE on serialized payload is fragile but intentional per spec design.
-        // The importId is a UUID embedded in the serialized job payload.
         $jobExists = DB::table('jobs')
             ->where('payload', 'LIKE', '%'.$importId.'%')
             ->exists();
@@ -393,8 +387,5 @@ class SapDatasetController extends Controller
                 "message" => "Import Gagal"
             ]);
         }
-
-
-        return back()->with('success', 'Import selesai.');
     }
 }
