@@ -1,15 +1,22 @@
 @auth
     <header class="header header-sticky p-0 mb-4">
-        <div class="container-fluid border-bottom px-4">
-            <button class="header-toggler" type="button" id="sidebar-toggle"
-                aria-controls="sidebar" aria-expanded="false" aria-label="Buka/tutup sidebar"
-                style="margin-inline-start: -14px">
-                <svg class="icon icon-lg">
-                    <use xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-menu') }}"></use>
-                </svg>
-            </button>
+        <div class="border-bottom px-4" style="display: flex; align-content: center;">
+            <div class="" style="display: flex; align-content: center;">
+                <button class="header-toggler" type="button" id="sidebar-toggle"
+                    aria-controls="sidebar" aria-expanded="false" aria-label="Buka/tutup sidebar"
+                    style="margin-inline-start: -14px">
+                    <svg class="icon icon-lg">
+                        <use xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-menu') }}"></use>
+                    </svg>
+                </button>
+                <div class="sidebar-header">
+                    <a class="sidebar-brand" href="{{ url('/dashboard') }}">
+                        <img src="{{ asset('template/assets/img/Logo_INKA_-_Industri_Kereta_Api_Indonesia.svg') }}" alt="Dashboard" style="width: 5%;">
+                    </a>
+                </div>
+            </div>
             <ul class="header-nav">
-                <li class="nav-item dropdown">
+                <li class="nav-item dropdown" style="display: flex; align-items: center;">
                     <a class="nav-link py-0 pe-0" data-coreui-toggle="dropdown" href="#" role="button"
                         aria-haspopup="true" aria-expanded="false">
                         <div class="avatar avatar-md">

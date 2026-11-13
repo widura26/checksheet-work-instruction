@@ -1,10 +1,4 @@
 <div class="sidebar sidebar-dark" id="sidebar" aria-hidden="true" inert>
-    <div class="sidebar-header">
-        <a class="sidebar-brand" href="{{ url('/dashboard') }}">
-            <img src="{{ asset('template/assets/img/Logo_INKA_-_Industri_Kereta_Api_Indonesia.svg') }}" alt="Dashboard"
-                style="width: 80%;">
-        </a>
-    </div>
     <ul class="sidebar-nav" data-simplebar="">
         @include('components.parts.sidebar-list-item', [
             'navtype' => 'nav-group',

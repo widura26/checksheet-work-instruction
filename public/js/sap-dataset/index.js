@@ -294,7 +294,19 @@ function initBomTable() {
             { data: 'kebutuhan', className: 'text-end' },
             { data: 'qty_pr', className: 'text-end' },
             { data: 'kode_material' },
-            { data: 'trainset' },
+            {
+                data: 'trainset',
+                render: (data) => {
+                    return `<span title="${data}" style="
+                        display: inline-block;
+                        max-width: 150px;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        vertical-align: middle;
+                    ">${data}</span>`;
+                }
+            },
             {
                 data: 'status_pr',
                 className: 'text-center',
