@@ -1,5 +1,3 @@
-let bomDataset = [];
-
 let chartGroupInstance = null;
 let chartStatusPrInstance = null;
 let bomDataTableInstance = null;
@@ -10,87 +8,6 @@ const filters = {
     trainset: 'Semua',
     selectedStatuses: new Set()
 };
-
-let loadSeq = 0;
-async function loadData() {
-    const seq = ++loadSeq;
-    const params = new URLSearchParams({
-        proyek: filters.proyek,
-        group: filters.group,
-        trainset: filters.trainset
-    });
-
-    $('#bomCountBadge').text('...');
-    let result = [];
-    try {
-        const res = await fetch('/material-planning/data?' + params, {
-            headers: { 'Accept': 'application/json' }
-        });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        result = await res.json();
-    } catch (err) {
-        console.error(err);
-        if (seq === loadSeq) alert('Gagal memuat data: ' + err.message);
-    }
-
-    if (seq !== loadSeq) return;   // ada request yang lebih baru, abaikan yang ini
-    bomDataset = result;
-    applyFilters();
-}
-
-function getFilteredData() {
-    if (filters.selectedStatuses.size === 0) return bomDataset;
-    return bomDataset.filter(item => filters.selectedStatuses.has(item.status_pr));
-}
-
-function updateMetrics(data) {
-    const total = data.length;
-    const jumlahMaterial = new Set(data.map(d => d.kode_material)).size;
-
-    $('#kpi-total-item').text(total.toLocaleString('id-ID'));
-    $('#kpi-jumlah-material').text(jumlahMaterial.toLocaleString('id-ID'));
-    $('#bomCountBadge').text(total.toLocaleString('id-ID'));
-}
-
-function updateStatusPrTable(data) {
-    const counts = {
-        'BELUM PR': { komp: 0, piece: 0 },
-        'PR PARSIAL': { komp: 0, piece: 0 },
-        'SUDAH PR': { komp: 0, piece: 0 },
-        'STOK DAN PR': { komp: 0, piece: 0 },
-        'STOK': { komp: 0, piece: 0 },
-        'STATUS LAIN / TIDAK DIKENAL': { komp: 0, piece: 0 },
-    };
-
-    data.forEach(item => {
-        const st = item.status_pr;
-        if (counts[st]) {
-            if (item.group === 'KOMPONEN') {
-                counts[st].komp++;
-            } else {
-                counts[st].piece++;
-            }
-        }
-    });
-
-    $('#sum-belum-komp').text(counts['BELUM PR'].komp);
-    $('#sum-belum-piece').text(counts['BELUM PR'].piece);
-
-    $('#sum-parsial-komp').text(counts['PR PARSIAL'].komp);
-    $('#sum-parsial-piece').text(counts['PR PARSIAL'].piece);
-
-    $('#sum-sudah-komp').text(counts['SUDAH PR'].komp);
-    $('#sum-sudah-piece').text(counts['SUDAH PR'].piece);
-
-    $('#sum-stokpr-komp').text(counts['STOK DAN PR'].komp);
-    $('#sum-stokpr-piece').text(counts['STOK DAN PR'].piece);
-
-    $('#sum-stok-komp').text(counts['STOK'].komp);
-    $('#sum-stok-piece').text(counts['STOK'].piece);
-
-    $('#sum-lain-komp').text(counts['STATUS LAIN / TIDAK DIKENAL'].komp);
-    $('#sum-lain-piece').text(counts['STATUS LAIN / TIDAK DIKENAL'].piece);
-}
 
 const createTooltipConfig = (unitName = 'item') => ({
     enabled: true,
@@ -173,6 +90,61 @@ const STATUS_PR_LABELS = ['BELUM PR', 'PR PARSIAL', 'SUDAH PR', 'STOK DAN PR', '
 const STATUS_PR_COLORS = ['#EF553B', '#FFA15A', '#00CC96', '#636EFA', '#AB63FA', '#7F7F7F'];
 const GROUP_PALETTE    = ['#0068c9', '#83c9ff', '#ff2b2b', '#ffabab', '#29b09d', '#7defa1', '#ff8700', '#ffd16a'];
 
+const STATUS_TABLE_KEYS = {
+    'BELUM PR': 'belum',
+    'PR PARSIAL': 'parsial',
+    'SUDAH PR': 'sudah',
+    'STOK DAN PR': 'stokpr',
+    'STOK': 'stok',
+    'STATUS LAIN / TIDAK DIKENAL': 'lain'
+};
+
+function buildParams(extra = {}) {
+    const params = new URLSearchParams({
+        proyek: filters.proyek,
+        group: filters.group,
+        trainset: filters.trainset
+    });
+
+    if (filters.selectedStatuses.size > 0) {
+        params.set('statuses', Array.from(filters.selectedStatuses).join(','));
+    }
+
+    Object.entries(extra).forEach(([key, value]) => {
+        if (value !== '' && value !== null && value !== undefined) {
+            params.set(key, value);
+        }
+    });
+
+    return params;
+}
+
+function renderSummary(summary) {
+    if (!summary) return;
+
+    const total = Number(summary.totalItem || 0);
+    const grouped = Number(summary.groupedItem || 0);
+    const jumlahMaterial = Number(summary.jumlahMaterial || 0);
+
+    $('#kpi-total-item').text(total.toLocaleString('id-ID'));
+    $('#kpi-jumlah-material').text(jumlahMaterial.toLocaleString('id-ID'));
+    $('#bomCountBadge').text(grouped.toLocaleString('id-ID'));
+
+    updateStatusPrTable(summary);
+    updateCharts(summary);
+}
+
+function updateStatusPrTable(summary) {
+    const matrix = summary.statusMatrix || {};
+
+    Object.entries(STATUS_TABLE_KEYS).forEach(([status, key]) => {
+        const counts = matrix[status] || {};
+
+        $(`#sum-${key}-komp`).text(Number(counts.komponen || 0).toLocaleString('id-ID'));
+        $(`#sum-${key}-piece`).text(Number(counts.piece_part || 0).toLocaleString('id-ID'));
+    });
+}
+
 function renderDoughnut(instance, canvasId, labels, values, colors, unitName) {
     if (instance) {
         instance.data.labels = labels;
@@ -215,38 +187,27 @@ function renderDoughnut(instance, canvasId, labels, values, colors, unitName) {
     return chart;
 }
 
-function updateCharts(data) {
-    // Chart Group: dinamis sesuai nilai 'group'
-    const groupCounts = {};
-    data.forEach(item => {
-        const g = item.group || '(kosong)';
-        groupCounts[g] = (groupCounts[g] || 0) + 1;
-    });
+function updateCharts(summary) {
+    // Chart Group: mengikuti ringkasan group dari server.
+    const groupCounts = summary.groupCounts || {};
     const groupLabels = Object.keys(groupCounts).sort();
-    const groupValues = groupLabels.map(g => groupCounts[g]);
+    const groupValues = groupLabels.map(group => Number(groupCounts[group] || 0));
     const groupColors = groupLabels.map((_, i) => GROUP_PALETTE[i % GROUP_PALETTE.length]);
 
     chartGroupInstance = renderDoughnut(
         chartGroupInstance, 'chart-group', groupLabels, groupValues, groupColors, 'item'
     );
 
-    // Chart Status PR: 6 status, hanya yang > 0
-    const statusCounts = Object.fromEntries(STATUS_PR_LABELS.map(s => [s, 0]));
-    data.forEach(item => {
-        const key = statusCounts[item.status_pr] !== undefined
-            ? item.status_pr
-            : 'STATUS LAIN / TIDAK DIKENAL';
-        statusCounts[key]++;
-    });
-
-    const visible = STATUS_PR_LABELS.filter(s => statusCounts[s] > 0);
+    // Chart Status PR: 6 status, hanya yang > 0.
+    const statusCounts = summary.statusTotals || {};
+    const visible = STATUS_PR_LABELS.filter(status => Number(statusCounts[status] || 0) > 0);
 
     chartStatusPrInstance = renderDoughnut(
         chartStatusPrInstance,
         'chart-status-pr',
         visible,
-        visible.map(s => statusCounts[s]),
-        visible.map(s => STATUS_PR_COLORS[STATUS_PR_LABELS.indexOf(s)]),
+        visible.map(status => Number(statusCounts[status] || 0)),
+        visible.map(status => STATUS_PR_COLORS[STATUS_PR_LABELS.indexOf(status)]),
         'material'
     );
 }
@@ -265,16 +226,10 @@ function formatStatusBadge(status) {
     }
 }
 
-function initBomTable(data) {
-    if ($.fn.DataTable.isDataTable('#bom-table')) {
-        bomDataTableInstance.clear();
-        bomDataTableInstance.rows.add(data);
-        bomDataTableInstance.draw();
-        return;
-    }
-
+function initBomTable() {
     bomDataTableInstance = $('#bom-table').DataTable({
-        data: data,
+        processing: true,
+        serverSide: true,
         pageLength: 10,
         lengthChange: false,
         ordering: true,
@@ -284,33 +239,80 @@ function initBomTable(data) {
         responsive: false,
         scrollX: true,
         scrollCollapse: true,
+        order: [[0, 'asc']],
+        ajax: function (data, callback) {
+            const page = Math.floor(data.start / data.length) + 1;
+            const params = buildParams({
+                page: page,
+                per_page: data.length,
+                search: data.search.value || ''
+            });
+
+            if (data.order && data.order.length > 0) {
+                const column = data.columns[data.order[0].column];
+
+                if (column && column.data && column.orderable !== false) {
+                    params.set('sort', column.data);
+                    params.set('dir', data.order[0].dir);
+                }
+            }
+
+            fetch('/material-planning/data?' + params.toString(), {
+                headers: { 'Accept': 'application/json' }
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    return res.json();
+                })
+                .then(json => {
+                    renderSummary(json.summary);
+
+                    callback({
+                        draw: data.draw,
+                        recordsTotal: json.summary ? json.summary.groupedItem : json.meta.total,
+                        recordsFiltered: json.meta.total,
+                        data: json.data
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Gagal memuat data: ' + err.message);
+
+                    callback({
+                        draw: data.draw,
+                        recordsTotal: 0,
+                        recordsFiltered: 0,
+                        data: []
+                    });
+                });
+        },
         columns: [
-            // {
-            //     data: null,
-            //     render: (d, type, row, meta) => meta.settings._iDisplayStart + meta.row + 1,
-            //     className: 'text-center text-muted fw-light'
-            // },
             { data: 'no', className: 'fw-semibold text-center' },
             { data: 'group' },
             { data: 'tindak_lanjut', render: $.fn.dataTable.render.text() },
-            { data: 'deskripsi',     render: $.fn.dataTable.render.text() },
+            { data: 'deskripsi', render: $.fn.dataTable.render.text() },
             { data: 'kebutuhan', className: 'text-end' },
             { data: 'qty_pr', className: 'text-end' },
             { data: 'kode_material' },
-            { data: 'trainset' },
+            {
+                data: 'trainset',
+                render: (data) => {
+                    return `<span title="${data}" style="
+                        display: inline-block;
+                        max-width: 150px;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        vertical-align: middle;
+                    ">${data}</span>`;
+                }
+            },
             {
                 data: 'status_pr',
                 className: 'text-center',
                 render: (data) => formatStatusBadge(data)
             }
         ],
-        drawCallback: function () {
-            const api = this.api();
-            const start = api.page.info().start;
-            api.column(0, { page: 'current' }).nodes().each(function (cell, i) {
-                cell.textContent = start + i + 1;
-            });
-        },
         language: {
             search: "_INPUT_",
             searchPlaceholder: "Cari material...",
@@ -318,55 +320,86 @@ function initBomTable(data) {
                 previous: "‹",
                 next: "›"
             },
-            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ item"
+            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ item",
+            processing: "Memuat data..."
         }
     });
 }
 
-function applyFilters() {
-    const data = getFilteredData();
-    updateMetrics(data);
-    updateStatusPrTable(data);
-    updateCharts(data);
-    initBomTable(data);
-}
-
-function csvCell(v) {
-    return `"${String(v ?? '').replace(/"/g, '""')}"`;
-}
-
-function exportBomToCsv() {
-    const data = getFilteredData();
-    if (!data.length) {
-        alert('Tidak ada data untuk diekspor.');
+function loadData() {
+    if (bomDataTableInstance) {
+        bomDataTableInstance.ajax.reload(null, true);
         return;
     }
 
-    const headers = [
-        'NO', 'Kode Material Konversi', 'Group', 'Tindak Lanjut',
-        'Deskripsi Material', 'Kebutuhan', 'Qty PR (BOM)',
-        'Kode Material', 'Trainset', 'Status PR', 'Proyek'
-    ];
+    initBomTable();
+}
 
-    const lines = [headers.map(csvCell).join(',')];
-    data.forEach(i => {
-        lines.push([
-            i.no, i.kode_konversi, i.group, i.tindak_lanjut, i.deskripsi,
-            i.kebutuhan, i.qty_pr, i.kode_material, i.trainset, i.status_pr, i.proyek
-        ].map(csvCell).join(','));
-    });
+function exportBomToCsv() {
+    const params = buildParams();
 
-    // \uFEFF = BOM supaya Excel membaca UTF-8 dengan benar
-    const blob = new Blob(['\uFEFF' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
+    if (bomDataTableInstance && bomDataTableInstance.search()) {
+        params.set('search', bomDataTableInstance.search());
+    }
 
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'Dataset_BOM_Monitoring.csv';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    window.location.href = '/material-planning/export?' + params.toString();
+}
+
+function setButtonBusy(busy) {
+    const button = document.getElementById('btnBomGenerate');
+    if (!button) return;
+
+    button.disabled = busy;
+    button.innerHTML = busy
+        ? '<span class="spinner-border spinner-border-sm me-1"></span> Mengimpor...'
+        : '⚙️ Generate & Rekap Data';
+}
+
+function showUploadResult(type, message) {
+    $('#bomUploadProgress').addClass('d-none');
+    $('#bomUploadResult').removeClass('d-none').html(
+        '<div class="alert alert-' + type + ' py-2 small">' + message + '</div>'
+    );
+}
+
+function pollImportStatus(importId, options = {}) {
+    const MAX_ATTEMPTS = 80;
+    const attempt = options.attempt || 0;
+    const onCompleted = options.onCompleted || function () {};
+    const onFailed = options.onFailed || function () {};
+    const onTimeout = options.onTimeout || function () {};
+    const onError = options.onError || function () {};
+
+    fetch('/material-planning/import-status/' + encodeURIComponent(importId), {
+        headers: { 'Accept': 'application/json' }
+    })
+        .then(res => res.json().then(json => ({ ok: res.ok, status: res.status, json })))
+        .then(({ ok, status, json }) => {
+            if (!ok) {
+                const message = json.message || ('HTTP ' + status);
+
+                if (status === 404 || status === 422) {
+                    onFailed(message);
+                    return;
+                }
+
+                throw new Error(message);
+            }
+
+            if (json.status === 'completed') {
+                onCompleted(json);
+            } else if (json.status === 'failed') {
+                onFailed(json.message || 'Import gagal. Periksa log server.');
+            } else if (attempt + 1 >= MAX_ATTEMPTS) {
+                onTimeout('Proses masih berjalan di background. Silakan cek kembali nanti.');
+            } else {
+                setTimeout(() => pollImportStatus(importId, {
+                    ...options,
+                    attempt: attempt + 1
+                }), 1500);
+            }
+        })
+        .catch(err => onError('Gagal memeriksa status import: ' + err.message));
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -410,7 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             filters.selectedStatuses.delete(status);
         }
-        applyFilters();
+        loadData();
     });
 
     // 5. CSV Export Button
@@ -420,7 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const bomFileInput = document.getElementById('bomFileInput');
     const bomFileLabel = document.getElementById('bomFileLabel');
     const bomStatusText = document.getElementById('bomStatusText');
-    const btnStreamlitGenerate = document.getElementById('btnStreamlitGenerate');
+    const btnBomGenerate = document.getElementById('btnBomGenerate');
     const bomDropzone = document.getElementById('bomDropzone');
 
     if (bomFileInput) {
@@ -455,9 +488,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 7. Generate & Rekap Data Button (Upload BOM via /bom/import)
-    if (btnStreamlitGenerate) {
-        btnStreamlitGenerate.addEventListener('click', () => {
+    // 7. Generate & Rekap Data Button (Upload BOM via /material-planning/import-excel)
+    if (btnBomGenerate) {
+        btnBomGenerate.addEventListener('click', () => {
             if (!bomFileInput.files.length) {
                 alert('Pilih file Excel BOM terlebih dahulu.');
                 return;
@@ -468,10 +501,9 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.append('file', file);
             formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
 
-            btnStreamlitGenerate.disabled = true;
-            btnStreamlitGenerate.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Mengimpor...';
-            $('#bomStreamlitProgress').removeClass('d-none');
-            $('#bomStreamlitResult').addClass('d-none').html('');
+            setButtonBusy(true);
+            $('#bomUploadProgress').removeClass('d-none');
+            $('#bomUploadResult').addClass('d-none').html('');
 
             $.ajax({
                 url: '/material-planning/import-excel',
@@ -480,69 +512,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 processData: false,
                 contentType: false,
                 success: function(res) {
-                    if (res.success) {
-                        pollBomStatus(res.import_id, 0);
+                    if (res.success && res.import_id) {
+                        pollImportStatus(res.import_id, {
+                            onCompleted: function (json) {
+                                setButtonBusy(false);
+                                showUploadResult(
+                                    'success',
+                                    'Import selesai — ' + Number(json.imported || 0).toLocaleString('id-ID') + ' baris data berhasil direkap.'
+                                );
+                                loadData();
+                            },
+                            onFailed: function (message) {
+                                setButtonBusy(false);
+                                showUploadResult('danger', message);
+                            },
+                            onTimeout: function (message) {
+                                setButtonBusy(false);
+                                showUploadResult('warning', message);
+                            },
+                            onError: function (message) {
+                                setButtonBusy(false);
+                                showUploadResult('danger', message);
+                            }
+                        });
                     } else {
-                        btnStreamlitGenerate.disabled = false;
-                        btnStreamlitGenerate.innerHTML = '⚙️ Generate & Rekap Data';
-                        $('#bomStreamlitProgress').addClass('d-none');
-                        $('#bomStreamlitResult').removeClass('d-none').html(
-                            '<div class="alert alert-danger py-2 small">' + (res.message || 'Gagal import') + '</div>'
-                        );
+                        setButtonBusy(false);
+                        showUploadResult('danger', res.message || 'Gagal memproses import.');
                     }
                 },
                 error: function(xhr) {
-                    btnStreamlitGenerate.disabled = false;
-                    btnStreamlitGenerate.innerHTML = '⚙️ Generate & Rekap Data';
-                    $('#bomStreamlitProgress').addClass('d-none');
-                    const msg = xhr.responseJSON?.message || 'Terjadi kesalahan saat import.';
-                    $('#bomStreamlitResult').removeClass('d-none').html(
-                        '<div class="alert alert-danger py-2 small">' + msg + '</div>'
-                    );
+                    setButtonBusy(false);
+                    const message = xhr.responseJSON?.message || 'Terjadi kesalahan saat import.';
+                    showUploadResult('danger', message);
                 }
             });
         });
-    }
-
-    function pollBomStatus(importId, attempt) {
-        const MAX_ATTEMPTS = 50;
-        fetch('/bom/status/' + encodeURIComponent(importId))
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'completed') {
-                    loadData();
-                    btnStreamlitGenerate.disabled = false;
-                    btnStreamlitGenerate.innerHTML = '⚙️ Generate & Rekap Data';
-                    $('#bomStreamlitProgress').addClass('d-none');
-                    $('#bomStreamlitResult').removeClass('d-none').html(
-                        '<div class="alert alert-success py-2 small">Import selesai — ' + data.imported + ' baris data berhasil direkap.</div>'
-                    );
-                } else if (data.status === 'failed') {
-                    btnStreamlitGenerate.disabled = false;
-                    btnStreamlitGenerate.innerHTML = '⚙️ Generate & Rekap Data';
-                    $('#bomStreamlitProgress').addClass('d-none');
-                    $('#bomStreamlitResult').removeClass('d-none').html(
-                        '<div class="alert alert-danger py-2 small">Import gagal. Periksa log server.</div>'
-                    );
-                } else if (attempt + 1 >= MAX_ATTEMPTS) {
-                    btnStreamlitGenerate.disabled = false;
-                    btnStreamlitGenerate.innerHTML = '⚙️ Generate & Rekap Data';
-                    $('#bomStreamlitProgress').addClass('d-none');
-                    $('#bomStreamlitResult').removeClass('d-none').html(
-                        '<div class="alert alert-warning py-2 small">Proses sedang berjalan di background...</div>'
-                    );
-                } else {
-                    setTimeout(() => pollBomStatus(importId, attempt + 1), 1500);
-                }
-            })
-            .catch(err => {
-                btnStreamlitGenerate.disabled = false;
-                btnStreamlitGenerate.innerHTML = '⚙️ Generate & Rekap Data';
-                $('#bomStreamlitProgress').addClass('d-none');
-                $('#bomStreamlitResult').removeClass('d-none').html(
-                    '<div class="alert alert-danger py-2 small">Gagal memeriksa status: ' + err.message + '</div>'
-                );
-            });
     }
 
     // 8. Import Purchase Requisition (Modal handling)
@@ -569,23 +573,54 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
 
         $.ajax({
-            url: '/sap-dataset/import-queue',
+            url: '/material-planning/import-queue',
             type: 'POST',
             data: formData,
             processData: false,
             contentType: false,
             success: function (res) {
-                progressDiv.addClass('d-none');
-                btn.prop('disabled', false).text('Import');
-
-                if (res.success) {
-                    let html = '<div class="alert alert-success py-2 small">' + res.message + '</div>';
-                    resultDiv.removeClass('d-none').html(html);
-                    form.reset();
-                    setTimeout(() => location.reload(), 1500);
-                } else {
+                if (res.success && res.import_id) {
+                    progressDiv.addClass('d-none');
                     resultDiv.removeClass('d-none').html(
-                        '<div class="alert alert-danger py-2 small">' + res.message + '</div>'
+                        '<div class="alert alert-info py-2 small">' + res.message + '</div>'
+                    );
+
+                    const resetButton = () => btn.prop('disabled', false).text('Import');
+
+                    pollImportStatus(res.import_id, {
+                        onCompleted: function (json) {
+                            resetButton();
+                            resultDiv.removeClass('d-none').html(
+                                '<div class="alert alert-success py-2 small">Import selesai — '
+                                + Number(json.imported || 0).toLocaleString('id-ID')
+                                + ' baris data berhasil diimpor.</div>'
+                            );
+                            setTimeout(() => location.reload(), 1000);
+                        },
+                        onFailed: function (message) {
+                            resetButton();
+                            resultDiv.removeClass('d-none').html(
+                                '<div class="alert alert-danger py-2 small">' + message + '</div>'
+                            );
+                        },
+                        onTimeout: function (message) {
+                            resetButton();
+                            resultDiv.removeClass('d-none').html(
+                                '<div class="alert alert-warning py-2 small">' + message + '</div>'
+                            );
+                        },
+                        onError: function (message) {
+                            resetButton();
+                            resultDiv.removeClass('d-none').html(
+                                '<div class="alert alert-danger py-2 small">' + message + '</div>'
+                            );
+                        }
+                    });
+                } else {
+                    progressDiv.addClass('d-none');
+                    btn.prop('disabled', false).text('Import');
+                    resultDiv.removeClass('d-none').html(
+                        '<div class="alert alert-danger py-2 small">' + (res.message || 'Gagal import.') + '</div>'
                     );
                 }
             },

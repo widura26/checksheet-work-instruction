@@ -1,6 +1,11 @@
 <?php
 
 return [
+    'groups' => [
+        'komponen' => 'KOMPONEN',
+        'piece_part' => 'PIECE PART',
+    ],
+
     'sheets' => [
         'PR' => [
             'label' => 'Purchase Requisition',

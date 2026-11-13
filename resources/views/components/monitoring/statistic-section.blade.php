@@ -1,3 +1,7 @@
+@php
+    $groupLabels = config('bom-sheets.groups', []);
+@endphp
+
 <div class="row g-3 mb-4">
     <div class="col-md-6">
         <div class="st-metric-card">
@@ -42,15 +46,15 @@
             <thead>
                 <tr>
                     <th style="width: 50%;">Status PR</th>
-                    <th class="text-end" style="width: 25%;">KOMPONEN</th>
-                    <th class="text-end" style="width: 25%;">PIECE PART</th>
+                    <th class="text-end" style="width: 25%;">{{ $groupLabels['komponen'] ?? 'KOMPONEN' }}</th>
+                    <th class="text-end" style="width: 25%;">{{ $groupLabels['piece_part'] ?? 'PIECE PART' }}</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td class="fw-semibold">BELUM PR</td>
                     <td class="text-end" id="sum-belum-komp">0</td>
-                    <td class="text-end" id="sum-belum-piece">3</td>
+                    <td class="text-end" id="sum-belum-piece">0</td>
                 </tr>
                 <tr>
                     <td class="fw-semibold">PR PARSIAL</td>
@@ -59,8 +63,8 @@
                 </tr>
                 <tr>
                     <td class="fw-semibold">SUDAH PR</td>
-                    <td class="text-end" id="sum-sudah-komp">1</td>
-                    <td class="text-end" id="sum-sudah-piece">209</td>
+                    <td class="text-end" id="sum-sudah-komp">0</td>
+                    <td class="text-end" id="sum-sudah-piece">0</td>
                 </tr>
                 <tr>
                     <td class="fw-semibold">STOK DAN PR</td>
@@ -70,12 +74,12 @@
                 <tr>
                     <td class="fw-semibold">STOK</td>
                     <td class="text-end" id="sum-stok-komp">0</td>
-                    <td class="text-end" id="sum-stok-piece">1</td>
+                    <td class="text-end" id="sum-stok-piece">0</td>
                 </tr>
                 <tr>
                     <td class="fw-semibold">STATUS LAIN / TIDAK DIKENAL</td>
                     <td class="text-end" id="sum-lain-komp">0</td>
-                    <td class="text-end" id="sum-lain-piece">1</td>
+                    <td class="text-end" id="sum-lain-piece">0</td>
                 </tr>
             </tbody>
         </table>
