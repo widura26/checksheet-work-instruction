@@ -2,17 +2,23 @@
 
 namespace App\Imports;
 
+use App\Support\ImportTracker;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithStartRow;
+use Maatwebsite\Excel\Events\AfterImport;
+use Maatwebsite\Excel\Events\BeforeImport;
+use Maatwebsite\Excel\Events\ImportFailed;
 
-class SapDatasetImport implements ToCollection, WithBatchInserts, WithChunkReading, WithStartRow, SkipsEmptyRows, WithHeadingRow,ShouldQueue
+class SapDatasetImport implements ToCollection, WithBatchInserts, WithChunkReading, WithStartRow, SkipsEmptyRows, WithHeadingRow, WithEvents, ShouldQueue
 {
     public int $timeout = 600;
     public int $tries = 3;
@@ -22,6 +28,23 @@ class SapDatasetImport implements ToCollection, WithBatchInserts, WithChunkReadi
     public function __construct(string $importId)
     {
         $this->importId = $importId;
+    }
+
+    public function registerEvents(): array
+    {
+        return [
+            BeforeImport::class => function () {
+                ImportTracker::processing($this->importId);
+            },
+            AfterImport::class => function () {
+                $state = ImportTracker::get($this->importId) ?? [];
+
+                ImportTracker::completed($this->importId, (int) ($state['imported'] ?? 0));
+            },
+            ImportFailed::class => function (ImportFailed $event) {
+                ImportTracker::failed($this->importId, $event->getException()->getMessage());
+            },
+        ];
     }
 
     public function collection($rows)
@@ -74,7 +97,13 @@ class SapDatasetImport implements ToCollection, WithBatchInserts, WithChunkReadi
                 'updated_at'          => now(),
             ];
         }
+
+        if (empty($allData)) {
+            return;
+        }
+
         DB::table('sap_datasets')->insert($allData);
+        ImportTracker::addImported($this->importId, count($allData));
     }
 
     private function mapRow($row): array
@@ -126,6 +155,11 @@ class SapDatasetImport implements ToCollection, WithBatchInserts, WithChunkReadi
 
     public function failed(\Throwable $e): void
     {
-        \Illuminate\Support\Facades\Log::error("Import {$this->importId} failed: {$e->getMessage()}");
+        ImportTracker::failed($this->importId, $e->getMessage());
+
+        Log::error("Import {$this->importId} failed: {$e->getMessage()}", [
+            'import_id' => $this->importId,
+            'exception' => $e,
+        ]);
     }
 }

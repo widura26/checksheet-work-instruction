@@ -123,6 +123,7 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
     Route::prefix('material-planning')->group(function(){
         Route::get('/', [SapDatasetController::class, 'index'])->name('sap-dataset.index');
         Route::get('/data', [SapDatasetController::class, 'data'])->name('material-planning.data');
+        Route::get('/export', [SapDatasetController::class, 'export'])->name('material-planning.export');
         Route::post('/import', [SapDatasetController::class, 'import'])->name('sap-dataset.import');
         Route::post('/import-queue', [SapDatasetController::class, 'importQueue'])->name('sap-dataset.import-queue');
         Route::get('/import-status/{importId}', [SapDatasetController::class, 'importStatus'])->name('sap-dataset.import-status');

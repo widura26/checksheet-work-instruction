@@ -8,9 +8,11 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use App\Imports\SapDatasetImport;
 use App\Jobs\ImportExcelJob;
 use App\Services\DataProcessService;
+use App\Support\ImportTracker;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Cache;
@@ -19,7 +21,7 @@ class SapDatasetController extends Controller
 {
     public function index(DataProcessService $svc){
         $options = Cache::remember('mp:options:v' . Cache::get('mp:version', 1), 300,
-            fn () => $svc->filterOptions($svc->prepare()));
+            fn () => $svc->filterOptions());
 
         $defaultTrainset = in_array('TS 14', $options['trainset']) ? 'TS 14' : 'Semua';
 
@@ -27,24 +29,101 @@ class SapDatasetController extends Controller
     }
 
     public function data(Request $request, DataProcessService $svc){
-        $proyek   = $request->input('proyek', 'Semua');
-        $group    = $request->input('group', 'Semua');
-        $trainset = $request->input('trainset', 'Semua');
+        $proyek   = (string) $request->input('proyek', 'Semua');
+        $group    = (string) $request->input('group', 'Semua');
+        $trainset = (string) $request->input('trainset', 'Semua');
+        $statuses = $this->statusesFromRequest($request);
 
-        $key = 'mp:data:v' . Cache::get('mp:version', 1) . ':' . md5("$proyek|$group|$trainset");
+        return response()->json($svc->paginateDataset(
+            $proyek,
+            $group,
+            $trainset,
+            $statuses,
+            (string) $request->input('search', ''),
+            (string) $request->input('sort', 'no'),
+            (string) $request->input('dir', 'asc'),
+            (int) $request->input('page', 1),
+            (int) $request->input('per_page', 10)
+        ));
+    }
 
-        return response()->json(
-            Cache::remember($key, 300, fn () => $svc->dataset($proyek, $group, $trainset))
+    public function export(Request $request, DataProcessService $svc){
+        $proyek   = (string) $request->input('proyek', 'Semua');
+        $group    = (string) $request->input('group', 'Semua');
+        $trainset = (string) $request->input('trainset', 'Semua');
+        $statuses = $this->statusesFromRequest($request);
+
+        $rows = $svc->filteredDataset(
+            $proyek,
+            $group,
+            $trainset,
+            $statuses,
+            (string) $request->input('search', ''),
+            (string) $request->input('sort', 'no'),
+            (string) $request->input('dir', 'asc')
         );
+
+        $filename = 'Dataset_BOM_Monitoring_' . now()->format('Ymd_His') . '.csv';
+
+        return response()->streamDownload(function () use ($rows) {
+            $output = fopen('php://output', 'w');
+
+            // BOM agar Excel membaca UTF-8 dengan benar.
+            fwrite($output, "\xEF\xBB\xBF");
+            fputcsv($output, [
+                'NO', 'Group', 'Tindak Lanjut', 'Deskripsi Material',
+                'Kebutuhan', 'Qty PR (BOM)', 'Kode Material', 'Trainset',
+                'Status PR', 'Proyek',
+            ]);
+
+            foreach ($rows as $row) {
+                fputcsv($output, [
+                    $row['no'],
+                    $row['group'],
+                    $row['tindak_lanjut'],
+                    $row['deskripsi'],
+                    $row['kebutuhan'],
+                    $row['qty_pr'],
+                    $row['kode_material'],
+                    $row['trainset'],
+                    $row['status_pr'],
+                    $row['proyek'],
+                ]);
+            }
+
+            fclose($output);
+        }, $filename, ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
+    private function statusesFromRequest(Request $request): array {
+        $statuses = $request->input('statuses', []);
+
+        if (is_string($statuses)) {
+            $statuses = explode(',', $statuses);
+        }
+
+        if (!is_array($statuses)) {
+            return [];
+        }
+
+        return array_values(array_intersect($statuses, DataProcessService::STATUS_PR_ORDER));
     }
 
     public function import(Request $request){
-        $request->validate([
-            'file' => 'required|file|extensions:xlsx,xls,csv',
-        ], [
-            'file.required' => 'File wajib dipilih.',
-            'file.extensions' => 'File harus berformat xlsx, xls, atau csv.',
-        ]);
+        try {
+            $request->validate([
+                'file' => 'required|file|extensions:xlsx,xls,csv',
+            ], [
+                'file.required' => 'File wajib dipilih.',
+                'file.extensions' => 'File harus berformat xlsx, xls, atau csv.',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'errors' => $e->errors(),
+            ], 422);
+        }
 
         set_time_limit(300);
         DB::disableQueryLog();
@@ -181,33 +260,60 @@ class SapDatasetController extends Controller
     }
 
     public function importQueue(Request $request){
-        $request->validate([
-            'file' => 'required|file|extensions:xlsx,xls,csv',
-        ], [
-            'file.required' => 'File wajib dipilih.',
-            'file.extensions' => 'File harus berformat xlsx, xls, atau csv.',
-        ]);
+        try {
+            $request->validate([
+                'file' => 'required|file|extensions:xlsx,xls,csv',
+            ], [
+                'file.required' => 'File wajib dipilih.',
+                'file.extensions' => 'File harus berformat xlsx, xls, atau csv.',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'errors' => $e->errors(),
+            ], 422);
+        }
 
         $file = $request->file('file');
         $importId = (string) Str::uuid();
-        $extension = $file->getClientOriginalExtension();
-        $fileName = $importId . '.' . $extension;
 
-        Storage::disk('local')->makeDirectory('imports');
-        $file->storeAs('imports', $fileName);
+        try {
+            $fileName = $importId . '.' . $file->getClientOriginalExtension();
 
-        $tempFile = storage_path('app/imports/' . $fileName);
-        Excel::import(new SapDatasetImport($importId), $tempFile);
+            Storage::disk('local')->makeDirectory('imports');
+            $file->storeAs('imports', $fileName, 'local');
 
-        return response()->json([
-            'success' => true,
-            'import_id' => $importId,
-            'message' => 'Import diproses di background. Gunakan import_id untuk cek status.',
-        ]);
+            ImportTracker::start($importId);
+
+            Excel::queueImport(
+                new SapDatasetImport($importId),
+                Storage::disk('local')->path('imports/' . $fileName)
+            );
+
+            return response()->json([
+                'success' => true,
+                'import_id' => $importId,
+                'message' => 'Import diproses di background. Gunakan import_id untuk cek status.',
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Gagal memulai import SAP dataset: ' . $e->getMessage(), [
+                'import_id' => $importId,
+                'exception' => $e,
+            ]);
+
+            ImportTracker::failed($importId, $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'import_id' => $importId,
+                'message' => 'Gagal memproses import.',
+            ], 500);
+        }
     }
 
     public function importStatus(string $importId){
-        if (!preg_match('/^[0-9a-f-]+$/i', $importId)) {
+        if (!Str::isUuid($importId)) {
             return response()->json([
                 'import_id' => $importId,
                 'status' => 'invalid',
@@ -215,36 +321,17 @@ class SapDatasetController extends Controller
             ], 422);
         }
 
-        $jobExists = DB::table('jobs')
-            ->where('payload', 'LIKE', '%'.$importId.'%')
-            ->exists();
+        $state = ImportTracker::get($importId);
 
-        $failedJob = DB::table('failed_jobs')
-            ->where('payload', 'LIKE', '%'.$importId.'%')
-            ->first();
-
-        if ($failedJob) {
+        if ($state === null) {
             return response()->json([
                 'import_id' => $importId,
-                'status' => 'failed',
-                'error' => $failedJob->exception,
-                'failed_at' => $failedJob->failed_at,
-            ]);
+                'status' => 'not_found',
+                'message' => 'Import ID tidak ditemukan atau sudah kedaluwarsa.',
+            ], 404);
         }
 
-        if ($jobExists) {
-            return response()->json([
-                'import_id' => $importId,
-                'status' => 'processing',
-                'message' => 'Job masih diproses oleh queue worker.',
-            ]);
-        }
-
-        return response()->json([
-            'import_id' => $importId,
-            'status' => 'completed',
-            'message' => 'Import telah selesai. Cek log untuk detail.',
-        ]);
+        return response()->json($state);
     }
 
     private function buildHeaderMap(array $header): array {
@@ -367,25 +454,51 @@ class SapDatasetController extends Controller
     public function import_excel(Request $request){
         try {
             $request->validate([
-                'file' => 'required|file|mimes:xlsx|max:20480',
+                'file' => 'required|file|extensions:xlsx,xls|max:20480',
+            ], [
+                'file.required' => 'File wajib dipilih.',
+                'file.extensions' => 'File harus berformat xlsx atau xls.',
+                'file.max' => 'Ukuran file maksimal 20 MB.',
             ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'errors' => $e->errors(),
+            ], 422);
+        }
 
-            $path = $request->file('file')->store('imports');
+        $importId = (string) Str::uuid();
+
+        try {
+            $file = $request->file('file');
+            $path = $file->storeAs('imports', $importId . '.' . $file->getClientOriginalExtension(), 'local');
+
+            ImportTracker::start($importId);
 
             set_time_limit(0);
             ini_set('memory_limit', '512M');
 
-            ImportExcelJob::dispatchSync($path);
+            ImportExcelJob::dispatchSync($importId, $path);
 
             return response()->json([
-                "success" => true,
-                "message" => "Import Sukses"
+                'success' => true,
+                'import_id' => $importId,
+                'message' => 'Import selesai diproses. Gunakan import_id untuk cek status.',
             ]);
-        } catch (\Throwable $th) {
+        } catch (\Throwable $e) {
+            Log::error('Gagal memulai import daftar kebutuhan material: ' . $e->getMessage(), [
+                'import_id' => $importId,
+                'exception' => $e,
+            ]);
+
+            ImportTracker::failed($importId, $e->getMessage());
+
             return response()->json([
-                "success" => false,
-                "message" => "Import Gagal"
-            ]);
+                'success' => false,
+                'import_id' => $importId,
+                'message' => 'Gagal memproses import.',
+            ], 500);
         }
     }
 }

@@ -4,6 +4,7 @@
 namespace App\Jobs;
 
 use App\Support\ExcelReader;
+use App\Support\ImportTracker;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -42,53 +43,78 @@ class ImportExcelJob implements ShouldQueue
         'P' => 'tindak_lanjut',
     ];
 
-    public function __construct(public string $path) {}
+    public function __construct(public string $importId, public string $path) {}
 
     public function handle(): void
     {
-        $file = Storage::path($this->path);
-        $buffer = [];
-        $total = 0;
+        ImportTracker::processing($this->importId);
 
-        foreach (ExcelReader::sheets($file) as $sheetName => $sheetFile) {
-            foreach (ExcelReader::rows($file, $sheetFile) as $rowNumber => $cells) {
-                if ($rowNumber === 1) {
-                    continue;
-                }
+        try {
+            $file = Storage::disk('local')->path($this->path);
+            $buffer = [];
+            $total = 0;
 
-                $row = ['id' => (string) Str::uuid(), 'sheet_asal' => $sheetName];
-                $filled = false;
-
-                foreach (self::MAP as $col => $field) {
-                    $value = trim($cells[$col] ?? '');
-                    if ($value !== '') {
-                        $filled = true;
+            foreach (ExcelReader::sheets($file) as $sheetName => $sheetFile) {
+                foreach (ExcelReader::rows($file, $sheetFile) as $rowNumber => $cells) {
+                    if ($rowNumber === 1) {
+                        continue;
                     }
-                    $row[$field] = $value;
-                }
 
-                if (! $filled) {
-                    continue;
-                }
+                    $row = ['id' => (string) Str::uuid(), 'sheet_asal' => $sheetName];
+                    $filled = false;
 
-                $buffer[] = $row;
+                    foreach (self::MAP as $col => $field) {
+                        $value = trim($cells[$col] ?? '');
+                        if ($value !== '') {
+                            $filled = true;
+                        }
+                        $row[$field] = $value;
+                    }
 
-                if (count($buffer) >= self::CHUNK) {
-                    DB::table(self::TABLE)->insert($buffer);
-                    $total += count($buffer);
-                    $buffer = [];
+                    if (! $filled) {
+                        continue;
+                    }
+
+                    $buffer[] = $row;
+
+                    if (count($buffer) >= self::CHUNK) {
+                        DB::table(self::TABLE)->insert($buffer);
+                        $total += count($buffer);
+                        ImportTracker::addImported($this->importId, count($buffer));
+                        $buffer = [];
+                    }
                 }
             }
-        }
 
-        if ($buffer) {
-            DB::table(self::TABLE)->insert($buffer);
-            $total += count($buffer);
-        }
+            if ($buffer) {
+                DB::table(self::TABLE)->insert($buffer);
+                $total += count($buffer);
+                ImportTracker::addImported($this->importId, count($buffer));
+            }
 
-        Storage::delete($this->path);
-        Log::info("Import selesai: {$total} baris");
+            ImportTracker::completed($this->importId, $total);
+            Log::info("Import selesai: {$total} baris", ['import_id' => $this->importId]);
+        } catch (\Throwable $e) {
+            Log::error('Import daftar kebutuhan material gagal: ' . $e->getMessage(), [
+                'import_id' => $this->importId,
+                'exception' => $e,
+            ]);
+
+            ImportTracker::failed($this->importId, $e->getMessage());
+
+            throw $e;
+        } finally {
+            Storage::disk('local')->delete($this->path);
+        }
+    }
+
+    public function failed(\Throwable $e): void
+    {
+        ImportTracker::failed($this->importId, $e->getMessage());
+
+        Log::error('Import daftar kebutuhan material gagal: ' . $e->getMessage(), [
+            'import_id' => $this->importId,
+            'exception' => $e,
+        ]);
     }
 }
-
-?>

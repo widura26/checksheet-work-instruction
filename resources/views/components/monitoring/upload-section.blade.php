@@ -42,18 +42,18 @@
 
         <!-- Action button and info -->
         <div class="d-flex align-items-center gap-3 flex-wrap">
-            <button type="button" class="btn btn-primary text-white fw-semibold px-4 py-2 rounded-2" id="btnStreamlitGenerate" style="background-color: #0068c9; border-color: #0068c9;">
+            <button type="button" class="btn btn-primary text-white fw-semibold px-4 py-2 rounded-2" id="btnBomGenerate" style="background-color: #0068c9; border-color: #0068c9;">
                 Generate & Rekap Data
             </button>
             <span class="text-muted small" id="bomStatusText">Belum ada file diunggah.</span>
         </div>
 
         <!-- Progress / Result container -->
-        <div id="bomStreamlitProgress" class="d-none mt-3">
+        <div id="bomUploadProgress" class="d-none mt-3">
             <div class="progress" style="height: 6px;">
                 <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" style="width: 100%"></div>
             </div>
         </div>
-        <div id="bomStreamlitResult" class="d-none mt-3"></div>
+        <div id="bomUploadResult" class="d-none mt-3"></div>
     </div>
 </div>
