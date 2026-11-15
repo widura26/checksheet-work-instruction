@@ -4,7 +4,6 @@ use App\Http\Controllers\BagianController;
 use App\Http\Controllers\BomController;
 use App\Http\Controllers\BomDocumentRevisionController;
 use App\Http\Controllers\BillOfMaterialController;
-use App\Http\Controllers\ChartsController;
 use App\Http\Controllers\DaftarKaryawanController;
 use App\Http\Controllers\DepartemenController;
 use App\Http\Controllers\DistribusiController;
@@ -130,13 +129,6 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::post('/delete', [SapDatasetController::class, 'delete'])->name('sap-dataset.delete');
         Route::get('/deviation', [SapDatasetController::class, 'deviation'])->name('sap-dataset.deviation');
         Route::post('/import-excel', [SapDatasetController::class, 'import_excel'])->name('sap-dataset.import-excel');
-    });
-
-    Route::prefix('charts')->group(function(){
-        Route::get('/purchase-requisitions', [ChartsController::class, 'purchaseRequisition'])->name('purchase-requisition-chart-data');
-        Route::get('/purchase-order', [ChartsController::class, 'purchaseOrder'])->name('purchase-order-chart-data');
-        Route::get('/bompr', [ChartsController::class, 'bomprdifference'])->name('bompr-chart-data');
-        Route::get('/popr', [ChartsController::class, 'poprdifference'])->name('popr-chart-data');
     });
 
     Route::prefix('bill-of-material')->group(function(){

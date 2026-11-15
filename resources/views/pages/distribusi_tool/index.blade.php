@@ -115,67 +115,7 @@
                     </svg>
                     Export Excel
                 </button>
-                @if (Auth::user()->hasRole('admin') || Auth::user()->hasRole('staff'))
-                    <a href="{{ route('distribusi.peminjaman.create') }}" class="btn btn-primary text-white">
-                        Peminjaman
-                    </a>
-                    <a href="{{ route('distribusi.penyerahan.create') }}" class="btn btn-info text-white">
-                        Penyerahan
-                    </a>
-                @endif
             </div>
-            <div class="row mb-3">
-                @if (Auth::user()->hasRole('admin'))
-                    <form action="{{ route('import-distribusi') }}" method="post" enctype="multipart/form-data">
-                        @csrf
-                        <div class="input-group">
-                            <input type="file" name="file" class="form-control" accept=".xlsx,.xls">
-                            <button type="submit" class="btn btn-success text-white">Import Riwayat Distribusi</button>
-                        </div>
-                    </form>
-                @endif
-            </div>
-            {{-- Tabel error import --}}
-            @if (session('import_errors') && count(session('import_errors')) > 0)
-                <div class="card border-danger">
-                    <div class="card-header bg-danger text-white">
-                        <strong>Data Gagal Di-import</strong>
-                    </div>
-
-                    <div class="card-body p-0">
-                        <table class="table table-striped table-bordered mb-0">
-                            <thead class="table-danger">
-                                <tr>
-                                    <th style="width: 120px;">Baris Di Excel</th>
-                                    <th style="width: 200px;">Kode Material</th>
-                                    <th>Pesan Error</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (session('import_errors') as $error)
-                                    <tr>
-                                        <td class="text-center">
-                                            {{ $error['row'] }}
-                                        </td>
-                                        <td>
-                                            {{ $error['kode_material'] ?? '-' }}
-                                        </td>
-                                        <td class="text-danger">
-                                            {{ $error['error'] }}
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="card-footer">
-                        <small class="text-muted">
-                            Perbaiki data pada file Excel sesuai baris di atas, lalu upload ulang.
-                        </small>
-                    </div>
-                </div>
-            @endif
             @if (session('success'))
                 <div class="alert alert-success">
                     {{ session('success') }}

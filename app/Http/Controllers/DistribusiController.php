@@ -272,16 +272,6 @@ class DistribusiController extends Controller
         return Excel::download(new DistribusiToolExport($filters), "{$time}_laporan_distribusi_tool.xlsx");
     }
 
-    public function createPenyerahan()
-    {
-        return view('pages.distribusi_tool.create_penyerahan');
-    }
-
-    public function createPeminjaman()
-    {
-        return view('pages.distribusi_tool.create_peminjaman');
-    }
-
     public function showPengembalian(DistribusiTool $distribusiTool)
     {
         $distribusiTool->load(['departemen', 'bagian', 'daftarDistribusiTool.tool', 'daftarDistribusiTool.posisiCt', 'project']);

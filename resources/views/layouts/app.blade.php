@@ -3,7 +3,6 @@
 
 <head>
     @include('partials.head')
-    {{-- @livewireStyles --}}
 </head>
 
 <body>
@@ -21,7 +20,6 @@
         @include('partials.footer')
     </div>
     @include('partials.scripts')
-    @livewireScripts
 </body>
 
 </html>
