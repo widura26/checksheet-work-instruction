@@ -20,9 +20,4 @@ class Unit extends Model
     {
         return $this->belongsTo(Bagian::class);
     }
-
-    public function distribusiTools()
-    {
-        return $this->hasMany(DistribusiTool::class, 'unit_id');
-    }
 }

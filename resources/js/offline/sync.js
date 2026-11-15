@@ -189,8 +189,7 @@ function isQueuableForm(form) {
     const action = form.action || '';
     return (
         action.includes('/pengurangan-tool') ||
-        action.includes('/update-stok-tool') ||
-        action.includes('/distribusi')
+        action.includes('/update-stok-tool')
     );
 }
 

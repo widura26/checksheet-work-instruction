@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bagian;
-use App\Models\DaftarDistribusiTool;
 use App\Models\Departemen;
 use App\Models\Unit;
 use Illuminate\Http\Request;
@@ -40,9 +39,6 @@ class BagianController extends Controller
                 ';
                 }
                 $buttons .= '<a href="' . route('lokasi.bagian.edit', $bagian->id) . '" class="btn btn-primary btn-sm">Edit</a>';
-                $buttons .= '<a href="' . route('lokasi.bagian.distribusi', $bagian->id) . '" class="btn btn-info btn-sm text-white" title="Lihat Distribusi">
-                   Lihat Distribusi
-                </a>';
                 $buttons .= '</div>';
                 return $buttons;
             })
@@ -103,61 +99,6 @@ class BagianController extends Controller
         return redirect()->route('lokasi.bagian.index')->with('success', 'Bagian deleted successfully.');
     }
 
-    public function distribusi($id)
-    {
-        $bagian = Bagian::with('departemen')->findOrFail($id);
-
-        return view('pages.lokasi.bagian.distribusi', compact('bagian'));
-    }
-
-    public function getDistribusiData($id)
-    {
-        $distribusi = \App\Models\DistribusiTool::where('bagian_id', $id)
-            ->where('status', '<>', 'batal')
-            ->with(['daftarDistribusiTool.tool', 'project', 'projectDest', 'departemen', 'unit']);
-
-        return DataTables::of($distribusi)
-            ->addIndexColumn()
-            ->addColumn('tanggal', function ($row) {
-                return $row->tanggal_pinjam_diserahkan->format('d/m/Y H:i');
-            })
-            ->addColumn('type_badge', function ($row) {
-                $color = $row->type == 'peminjaman' ? 'primary' : 'success';
-                return '<span class="badge bg-' . $color . '">' . ucfirst($row->type) . '</span>';
-            })
-            ->addColumn('kategori_badge', function ($row) {
-                $kategori = strtolower($row->kategori);
-
-                $badgeClass = match ($kategori) {
-                    'tool' => 'bg-warning',
-                    'consumable' => 'bg-primary',
-                    'apd' => 'bg-info',
-                    default => 'bg-secondary',
-                };
-                return '<span class="badge ' . $badgeClass . '">' . ucfirst($row->kategori) . '</span>';
-            })
-            ->addColumn('status_badge', function ($row) {
-                $statusColors = [
-                    'kembali' => 'success',
-                    'kembali_sebagian' => 'warning',
-                    'diserahkan' => 'primary',
-                    'belum_kembali' => 'danger',
-                    'batal' => 'dark'
-                ];
-                $color = $statusColors[$row->status] ?? 'secondary';
-                return '<span class="badge bg-' . $color . '">' . ucwords(str_replace('_', ' ', $row->status)) . '</span>';
-            })
-            ->addColumn('jumlah_material', function ($row) {
-                $totalItem = $row->daftarDistribusiTool->sum('jumlah_distribusi');
-                $jumlahJenis = $row->daftarDistribusiTool->count();
-                return $totalItem . ' unit (' . $jumlahJenis . ' jenis)';
-            })
-            ->addColumn('action', function ($row) {
-                return '<a href="' . route('distribusi.show', $row->public_id) . '" class="btn btn-sm btn-info text-white">Detail</a>';
-            })
-            ->rawColumns(['type_badge', 'kategori_badge', 'status_badge', 'action'])
-            ->make(true);
-    }
     public function toggleBagian(Bagian $bagian)
     {
         $bagianActive = $bagian->is_active;

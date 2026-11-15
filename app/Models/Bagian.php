@@ -26,9 +26,4 @@ class Bagian extends Model
     {
         return $this->hasMany(Unit::class);
     }
-
-    public function distribusiTools()
-    {
-        return $this->hasMany(DistribusiTool::class, 'bagian_id');
-    }
 }
