@@ -7,6 +7,8 @@ use App\Models\Departemen;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
 class BagianController extends Controller
@@ -58,12 +60,12 @@ class BagianController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nama_bagian' => 'required|string|max:100',
             'departemen_id' => 'required|exists:departemens,id',
         ]);
 
-        Bagian::create($request->all());
+        Bagian::create($validated);
 
         return redirect()->route('lokasi.bagian.index')->with('success', 'Bagian created successfully.');
     }
@@ -81,30 +83,44 @@ class BagianController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nama_bagian' => 'required|string|max:100',
             'departemen_id' => 'required|exists:departemens,id',
         ]);
 
         $bagian = Bagian::findOrFail($id);
-        $bagian->update($request->all());
+        $bagian->update($validated);
 
         return redirect()->route('lokasi.bagian.index')->with('success', 'Bagian updated successfully.');
     }
 
     public function destroy($id)
     {
-        Bagian::findOrFail($id)->delete();
-
-        return redirect()->route('lokasi.bagian.index')->with('success', 'Bagian deleted successfully.');
+        try {
+            Bagian::findOrFail($id)->delete();
+            return redirect()->route('lokasi.bagian.index')->with('success', 'Bagian deleted successfully.');
+        } catch (\Throwable $e) {
+            Log::error('Gagal menghapus bagian: ' . $e->getMessage(), ['bagian_id' => $id]);
+            return redirect()->route('lokasi.bagian.index')->with('error', 'Gagal menghapus bagian. Pastikan tidak ada data terkait.');
+        }
     }
 
     public function toggleBagian(Bagian $bagian)
     {
-        $bagianActive = $bagian->is_active;
-        $bagian->is_active = !$bagian->is_active;
-        $bagian->save();
-        Unit::where('bagian_id', $bagian->id)->update(['is_active' => !$bagianActive]);
-        return redirect()->route('lokasi.bagian.index')->with('success', 'bagian Berhasil Di Non Aktifkan.');
+        try {
+            DB::transaction(function () use ($bagian) {
+                $bagianActive = (bool) $bagian->is_active;
+                $newStatus = !$bagianActive;
+                $bagian->is_active = $newStatus;
+                $bagian->save();
+                Unit::where('bagian_id', $bagian->id)->update(['is_active' => $newStatus]);
+            });
+
+            $message = $bagian->is_active ? 'Bagian berhasil diaktifkan.' : 'Bagian berhasil dinonaktifkan.';
+            return redirect()->route('lokasi.bagian.index')->with('success', $message);
+        } catch (\Throwable $e) {
+            Log::error('Gagal mengubah status bagian: ' . $e->getMessage(), ['bagian_id' => $bagian->id]);
+            return redirect()->route('lokasi.bagian.index')->with('error', 'Gagal mengubah status bagian.');
+        }
     }
 }

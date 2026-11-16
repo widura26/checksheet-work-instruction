@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\BillOfMaterialRevision;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemAdapter;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class BomDocumentRevisionController extends Controller
@@ -21,11 +23,20 @@ class BomDocumentRevisionController extends Controller
     public function delete(string $id){
         $revision = BillOfMaterialRevision::findOrFail($id);
         $bomId = $revision->bom_id;
+        $path = $revision->path_file;
 
-        Storage::disk('public')->delete($revision->path_file);
-        $revision->delete();
+        try {
+            DB::transaction(function () use ($revision) {
+                $revision->delete();
+            });
+            Storage::disk('public')->delete($path);
 
-        return redirect()->route('bill-of-material.edit', $bomId)->with('success', 'Dokumen berhasil dihapus.');
+            return redirect()->route('bill-of-material.edit', $bomId)->with('success', 'Dokumen berhasil dihapus.');
+        } catch (\Throwable $e) {
+            Log::error('Gagal menghapus dokumen BOM: ' . $e->getMessage(), ['revision_id' => $id]);
+
+            return redirect()->route('bill-of-material.edit', $bomId)->with('error', 'Gagal menghapus dokumen.');
+        }
     }
 
     public function download(string $id){

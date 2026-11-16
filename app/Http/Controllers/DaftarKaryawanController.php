@@ -133,10 +133,11 @@ class DaftarKaryawanController extends Controller
         }
 
         $request->validate([
-            'file' => 'required|file|extensions:xlsx,xls,csv',
+            'file' => 'required|file|mimes:xlsx,xls,csv,txt|max:10240',
         ], [
             'file.required' => 'File wajib dipilih.',
-            'file.extensions' => 'File harus berformat xlsx, xls, atau csv.',
+            'file.mimes' => 'File harus berformat xlsx, xls, atau csv.',
+            'file.max' => 'Ukuran file maksimal 10 MB.',
         ]);
 
         try {

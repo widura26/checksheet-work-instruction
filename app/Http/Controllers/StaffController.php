@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
 
 class StaffController extends Controller
@@ -159,22 +160,65 @@ class StaffController extends Controller
     {
         try {
             $staff = User::where('nip', $nip)->firstOrFail();
+
+            if (auth()->id() === $staff->id && $staff->is_active) {
+                return redirect()->route('staff.index')->with('error', 'Anda tidak dapat menonaktifkan akun sendiri.');
+            }
+
+            if ($staff->is_active && $staff->hasRole('admin')) {
+                $activeAdmins = User::role('admin')->where('is_active', true)->count();
+                if ($activeAdmins <= 1) {
+                    return redirect()->route('staff.index')->with('error', 'Tidak dapat menonaktifkan admin aktif terakhir.');
+                }
+            }
+
             $staff->is_active = !$staff->is_active;
             $staff->save();
             return redirect()->route('staff.index')->with('success', 'Status Staff berhasil diperbarui.');
         } catch (\Throwable $th) {
-            return redirect()->route('staff.index')->with('error', 'Staff tidak ditemukan.');
+            Log::error('Gagal mengubah status staff: ' . $th->getMessage(), ['nip' => $nip]);
+            return redirect()->route('staff.index')->with('error', 'Gagal memperbarui status staff.');
         }
     }
+
     public function destroy(Request $request, $id)
     {
-        $staff = User::findOrFail($id);
-        $staff->delete();
+        try {
+            $staff = User::findOrFail($id);
 
-        if ($request->ajax()) {
-            return response()->json(['success' => 'Staff berhasil dihapus.']);
+            if (auth()->id() === $staff->id) {
+                $message = 'Anda tidak dapat menghapus akun sendiri.';
+                if ($request->ajax()) {
+                    return response()->json(['message' => $message], 422);
+                }
+                return redirect()->route('staff.index')->with('error', $message);
+            }
+
+            if ($staff->hasRole('admin')) {
+                $adminCount = User::role('admin')->count();
+                if ($adminCount <= 1) {
+                    $message = 'Tidak dapat menghapus admin terakhir.';
+                    if ($request->ajax()) {
+                        return response()->json(['message' => $message], 422);
+                    }
+                    return redirect()->route('staff.index')->with('error', $message);
+                }
+            }
+
+            $staff->delete();
+
+            if ($request->ajax()) {
+                return response()->json(['success' => 'Staff berhasil dihapus.']);
+            }
+
+            return redirect()->route('staff.index')->with('success', 'Staff berhasil dihapus.');
+        } catch (\Throwable $th) {
+            Log::error('Gagal menghapus staff: ' . $th->getMessage(), ['staff_id' => $id]);
+            $message = 'Gagal menghapus staff.';
+            if ($request->ajax()) {
+                return response()->json(['message' => $message], 500);
+            }
+            return redirect()->route('staff.index')->with('error', $message);
         }
-
-        return redirect()->route('staff.index')->with('success', 'Staff berhasil dihapus.');
     }
 }

@@ -13,6 +13,7 @@ use App\Imports\SapDatasetImport;
 use App\Exports\SapDatasetExport;
 use App\Jobs\ImportExcelJob;
 use App\Services\DataProcessService;
+use App\Models\DaftarKebutuhanMaterial;
 use App\Support\ImportTracker;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
@@ -23,8 +24,7 @@ class SapDatasetController extends Controller
     public function index(DataProcessService $svc){
         $options = Cache::remember('mp:options:v' . Cache::get('mp:version', 1), 300,
             fn () => $svc->filterOptions());
-
-        $defaultTrainset = in_array('TS 14', $options['trainset']) ? 'TS 14' : 'Semua';
+        $defaultTrainset = 'Semua';
 
         return view('material-planning.index', compact('options','defaultTrainset'));
     }
@@ -52,51 +52,51 @@ class SapDatasetController extends Controller
         $proyek   = (string) $request->input('proyek', 'Semua');
         $group    = (string) $request->input('group', 'Semua');
         $trainset = (string) $request->input('trainset', 'Semua');
-        $statuses = $this->statusesFromRequest($request);
         $format   = strtolower((string) $request->input('format', 'csv'));
 
-        $rows = $svc->filteredDataset(
-            $proyek,
-            $group,
-            $trainset,
-            $statuses,
-            (string) $request->input('search', ''),
-            (string) $request->input('sort', 'no'),
-            (string) $request->input('dir', 'asc')
-        );
+        $columns = \Illuminate\Support\Facades\Schema::getColumnListing('daftar_kebutuhan_materials');
+
+        $query = DaftarKebutuhanMaterial::query()->select($columns);
+
+        $dbGroup = DaftarKebutuhanMaterial::query()->getGrammar()->wrap('group');
+        $query->whereNotNull('group')->whereRaw("TRIM($dbGroup) <> ''");
+
+        if ($proyek !== 'Semua') {
+            $query->where('wbs', $proyek);
+        }
+        if ($group !== 'Semua') {
+            $query->where('group', $group);
+        }
+        if ($trainset !== 'Semua') {
+            $query->where('lot', $trainset);
+        }
+
+        $query->orderBy('no')->orderBy('kode_material');
 
         $baseName = 'Dataset_BOM_Monitoring_' . now()->format('Ymd_His');
 
         if ($format === 'xlsx' || $format === 'excel') {
-            return Excel::download(new SapDatasetExport($rows), $baseName . '.xlsx');
+            return Excel::download(
+                new SapDatasetExport($query->get(), $columns),
+                $baseName . '.xlsx'
+            );
         }
 
         $filename = $baseName . '.csv';
 
-        return response()->streamDownload(function () use ($rows) {
+        return response()->streamDownload(function () use ($query, $columns) {
             $output = fopen('php://output', 'w');
 
             // BOM + delimiter semicolon agar terbaca rapi per kolom di Excel.
             fwrite($output, "\xEF\xBB\xBF");
-            fputcsv($output, [
-                'NO', 'Group', 'Tindak Lanjut', 'Deskripsi Material',
-                'Kebutuhan', 'Qty PR (BOM)', 'Kode Material', 'Trainset',
-                'Status PR', 'Proyek',
-            ], ';');
+            fputcsv($output, $columns, ';');
 
-            foreach ($rows as $row) {
-                fputcsv($output, [
-                    $row['no'],
-                    $row['group'],
-                    $row['tindak_lanjut'],
-                    $row['deskripsi'],
-                    $row['kebutuhan'],
-                    $row['qty_pr'],
-                    $row['kode_material'],
-                    $row['trainset'],
-                    $row['status_pr'],
-                    $row['proyek'],
-                ], ';');
+            foreach ($query->cursor() as $row) {
+                $data = [];
+                foreach ($columns as $column) {
+                    $data[] = $row->{$column};
+                }
+                fputcsv($output, $data, ';');
             }
 
             fclose($output);
@@ -120,15 +120,16 @@ class SapDatasetController extends Controller
     public function import(Request $request){
         try {
             $request->validate([
-                'file' => 'required|file|extensions:xlsx,xls,csv',
+                'file' => 'required|file|mimes:xlsx,xls,csv,txt|max:20480',
             ], [
                 'file.required' => 'File wajib dipilih.',
-                'file.extensions' => 'File harus berformat xlsx, xls, atau csv.',
+                'file.mimes' => 'File harus berformat xlsx, xls, atau csv.',
+                'file.max' => 'Ukuran file maksimal 20 MB.',
             ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Validasi gagal.',
                 'errors' => $e->errors(),
             ], 422);
         }
@@ -262,7 +263,7 @@ class SapDatasetController extends Controller
             Log::error('Error importing SAP dataset: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal mengimpor data: ' . $e->getMessage(),
+                'message' => 'Gagal mengimpor data.',
             ], 500);
         }
     }
@@ -270,15 +271,16 @@ class SapDatasetController extends Controller
     public function importQueue(Request $request){
         try {
             $request->validate([
-                'file' => 'required|file|extensions:xlsx,xls,csv',
+                'file' => 'required|file|mimes:xlsx,xls,csv,txt|max:20480',
             ], [
                 'file.required' => 'File wajib dipilih.',
-                'file.extensions' => 'File harus berformat xlsx, xls, atau csv.',
+                'file.mimes' => 'File harus berformat xlsx, xls, atau csv.',
+                'file.max' => 'Ukuran file maksimal 20 MB.',
             ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Validasi gagal.',
                 'errors' => $e->errors(),
             ], 422);
         }
@@ -393,9 +395,32 @@ class SapDatasetController extends Controller
         return $result;
     }
 
-    public function delete(){
-        SapDataset::truncate();
-        return redirect()->back();
+    public function delete(Request $request){
+        if (!auth()->user()->hasRole(['admin'])) {
+            abort(403);
+        }
+
+        $request->validate([
+            'confirm_delete' => 'required|string|in:HAPUS',
+        ], [
+            'confirm_delete.required' => 'Konfirmasi penghapusan wajib diisi.',
+            'confirm_delete.in' => 'Konfirmasi tidak valid.',
+        ]);
+
+        try {
+            DB::transaction(function () {
+                SapDataset::query()->delete();
+            });
+            Cache::forget('mp:version');
+            Log::warning('Seluruh data SAP dataset dihapus oleh user.', [
+                'user_id' => auth()->id(),
+            ]);
+
+            return redirect()->back()->with('success', 'Data SAP dataset berhasil dihapus.');
+        } catch (\Throwable $e) {
+            Log::error('Gagal menghapus data SAP dataset: ' . $e->getMessage(), ['user_id' => auth()->id()]);
+            return redirect()->back()->with('error', 'Gagal menghapus data SAP dataset.');
+        }
     }
 
     public function deviation(Request $request){
@@ -462,16 +487,16 @@ class SapDatasetController extends Controller
     public function import_excel(Request $request){
         try {
             $request->validate([
-                'file' => 'required|file|extensions:xlsx,xls|max:20480',
+                'file' => 'required|file|mimes:xlsx,xls|max:20480',
             ], [
                 'file.required' => 'File wajib dipilih.',
-                'file.extensions' => 'File harus berformat xlsx atau xls.',
+                'file.mimes' => 'File harus berformat xlsx atau xls.',
                 'file.max' => 'Ukuran file maksimal 20 MB.',
             ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Validasi gagal.',
                 'errors' => $e->errors(),
             ], 422);
         }

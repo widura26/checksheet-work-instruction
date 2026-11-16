@@ -7,101 +7,159 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
     <title>Login - Worksheet</title>
-    <link rel="apple-touch-icon" sizes="57x57" href="{{ asset('template/assets/favicon/apple-icon-57x57.png') }}" />
-    <link rel="apple-touch-icon" sizes="60x60" href="{{ asset('template/assets/favicon/apple-icon-60x60.png') }}" />
-    <link rel="apple-touch-icon" sizes="72x72" href="{{ asset('template/assets/favicon/apple-icon-72x72.png') }}" />
-    <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('template/assets/favicon/apple-icon-76x76.png') }}" />
-    <link rel="apple-touch-icon" sizes="114x114" href="{{ asset('template/assets/favicon/apple-icon-114x114.png') }}" />
-    <link rel="apple-touch-icon" sizes="120x120" href="{{ asset('template/assets/favicon/apple-icon-120x120.png') }}" />
-    <link rel="apple-touch-icon" sizes="144x144" href="{{ asset('template/assets/favicon/apple-icon-144x144.png') }}" />
-    <link rel="apple-touch-icon" sizes="152x152" href="{{ asset('template/assets/favicon/apple-icon-152x152.png') }}" />
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('template/assets/favicon/apple-icon-180x180.png') }}" />
     <link rel="icon" type="image/png" sizes="192x192"
         href="{{ asset('template/assets/img/Logo_INKA_-_Industri_Kereta_Api_Indonesia.svg') }}" />
-    <link rel="manifest" href="{{ asset('template/assets/favicon/manifest.json') }}" />
-    <meta name="msapplication-TileColor" content="#ffffff" />
-    <meta name="msapplication-TileImage" content="{{ asset('template/assets/favicon/ms-icon-144x144.png') }}" />
     <meta name="theme-color" content="#ffffff" />
-    <!-- Vendors styles-->
-    <link rel="stylesheet" href="{{ asset('template/vendors/simplebar/css/simplebar.css') }}" />
-    <link rel="stylesheet" href="{{ asset('template/css/vendors/simplebar.css') }}" />
-    <!-- Main styles for this application-->
     <link href="{{ asset('template/css/style.css') }}" rel="stylesheet" />
-    <!-- We use those styles to show code examples, you should remove them in your application.-->
-    <link href="{{ asset('template/css/examples.css') }}" rel="stylesheet" />
-    <script src="{{ asset('template/js/config.js') }}"></script>
-    <script src="{{ asset('template/js/color-modes.js') }}"></script>
+    <style>
+        :root {
+            --login-bg: #ffffff;
+            --login-card-bg: #ffffff;
+            --login-border: #e9ecef;
+            --login-text: #212529;
+            --login-muted: #6c757d;
+            --login-focus: #212529;
+        }
+
+        body {
+            background: var(--login-bg);
+            color: var(--login-text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        .login-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            background: #ffffff;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            background: var(--login-card-bg);
+            border: 1px solid var(--login-border);
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        .login-logo {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.75rem;
+        }
+
+        .login-logo img {
+            height: 72px;
+            width: auto;
+            max-width: 100%;
+        }
+
+        .login-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 0.25rem;
+            color: var(--login-text);
+        }
+
+        .login-subtitle {
+            font-size: 0.875rem;
+            text-align: center;
+            color: var(--login-muted);
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.4rem;
+            color: var(--login-text);
+        }
+
+        .form-control {
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 0.75rem 0.9rem;
+            font-size: 0.95rem;
+            background: #fff;
+            box-shadow: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .form-control:focus {
+            border-color: #adb5bd;
+            box-shadow: 0 0 0 3px rgba(33, 37, 41, 0.06);
+        }
+
+        .btn-login {
+            width: 100%;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            background: #111827;
+            border: 1px solid #111827;
+            color: #fff;
+            transition: background 0.15s ease, transform 0.05s ease;
+        }
+
+        .btn-login:hover,
+        .btn-login:focus {
+            background: #000000;
+            border-color: #000000;
+            color: #fff;
+        }
+
+        .btn-login:active {
+            transform: translateY(1px);
+        }
+
+        .invalid-feedback {
+            font-size: 0.8125rem;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="bg-body-tertiary min-vh-100 d-flex flex-row align-items-center">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="card-group d-block d-md-flex row">
-                        <div class="card col-md-7 p-4 mb-0">
-                            <div class="card-body">
-                                <h4 class="mb-3">Worksheet</h4>
-                                <form method="POST" action="{{ route('login') }}">
-                                    @csrf
-                                    <div class="input-group mb-3">
-                                        <span class="input-group-text">
-                                            <svg class="icon">
-                                                <use
-                                                    xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-user') }}">
-                                                </use>
-                                            </svg></span>
-                                        <input class="form-control @error('nip') is-invalid @enderror" type="text"
-                                            name="nip" placeholder="NIP" value="{{ old('nip') }}" required
-                                            autofocus />
-                                        @error('nip')
-                                            <div class="invalid-feedback">
-                                                {{ $message }}
-                                            </div>
-                                        @enderror
-                                    </div>
-                                    <div class="input-group mb-4">
-                                        <span class="input-group-text">
-                                            <svg class="icon">
-                                                <use
-                                                    xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-lock-locked') }}">
-                                                </use>
-                                            </svg></span>
-                                        <input class="form-control @error('password') is-invalid @enderror"
-                                            type="password" name="password" placeholder="Password" required />
-                                        @error('password')
-                                            <div class="invalid-feedback">
-                                                {{ $message }}
-                                            </div>
-                                        @enderror
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <button class="btn btn-primary px-4" type="submit">
-                                                Login
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                        <div class="card col-md-5 text-white bg-white py-5">
-                            <div class="card-body text-center">
-                                <div>
-                                    <img src="{{ asset('template/assets/img/Logo_INKA_-_Industri_Kereta_Api_Indonesia.svg') }}"
-                                        alt="Dashboard" style="width: 80%;">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-logo">
+                <img src="{{ asset('template/assets/img/Logo_INKA_-_Industri_Kereta_Api_Indonesia.svg') }}" alt="INKA">
             </div>
+
+            <form method="POST" action="{{ route('login') }}">
+                @csrf
+
+                <div class="mb-3">
+                    <label for="nip" class="form-label">NIP</label>
+                    <input id="nip" class="form-control @error('nip') is-invalid @enderror" type="text"
+                        name="nip" placeholder="Masukkan NIP" value="{{ old('nip') }}" required autofocus />
+                    @error('nip')
+                        <div class="invalid-feedback d-block">
+                            {{ $message }}
+                        </div>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label for="password" class="form-label">Password</label>
+                    <input id="password" class="form-control @error('password') is-invalid @enderror"
+                        type="password" name="password" placeholder="Masukkan password" required />
+                    @error('password')
+                        <div class="invalid-feedback d-block">
+                            {{ $message }}
+                        </div>
+                    @enderror
+                </div>
+
+                <button class="btn btn-login" type="submit">Login</button>
+            </form>
         </div>
     </div>
-    <!-- CoreUI and necessary plugins-->
-    <script src="{{ asset('template/vendors/@coreui/coreui/js/coreui.bundle.min.js') }}"></script>
-    <script src="{{ asset('template/vendors/simplebar/js/simplebar.min.js') }}"></script>
-    <script type="module"></script>
 </body>
 
 </html>

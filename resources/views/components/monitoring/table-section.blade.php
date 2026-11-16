@@ -77,7 +77,7 @@
                     <th>Kebutuhan</th>
                     <th>Qty PR (BOM)</th>
                     <th>Kode Material</th>
-                    <th>Trainset</th>
+                    <th>Lot / Batch</th>
                     <th>Status PR</th>
                 </tr>
             </thead>

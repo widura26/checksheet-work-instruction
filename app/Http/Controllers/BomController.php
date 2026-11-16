@@ -6,6 +6,8 @@ use App\Models\BillOfMaterial;
 use App\Models\BillOfMaterialRevision;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class BomController extends Controller
@@ -51,7 +53,7 @@ class BomController extends Controller
                     'name'           => $item->name,
                     'name_project'   => $item->name_project,
                     'published_date' => $item->published_date ? \Carbon\Carbon::parse($item->published_date)->format('d-m-Y') : null,
-                    'revise'         => $item->latestRevision->revision_version,
+                    'revise'         => optional($item->latestRevision)->revision_version,
                     'project_code'   => $item->project_code,
                     'project_name'   => $item->name_project,
                 ];
@@ -68,7 +70,7 @@ class BomController extends Controller
 
     public function store(Request $request){
         $validated = $request->validate([
-            'project_id'         => 'required',
+            'project_id'         => 'required|exists:projects,id',
             'number'             => 'required|string|max:255',
             'name'               => 'required|string|max:255',
             'published_date'     => 'required|date',
@@ -78,30 +80,42 @@ class BomController extends Controller
             'revision_versions.*'=> 'nullable|string|max:255',
         ]);
 
-        $bom = BillOfMaterial::create([
-            'project_id'     => $validated['project_id'],
-            'number'         => $validated['number'],
-            'name'           => $validated['name'],
-            'published_date' => $validated['published_date'],
-        ]);
-
-        if ($request->hasFile('documents')) {
-            $files = $request->file('documents');
-            $versions = $request->input('revision_versions', []);
-
-            foreach ($files as $index => $file) {
-                $rev = $versions[$index] ?? '0';
-                $path = $file->store('bill-of-material-revisions/rev-' . $rev, 'public');
-                BillOfMaterialRevision::create([
-                    'bom_id'            => $bom->id,
-                    'original_name_file'=> $file->getClientOriginalName(),
-                    'path_file'         => $path,
-                    'revision_version'  => $rev,
+        $storedPaths = [];
+        try {
+            DB::transaction(function () use ($request, $validated, &$storedPaths) {
+                $bom = BillOfMaterial::create([
+                    'project_id'     => $validated['project_id'],
+                    'number'         => $validated['number'],
+                    'name'           => $validated['name'],
+                    'published_date' => $validated['published_date'],
                 ]);
-            }
-        }
 
-        return redirect()->route('bill-of-material.index')->with('success', 'Bill Of Material berhasil ditambahkan.');
+                if ($request->hasFile('documents')) {
+                    $files = $request->file('documents');
+                    $versions = $request->input('revision_versions', []);
+
+                    foreach ($files as $index => $file) {
+                        $rev = $versions[$index] ?? '0';
+                        $path = $file->store('bill-of-material-revisions/rev-' . $rev, 'public');
+                        $storedPaths[] = $path;
+                        BillOfMaterialRevision::create([
+                            'bom_id'            => $bom->id,
+                            'original_name_file'=> $file->getClientOriginalName(),
+                            'path_file'         => $path,
+                            'revision_version'  => $rev,
+                        ]);
+                    }
+                }
+            });
+
+            return redirect()->route('bill-of-material.index')->with('success', 'Bill Of Material berhasil ditambahkan.');
+        } catch (\Throwable $e) {
+            foreach ($storedPaths as $path) {
+                Storage::disk('public')->delete($path);
+            }
+            Log::error('Gagal menambahkan Bill Of Material: ' . $e->getMessage());
+            return redirect()->back()->withInput()->with('error', 'Gagal menambahkan Bill Of Material.');
+        }
     }
 
     public function edit(string $id){
@@ -115,7 +129,7 @@ class BomController extends Controller
         $bom = BillOfMaterial::findOrFail($id);
 
         $validated = $request->validate([
-            'project_id'         => 'required',
+            'project_id'         => 'required|exists:projects,id',
             'number'             => 'required|string|max:255',
             'name'               => 'required|string|max:255',
             'published_date'     => 'required|date',
@@ -125,41 +139,63 @@ class BomController extends Controller
             'revision_versions.*'=> 'nullable|string|max:255',
         ]);
 
-        $bom->update([
-            'project_id'     => $validated['project_id'],
-            'number'         => $validated['number'],
-            'name'           => $validated['name'],
-            'published_date' => $validated['published_date'],
-        ]);
-
-        if ($request->hasFile('documents')) {
-            $files = $request->file('documents');
-            $versions = $request->input('revision_versions', []);
-            foreach ($files as $index => $file) {
-                $rev = $versions[$index] ?? '0';
-                $path = $file->store('bill-of-material-revisions/rev-' . $rev, 'public');
-                BillOfMaterialRevision::create([
-                    'bom_id'            => $bom->id,
-                    'original_name_file'=> $file->getClientOriginalName(),
-                    'path_file'         => $path,
-                    'revision_version'  => $rev,
+        $storedPaths = [];
+        try {
+            DB::transaction(function () use ($request, $validated, $bom, &$storedPaths) {
+                $bom->update([
+                    'project_id'     => $validated['project_id'],
+                    'number'         => $validated['number'],
+                    'name'           => $validated['name'],
+                    'published_date' => $validated['published_date'],
                 ]);
-            }
-        }
 
-        return redirect()->route('bill-of-material.index')->with('success', 'Bill Of Material berhasil diperbarui.');
+                if ($request->hasFile('documents')) {
+                    $files = $request->file('documents');
+                    $versions = $request->input('revision_versions', []);
+                    foreach ($files as $index => $file) {
+                        $rev = $versions[$index] ?? '0';
+                        $path = $file->store('bill-of-material-revisions/rev-' . $rev, 'public');
+                        $storedPaths[] = $path;
+                        BillOfMaterialRevision::create([
+                            'bom_id'            => $bom->id,
+                            'original_name_file'=> $file->getClientOriginalName(),
+                            'path_file'         => $path,
+                            'revision_version'  => $rev,
+                        ]);
+                    }
+                }
+            });
+
+            return redirect()->route('bill-of-material.index')->with('success', 'Bill Of Material berhasil diperbarui.');
+        } catch (\Throwable $e) {
+            foreach ($storedPaths as $path) {
+                Storage::disk('public')->delete($path);
+            }
+            Log::error('Gagal memperbarui Bill Of Material: ' . $e->getMessage(), ['bom_id' => $id]);
+            return redirect()->back()->withInput()->with('error', 'Gagal memperbarui Bill Of Material.');
+        }
     }
 
     public function delete(string $id){
         $bom = BillOfMaterial::with('revisions')->findOrFail($id);
+        $paths = $bom->revisions->pluck('path_file')->all();
 
-        foreach ($bom->revisions as $revision) {
-            Storage::disk('public')->delete($revision->path_file);
-            $revision->delete();
+        try {
+            DB::transaction(function () use ($bom) {
+                foreach ($bom->revisions as $revision) {
+                    $revision->delete();
+                }
+                $bom->delete();
+            });
+
+            foreach ($paths as $path) {
+                Storage::disk('public')->delete($path);
+            }
+
+            return redirect()->route('bill-of-material.index')->with('success', 'Bill Of Material berhasil dihapus.');
+        } catch (\Throwable $e) {
+            Log::error('Gagal menghapus Bill Of Material: ' . $e->getMessage(), ['bom_id' => $id]);
+            return redirect()->route('bill-of-material.index')->with('error', 'Gagal menghapus Bill Of Material.');
         }
-
-        $bom->delete();
-
-        return redirect()->route('bill-of-material.index')->with('success', 'Bill Of Material berhasil dihapus.');
     }
 }

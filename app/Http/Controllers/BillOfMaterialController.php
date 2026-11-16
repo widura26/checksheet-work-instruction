@@ -15,7 +15,7 @@ class BillOfMaterialController extends Controller
     {
         try {
             $request->validate([
-                'file' => 'required|file|extensions:csv,xlsx,xls|max:20480',
+                'file' => 'required|file|mimes:csv,txt,xlsx,xls|max:20480',
             ], [
                 'file.required' => 'Pilih file terlebih dahulu.',
                 'file.extensions' => 'Format file harus .csv, .xlsx, atau .xls.',
