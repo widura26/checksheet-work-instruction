@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('departemens', function (Blueprint $table) {
             $table->id();
             $table->string('nama_departemen');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->softDeletes();
         });
