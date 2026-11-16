@@ -23,8 +23,7 @@ class SapDatasetController extends Controller
     public function index(DataProcessService $svc){
         $options = Cache::remember('mp:options:v' . Cache::get('mp:version', 1), 300,
             fn () => $svc->filterOptions());
-
-        $defaultTrainset = in_array('TS 14', $options['trainset']) ? 'TS 14' : 'Semua';
+        $defaultTrainset = 'Semua';
 
         return view('material-planning.index', compact('options','defaultTrainset'));
     }
