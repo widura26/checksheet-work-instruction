@@ -6,7 +6,6 @@
             </svg>
             <span class="fw-semibold" style="font-size: 15px; color: #31333F;">Upload Daftar Kebutuhan Material</span>
         </div>
-        <span class="text-muted small">Excel (.xlsx / .xls)</span>
     </div>
     <div class="st-expander-body" id="expanderBody" style="display: none;">
         <!-- Kriteria File -->
@@ -41,11 +40,11 @@
         </div>
 
         <!-- Action button and info -->
-        <div class="d-flex align-items-center gap-3 flex-wrap">
-            <button type="button" class="btn btn-primary text-white fw-semibold px-4 py-2 rounded-2" id="btnBomGenerate" style="background-color: #0068c9; border-color: #0068c9;">
+        <div class="d-flex align-items-center gap-3 flex-wrap" style="justify-content: end;">
+            <span class="text-muted small" id="bomStatusText">Belum ada file diunggah.</span>
+            <button type="button" class="btn btn-primary text-white fw-semibold px-4 py-2 rounded-2" id="btnBomGenerate" style="background-color: #187cff;">
                 Generate & Rekap Data
             </button>
-            <span class="text-muted small" id="bomStatusText">Belum ada file diunggah.</span>
         </div>
 
         <!-- Progress / Result container -->
