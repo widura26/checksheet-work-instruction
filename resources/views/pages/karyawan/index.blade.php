@@ -236,8 +236,8 @@
                 update: "{{ route('karyawan.update', '__NIP__') }}",
                 destroy: "{{ route('karyawan.destroy', '__NIP__') }}",
                 import: "{{ route('karyawan.import') }}",
-                bagian: "{{ route('distribusi.api.bagian', '__ID__') }}",
-                unit: "{{ route('distribusi.api.unit', '__ID__') }}",
+                bagian: "{{ route('karyawan.api.bagian', '__ID__') }}",
+                unit: "{{ route('karyawan.api.unit', '__ID__') }}",
             },
             canManage: {{ Auth::user()->hasRole(['admin']) ? 'true' : 'false' }}
         };

@@ -43,10 +43,16 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="st-card-title mb-0">Data Daftar Kebutuhan Material (<span id="bomCountBadge">215</span>)</h5>
         <div class="d-flex gap-2">
-            <button type="button" class="btn btn-sm btn-light border py-1 px-3 d-flex align-items-center gap-1 fw-semibold text-secondary" id="btnExportBomCsv" title="Download CSV">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                Download CSV
-            </button>
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-light border py-1 px-3 d-flex align-items-center gap-1 fw-semibold text-secondary dropdown-toggle" data-bs-toggle="dropdown" data-coreui-toggle="dropdown" aria-expanded="false" title="Download Data">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Download
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><button type="button" class="dropdown-item" id="btnExportBomCsv">CSV</button></li>
+                    <li><button type="button" class="dropdown-item" id="btnExportBomXlsx">Excel (.xlsx)</button></li>
+                </ul>
+            </div>
         </div>
     </div>
     <div class="table-responsive">

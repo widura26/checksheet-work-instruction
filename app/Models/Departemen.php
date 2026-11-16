@@ -19,14 +19,4 @@ class Departemen extends Model
     {
         return $this->hasMany(Bagian::class);
     }
-
-    public function distribusiTools()
-    {
-        return $this->hasMany(DistribusiTool::class, 'departemen_id');
-    }
-
-    public function posisiCt()
-    {
-        return $this->hasOne(Posisi_CT::class, 'departemen_id');
-    }
 }

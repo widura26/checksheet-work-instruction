@@ -10,6 +10,7 @@ use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use App\Imports\SapDatasetImport;
+use App\Exports\SapDatasetExport;
 use App\Jobs\ImportExcelJob;
 use App\Services\DataProcessService;
 use App\Support\ImportTracker;
@@ -52,6 +53,7 @@ class SapDatasetController extends Controller
         $group    = (string) $request->input('group', 'Semua');
         $trainset = (string) $request->input('trainset', 'Semua');
         $statuses = $this->statusesFromRequest($request);
+        $format   = strtolower((string) $request->input('format', 'csv'));
 
         $rows = $svc->filteredDataset(
             $proyek,
@@ -63,18 +65,24 @@ class SapDatasetController extends Controller
             (string) $request->input('dir', 'asc')
         );
 
-        $filename = 'Dataset_BOM_Monitoring_' . now()->format('Ymd_His') . '.csv';
+        $baseName = 'Dataset_BOM_Monitoring_' . now()->format('Ymd_His');
+
+        if ($format === 'xlsx' || $format === 'excel') {
+            return Excel::download(new SapDatasetExport($rows), $baseName . '.xlsx');
+        }
+
+        $filename = $baseName . '.csv';
 
         return response()->streamDownload(function () use ($rows) {
             $output = fopen('php://output', 'w');
 
-            // BOM agar Excel membaca UTF-8 dengan benar.
+            // BOM + delimiter semicolon agar terbaca rapi per kolom di Excel.
             fwrite($output, "\xEF\xBB\xBF");
             fputcsv($output, [
                 'NO', 'Group', 'Tindak Lanjut', 'Deskripsi Material',
                 'Kebutuhan', 'Qty PR (BOM)', 'Kode Material', 'Trainset',
                 'Status PR', 'Proyek',
-            ]);
+            ], ';');
 
             foreach ($rows as $row) {
                 fputcsv($output, [
@@ -88,7 +96,7 @@ class SapDatasetController extends Controller
                     $row['trainset'],
                     $row['status_pr'],
                     $row['proyek'],
-                ]);
+                ], ';');
             }
 
             fclose($output);

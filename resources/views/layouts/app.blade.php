@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     @include('partials.head')
-    {{-- @livewireStyles --}}
 </head>
 
 <body>
@@ -11,17 +10,16 @@
     @include('partials.sidebar')
     <div class="sidebar-overlay-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
 
-    <div class="">
+    <div class="app-shell">
         @include('partials.header')
-        <div class="grow">
-            <div class="container-lg px-4">
+        <main class="app-content">
+            <div class="container-fluid app-container">
                 @yield('content')
             </div>
-        </div>
+        </main>
         @include('partials.footer')
     </div>
     @include('partials.scripts')
-    @livewireScripts
 </body>
 
 </html>

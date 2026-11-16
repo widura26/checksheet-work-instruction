@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\DaftarKaryawanRequest;
 use App\Imports\KaryawanImport;
+use App\Models\Bagian;
 use App\Models\Departemen;
 use App\Models\Karyawan;
+use App\Models\Unit;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -169,5 +171,19 @@ class DaftarKaryawanController extends Controller
                 'message' => 'Gagal menghapus data karyawan.',
             ], 500);
         }
+    }
+
+    public function getBagian($departemen_id)
+    {
+        return response()->json(
+            Bagian::where('departemen_id', $departemen_id)->get()
+        );
+    }
+
+    public function getUnit($bagian_id)
+    {
+        return response()->json(
+            Unit::where('bagian_id', $bagian_id)->get()
+        );
     }
 }

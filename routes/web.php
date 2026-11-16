@@ -4,10 +4,8 @@ use App\Http\Controllers\BagianController;
 use App\Http\Controllers\BomController;
 use App\Http\Controllers\BomDocumentRevisionController;
 use App\Http\Controllers\BillOfMaterialController;
-use App\Http\Controllers\ChartsController;
 use App\Http\Controllers\DaftarKaryawanController;
 use App\Http\Controllers\DepartemenController;
-use App\Http\Controllers\DistribusiController;
 use App\Http\Controllers\KodeMaterialController;
 use App\Http\Controllers\ProjectCodeController;
 use App\Http\Controllers\ProsesController;
@@ -59,6 +57,8 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
     Route::prefix('karyawan')->name('karyawan.')->group(function () {
         Route::get('/', [DaftarKaryawanController::class, 'index'])->name('index');
         Route::get('/data', [DaftarKaryawanController::class, 'data'])->name('data');
+        Route::get('/api/bagian/{departemen_id}', [DaftarKaryawanController::class, 'getBagian'])->name('api.bagian');
+        Route::get('/api/unit/{bagian_id}', [DaftarKaryawanController::class, 'getUnit'])->name('api.unit');
         Route::get('/{karyawan}', [DaftarKaryawanController::class, 'show'])->name('show');
         Route::post('/', [DaftarKaryawanController::class, 'store'])->name('store');
         Route::put('/{karyawan}', [DaftarKaryawanController::class, 'update'])->name('update');
@@ -74,8 +74,6 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::get('/{id}/edit', [DepartemenController::class, 'edit'])->name('edit');
         Route::put('/{id}', [DepartemenController::class, 'update'])->name('update');
         Route::delete('/{id}', [DepartemenController::class, 'destroy'])->name('destroy');
-        Route::get('/{id}/distribusi', [DepartemenController::class, 'distribusi'])->name('distribusi');
-        Route::get('/{id}/distribusi/data', [DepartemenController::class, 'getDistribusiData'])->name('distribusi.data');
         Route::post('/{departemen}/toggle', [DepartemenController::class, 'toggleDepartemen'])->name('toggle');
     });
 
@@ -87,8 +85,6 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::get('/{id}/edit', [BagianController::class, 'edit'])->name('edit');
         Route::put('/{id}', [BagianController::class, 'update'])->name('update');
         Route::delete('/{id}', [BagianController::class, 'destroy'])->name('destroy');
-        Route::get('/{id}/distribusi', [BagianController::class, 'distribusi'])->name('distribusi');
-        Route::get('/{id}/distribusi/data', [BagianController::class, 'getDistribusiData'])->name('distribusi.data');
         Route::post('/{bagian}/toggle', [BagianController::class, 'toggleBagian'])->name('toggle');
     });
 
@@ -100,24 +96,7 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::get('/{id}/edit', [UnitController::class, 'edit'])->name('edit');
         Route::put('/{id}', [UnitController::class, 'update'])->name('update');
         Route::delete('/{id}', [UnitController::class, 'destroy'])->name('destroy');
-        Route::get('/{id}/distribusi', [UnitController::class, 'distribusi'])->name('distribusi');
-        Route::get('/{id}/distribusi/data', [UnitController::class, 'getDistribusiData'])->name('distribusi.data');
         Route::post('/{unit}/toggle', [UnitController::class, 'toggleUnit'])->name('toggle');
-    });
-
-    Route::prefix('distribusi')->controller(DistribusiController::class)->group(function () {
-        Route::get('/', 'index')->name('distribusi.index');
-        Route::get('/datatable', 'datatable')->name('distribusi.datatable');
-        Route::get('/export', 'exportExcel')->name('distribusi.export');
-        Route::get('/{distribusiTool}', 'show')->name('distribusi.show');
-        Route::post('/batalkan/{distribusiTool}/penyerahan', 'batalkanPenyerahan')->name('distribusi.batalkan-penyerahan')->middleware('client.request.id');
-        Route::get('/peminjaman/{distribusiTool}/kembali', 'showPengembalian')->name('distribusi.peminjaman.kembali');
-        Route::post('/peminjaman/{distribusiTool}/kembali', 'storePengembalian')->name('distribusi.peminjaman.storeKembali')->middleware('client.request.id');
-        Route::get('/api/bagian/{departemen_id}', 'getBagian')->name('distribusi.api.bagian');
-        Route::get('/api/unit/{bagian_id}', 'getUnit')->name('distribusi.api.unit');
-        Route::get('/print/{distribusiTool}/berita-acara', 'beritaAcara')->name('distribusi.berita-acara');
-        Route::post('/distribusi/upload-bast', [DistribusiController::class, 'uploadBast'])->name('distribusi.upload-bast')->middleware('client.request.id');
-        Route::get('/distribusi/unduh-bast-ttd/{distribusiTool}', [DistribusiController::class, 'downloadBastFile'])->name('distribusi.unduh-bast-ttd');
     });
 
     Route::prefix('material-planning')->group(function(){
@@ -130,13 +109,6 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::post('/delete', [SapDatasetController::class, 'delete'])->name('sap-dataset.delete');
         Route::get('/deviation', [SapDatasetController::class, 'deviation'])->name('sap-dataset.deviation');
         Route::post('/import-excel', [SapDatasetController::class, 'import_excel'])->name('sap-dataset.import-excel');
-    });
-
-    Route::prefix('charts')->group(function(){
-        Route::get('/purchase-requisitions', [ChartsController::class, 'purchaseRequisition'])->name('purchase-requisition-chart-data');
-        Route::get('/purchase-order', [ChartsController::class, 'purchaseOrder'])->name('purchase-order-chart-data');
-        Route::get('/bompr', [ChartsController::class, 'bomprdifference'])->name('bompr-chart-data');
-        Route::get('/popr', [ChartsController::class, 'poprdifference'])->name('popr-chart-data');
     });
 
     Route::prefix('bill-of-material')->group(function(){
