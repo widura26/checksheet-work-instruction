@@ -13,6 +13,7 @@ use App\Imports\SapDatasetImport;
 use App\Exports\SapDatasetExport;
 use App\Jobs\ImportExcelJob;
 use App\Services\DataProcessService;
+use App\Models\DaftarKebutuhanMaterial;
 use App\Support\ImportTracker;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
@@ -51,51 +52,51 @@ class SapDatasetController extends Controller
         $proyek   = (string) $request->input('proyek', 'Semua');
         $group    = (string) $request->input('group', 'Semua');
         $trainset = (string) $request->input('trainset', 'Semua');
-        $statuses = $this->statusesFromRequest($request);
         $format   = strtolower((string) $request->input('format', 'csv'));
 
-        $rows = $svc->filteredDataset(
-            $proyek,
-            $group,
-            $trainset,
-            $statuses,
-            (string) $request->input('search', ''),
-            (string) $request->input('sort', 'no'),
-            (string) $request->input('dir', 'asc')
-        );
+        $columns = \Illuminate\Support\Facades\Schema::getColumnListing('daftar_kebutuhan_materials');
+
+        $query = DaftarKebutuhanMaterial::query()->select($columns);
+
+        $dbGroup = DaftarKebutuhanMaterial::query()->getGrammar()->wrap('group');
+        $query->whereNotNull('group')->whereRaw("TRIM($dbGroup) <> ''");
+
+        if ($proyek !== 'Semua') {
+            $query->where('wbs', $proyek);
+        }
+        if ($group !== 'Semua') {
+            $query->where('group', $group);
+        }
+        if ($trainset !== 'Semua') {
+            $query->where('lot', $trainset);
+        }
+
+        $query->orderBy('no')->orderBy('kode_material');
 
         $baseName = 'Dataset_BOM_Monitoring_' . now()->format('Ymd_His');
 
         if ($format === 'xlsx' || $format === 'excel') {
-            return Excel::download(new SapDatasetExport($rows), $baseName . '.xlsx');
+            return Excel::download(
+                new SapDatasetExport($query->get(), $columns),
+                $baseName . '.xlsx'
+            );
         }
 
         $filename = $baseName . '.csv';
 
-        return response()->streamDownload(function () use ($rows) {
+        return response()->streamDownload(function () use ($query, $columns) {
             $output = fopen('php://output', 'w');
 
             // BOM + delimiter semicolon agar terbaca rapi per kolom di Excel.
             fwrite($output, "\xEF\xBB\xBF");
-            fputcsv($output, [
-                'NO', 'Group', 'Tindak Lanjut', 'Deskripsi Material',
-                'Kebutuhan', 'Qty PR (BOM)', 'Kode Material', 'Trainset',
-                'Status PR', 'Proyek',
-            ], ';');
+            fputcsv($output, $columns, ';');
 
-            foreach ($rows as $row) {
-                fputcsv($output, [
-                    $row['no'],
-                    $row['group'],
-                    $row['tindak_lanjut'],
-                    $row['deskripsi'],
-                    $row['kebutuhan'],
-                    $row['qty_pr'],
-                    $row['kode_material'],
-                    $row['trainset'],
-                    $row['status_pr'],
-                    $row['proyek'],
-                ], ';');
+            foreach ($query->cursor() as $row) {
+                $data = [];
+                foreach ($columns as $column) {
+                    $data[] = $row->{$column};
+                }
+                fputcsv($output, $data, ';');
             }
 
             fclose($output);
