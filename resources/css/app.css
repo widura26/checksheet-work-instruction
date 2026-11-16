@@ -94,7 +94,7 @@
 .sidebar.sidebar-dark .nav-link {
     color: #000000;
     border-radius: .55rem;
-    margin: .2rem .85rem;
+    /* margin: .2rem .85rem; */
     padding: .7rem .9rem;
     font-weight: 500;
     letter-spacing: .2px;

@@ -1,4 +1,9 @@
 <div class="sidebar sidebar-dark" id="sidebar" aria-hidden="true" inert>
+    <div class="sidebar-header" style="border-bottom: 1px solid #ccc;">
+        <a class="sidebar-brand" href="{{ url('/dashboard') }}" aria-label="INKA - Dashboard">
+            <img src="{{ asset('template/assets/img/Logo_INKA_-_Industri_Kereta_Api_Indonesia.svg') }}" alt="INKA">
+        </a>
+    </div>
     <ul class="sidebar-nav" data-simplebar="">
         @include('components.parts.sidebar-list-item', [
             'navtype' => 'nav-group',

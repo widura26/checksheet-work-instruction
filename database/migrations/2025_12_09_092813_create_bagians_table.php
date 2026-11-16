@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('departemen_id')->constrained('departemens');
             $table->string('nama_bagian', 100);
-            $table->string('lokasi', 100); // disesuaikan dengan kolom lokasi di tabel materials
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->softDeletes();
         });
