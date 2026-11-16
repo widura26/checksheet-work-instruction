@@ -1,6 +1,6 @@
 @auth
-    <header class="header header-sticky p-0 mb-3 mb-md-4 app-header">
-        <div class="container-fluid border-bottom app-header-inner">
+    <header class="header header-sticky p-0 mb-3 mb-md-4 app-header border-bottom-0 shadow-none">
+        <div class="container-fluid app-header-inner">
             <div class="app-header-left">
                 <button class="header-toggler app-sidebar-toggle" type="button" id="sidebar-toggle"
                     aria-controls="sidebar" aria-expanded="false" aria-label="Buka/tutup sidebar">
@@ -8,9 +8,6 @@
                         <use xlink:href="{{ asset('template/vendors/@coreui/icons/svg/free.svg#cil-menu') }}"></use>
                     </svg>
                 </button>
-                <a class="app-header-brand" href="{{ url('/dashboard') }}" aria-label="Dashboard">
-                    <img src="{{ asset('template/assets/img/Logo_INKA_-_Industri_Kereta_Api_Indonesia.svg') }}" alt="INKA">
-                </a>
             </div>
             <ul class="header-nav ms-auto app-header-right">
                 <li class="nav-item dropdown">
