@@ -1,7 +1,3 @@
-@php
-    $groupLabels = config('bom-sheets.groups', []);
-@endphp
-
 <div class="row g-3 mb-4">
     <div class="col-md-6">
         <div class="st-metric-card">
@@ -41,47 +37,36 @@
             <span class="badge bg-light text-secondary border">Rekap Matriks</span>
         </div>
     </div>
-    <div class="table-responsive">
+    <div class="table-responsive st-matrix-scroll">
         <table class="table table-bordered align-middle st-table mb-0" id="table-status-pr">
-            <thead>
-                <tr>
-                    <th style="width: 50%;">Status PR</th>
-                    <th class="text-end" style="width: 25%;">{{ $groupLabels['komponen'] ?? 'KOMPONEN' }}</th>
-                    <th class="text-end" style="width: 25%;">{{ $groupLabels['piece_part'] ?? 'PIECE PART' }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="fw-semibold">BELUM PR</td>
-                    <td class="text-end" id="sum-belum-komp">0</td>
-                    <td class="text-end" id="sum-belum-piece">0</td>
-                </tr>
-                <tr>
-                    <td class="fw-semibold">PR PARSIAL</td>
-                    <td class="text-end" id="sum-parsial-komp">0</td>
-                    <td class="text-end" id="sum-parsial-piece">0</td>
-                </tr>
-                <tr>
-                    <td class="fw-semibold">SUDAH PR</td>
-                    <td class="text-end" id="sum-sudah-komp">0</td>
-                    <td class="text-end" id="sum-sudah-piece">0</td>
-                </tr>
-                <tr>
-                    <td class="fw-semibold">STOK DAN PR</td>
-                    <td class="text-end" id="sum-stokpr-komp">0</td>
-                    <td class="text-end" id="sum-stokpr-piece">0</td>
-                </tr>
-                <tr>
-                    <td class="fw-semibold">STOK</td>
-                    <td class="text-end" id="sum-stok-komp">0</td>
-                    <td class="text-end" id="sum-stok-piece">0</td>
-                </tr>
-                <tr>
-                    <td class="fw-semibold">STATUS LAIN / TIDAK DIKENAL</td>
-                    <td class="text-end" id="sum-lain-komp">0</td>
-                    <td class="text-end" id="sum-lain-piece">0</td>
-                </tr>
-            </tbody>
+            <thead id="table-status-pr-head"></thead>
+            <tbody id="table-status-pr-body"></tbody>
         </table>
     </div>
 </div>
+
+<style>
+    .st-matrix-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #table-status-pr th:first-child,
+    #table-status-pr td:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        min-width: 220px;
+        background-color: #ffffff;
+        box-shadow: 2px 0 0 rgba(49, 51, 63, 0.08);
+    }
+
+    #table-status-pr thead th:first-child {
+        z-index: 3;
+        background-color: #f8f9fb;
+    }
+
+    #table-status-pr tbody tr:hover td:first-child {
+        background-color: #f8fafc;
+    }
+</style>

@@ -86,8 +86,8 @@ const sharedLegendConfig = {
     }
 };
 
-const STATUS_PR_LABELS = ['BELUM PR', 'PR PARSIAL', 'SUDAH PR', 'STOK DAN PR', 'STOK', 'STATUS LAIN / TIDAK DIKENAL'];
-const STATUS_PR_COLORS = ['#EF553B', '#FFA15A', '#00CC96', '#636EFA', '#AB63FA', '#7F7F7F'];
+const STATUS_PR_LABELS = ['BELUM PR', 'PR PARSIAL', 'SUDAH PR', 'STOK DAN PR', 'STOK'];
+const STATUS_PR_COLORS = ['#EF553B', '#FFA15A', '#00CC96', '#636EFA', '#AB63FA'];
 const GROUP_PALETTE    = ['#0068c9', '#83c9ff', '#ff2b2b', '#ffabab', '#29b09d', '#7defa1', '#ff8700', '#ffd16a'];
 
 const STATUS_TABLE_KEYS = {
@@ -136,13 +136,24 @@ function renderSummary(summary) {
 
 function updateStatusPrTable(summary) {
     const matrix = summary.statusMatrix || {};
+    const groups = Array.isArray(summary.matrixGroups) ? summary.matrixGroups : [];
 
-    Object.entries(STATUS_TABLE_KEYS).forEach(([status, key]) => {
+    const headerCells = ['<th class="st-sticky-col" style="min-width: 220px;">Status PR</th>']
+        .concat(groups.map(group => `<th class="text-end" style="min-width: 140px; white-space: nowrap;">${$('<div>').text(group).html()}</th>`))
+        .join('');
+    $('#table-status-pr-head').html(`<tr>${headerCells}</tr>`);
+
+    const bodyRows = Object.keys(STATUS_TABLE_KEYS).map(status => {
         const counts = matrix[status] || {};
+        const cells = groups.map(group => {
+            const value = Number(counts[group] || 0).toLocaleString('id-ID');
+            return `<td class="text-end" style="white-space: nowrap;">${value}</td>`;
+        }).join('');
 
-        $(`#sum-${key}-komp`).text(Number(counts.komponen || 0).toLocaleString('id-ID'));
-        $(`#sum-${key}-piece`).text(Number(counts.piece_part || 0).toLocaleString('id-ID'));
-    });
+        return `<tr><td class="fw-semibold st-sticky-col" style="min-width: 220px;">${$('<div>').text(status).html()}</td>${cells}</tr>`;
+    }).join('');
+
+    $('#table-status-pr-body').html(bodyRows);
 }
 
 function renderDoughnut(instance, canvasId, labels, values, colors, unitName) {

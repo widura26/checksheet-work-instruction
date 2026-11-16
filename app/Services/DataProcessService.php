@@ -357,15 +357,12 @@ class DataProcessService {
     }
 
     public function summarize(Collection $rows): array {
-        $komponen = (string) config('bom-sheets.groups.komponen', 'KOMPONEN');
-        $piecePart = (string) config('bom-sheets.groups.piece_part', 'PIECE PART');
-
         $matrix = [];
         $totals = [];
         $rawTotal = 0;
 
         foreach (self::STATUS_PR_ORDER as $status) {
-            $matrix[$status] = ['komponen' => 0, 'piece_part' => 0];
+            $matrix[$status] = [];
             $totals[$status] = 0;
         }
 
@@ -376,20 +373,20 @@ class DataProcessService {
             $rawCount = (int) ($row['raw_count'] ?? 1);
 
             if (!isset($matrix[$status])) {
-                $matrix[$status] = ['komponen' => 0, 'piece_part' => 0];
+                $matrix[$status] = [];
                 $totals[$status] = 0;
             }
 
-            $bucket = $row['group'] === $komponen ? 'komponen' : 'piece_part';
-            $matrix[$status][$bucket] += $rawCount;
+            $group = trim((string) ($row['group'] ?? '')) ?: '(kosong)';
+            $matrix[$status][$group] = ($matrix[$status][$group] ?? 0) + $rawCount;
             $totals[$status] += $rawCount;
             $rawTotal += $rawCount;
 
-            $group = $row['group'] ?: '(kosong)';
             $groupCounts[$group] = ($groupCounts[$group] ?? 0) + $rawCount;
         }
 
-        ksort($groupCounts);
+        ksort($groupCounts, SORT_NATURAL);
+        $matrixGroups = array_keys($groupCounts);
 
         return [
             'totalItem'      => $rawTotal,
@@ -398,10 +395,7 @@ class DataProcessService {
             'statusMatrix'   => $matrix,
             'statusTotals'   => $totals,
             'groupCounts'    => $groupCounts,
-            'groupLabels'    => [
-                'komponen'   => $komponen,
-                'piece_part' => $piecePart,
-            ],
+            'matrixGroups'   => $matrixGroups,
         ];
     }
 
