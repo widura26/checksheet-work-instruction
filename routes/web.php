@@ -63,7 +63,7 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
         Route::post('/', [DaftarKaryawanController::class, 'store'])->name('store');
         Route::put('/{karyawan}', [DaftarKaryawanController::class, 'update'])->name('update');
         Route::delete('/{karyawan}', [DaftarKaryawanController::class, 'destroy'])->name('destroy');
-        Route::post('/import', [DaftarKaryawanController::class, 'import'])->name('import');
+        Route::post('/import', [DaftarKaryawanController::class, 'import'])->middleware('throttle:10,1')->name('import');
     });
 
     Route::prefix('lokasi/departemen')->name('lokasi.departemen.')->group(function () {
@@ -101,14 +101,14 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
 
     Route::prefix('material-planning')->group(function(){
         Route::get('/', [SapDatasetController::class, 'index'])->name('sap-dataset.index');
-        Route::get('/data', [SapDatasetController::class, 'data'])->name('material-planning.data');
-        Route::get('/export', [SapDatasetController::class, 'export'])->name('material-planning.export');
-        Route::post('/import', [SapDatasetController::class, 'import'])->name('sap-dataset.import');
-        Route::post('/import-queue', [SapDatasetController::class, 'importQueue'])->name('sap-dataset.import-queue');
-        Route::get('/import-status/{importId}', [SapDatasetController::class, 'importStatus'])->name('sap-dataset.import-status');
-        Route::post('/delete', [SapDatasetController::class, 'delete'])->name('sap-dataset.delete');
-        Route::get('/deviation', [SapDatasetController::class, 'deviation'])->name('sap-dataset.deviation');
-        Route::post('/import-excel', [SapDatasetController::class, 'import_excel'])->name('sap-dataset.import-excel');
+        Route::get('/data', [SapDatasetController::class, 'data'])->middleware('throttle:120,1')->name('material-planning.data');
+        Route::get('/export', [SapDatasetController::class, 'export'])->middleware('throttle:30,1')->name('material-planning.export');
+        Route::post('/import', [SapDatasetController::class, 'import'])->middleware('throttle:10,1')->name('sap-dataset.import');
+        Route::post('/import-queue', [SapDatasetController::class, 'importQueue'])->middleware('throttle:10,1')->name('sap-dataset.import-queue');
+        Route::get('/import-status/{importId}', [SapDatasetController::class, 'importStatus'])->middleware('throttle:120,1')->name('sap-dataset.import-status');
+        Route::post('/delete', [SapDatasetController::class, 'delete'])->middleware('throttle:10,1')->name('sap-dataset.delete');
+        Route::get('/deviation', [SapDatasetController::class, 'deviation'])->middleware('throttle:60,1')->name('sap-dataset.deviation');
+        Route::post('/import-excel', [SapDatasetController::class, 'import_excel'])->middleware('throttle:10,1')->name('sap-dataset.import-excel');
     });
 
     Route::prefix('bill-of-material')->group(function(){
@@ -122,13 +122,13 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
 
         Route::prefix('document')->group(function(){
             Route::get('/{id}', [BomDocumentRevisionController::class, 'show'])->name('bom-document-revision.index');
-            Route::get('/{id}/delete', [BomDocumentRevisionController::class, 'delete'])->name('bom-document-revision.delete');
+            Route::delete('/{id}', [BomDocumentRevisionController::class, 'delete'])->name('bom-document-revision.delete');
             Route::get('/{id}/download', [BomDocumentRevisionController::class, 'download'])->name('bom-document-revision.download');
         });
     });
 
     Route::prefix('bom')->name('bom.')->group(function () {
-        Route::post('/import', [BillOfMaterialController::class, 'import'])->name('import');
-        Route::get('/status/{importId}', [BillOfMaterialController::class, 'status'])->name('status');
+        Route::post('/import', [BillOfMaterialController::class, 'import'])->middleware('throttle:10,1')->name('import');
+        Route::get('/status/{importId}', [BillOfMaterialController::class, 'status'])->middleware('throttle:120,1')->name('status');
     });
 });

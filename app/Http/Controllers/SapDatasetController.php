@@ -120,15 +120,16 @@ class SapDatasetController extends Controller
     public function import(Request $request){
         try {
             $request->validate([
-                'file' => 'required|file|extensions:xlsx,xls,csv',
+                'file' => 'required|file|mimes:xlsx,xls,csv,txt|max:20480',
             ], [
                 'file.required' => 'File wajib dipilih.',
-                'file.extensions' => 'File harus berformat xlsx, xls, atau csv.',
+                'file.mimes' => 'File harus berformat xlsx, xls, atau csv.',
+                'file.max' => 'Ukuran file maksimal 20 MB.',
             ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Validasi gagal.',
                 'errors' => $e->errors(),
             ], 422);
         }
@@ -262,7 +263,7 @@ class SapDatasetController extends Controller
             Log::error('Error importing SAP dataset: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal mengimpor data: ' . $e->getMessage(),
+                'message' => 'Gagal mengimpor data.',
             ], 500);
         }
     }
@@ -270,15 +271,16 @@ class SapDatasetController extends Controller
     public function importQueue(Request $request){
         try {
             $request->validate([
-                'file' => 'required|file|extensions:xlsx,xls,csv',
+                'file' => 'required|file|mimes:xlsx,xls,csv,txt|max:20480',
             ], [
                 'file.required' => 'File wajib dipilih.',
-                'file.extensions' => 'File harus berformat xlsx, xls, atau csv.',
+                'file.mimes' => 'File harus berformat xlsx, xls, atau csv.',
+                'file.max' => 'Ukuran file maksimal 20 MB.',
             ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Validasi gagal.',
                 'errors' => $e->errors(),
             ], 422);
         }
@@ -393,9 +395,32 @@ class SapDatasetController extends Controller
         return $result;
     }
 
-    public function delete(){
-        SapDataset::truncate();
-        return redirect()->back();
+    public function delete(Request $request){
+        if (!auth()->user()->hasRole(['admin'])) {
+            abort(403);
+        }
+
+        $request->validate([
+            'confirm_delete' => 'required|string|in:HAPUS',
+        ], [
+            'confirm_delete.required' => 'Konfirmasi penghapusan wajib diisi.',
+            'confirm_delete.in' => 'Konfirmasi tidak valid.',
+        ]);
+
+        try {
+            DB::transaction(function () {
+                SapDataset::query()->delete();
+            });
+            Cache::forget('mp:version');
+            Log::warning('Seluruh data SAP dataset dihapus oleh user.', [
+                'user_id' => auth()->id(),
+            ]);
+
+            return redirect()->back()->with('success', 'Data SAP dataset berhasil dihapus.');
+        } catch (\Throwable $e) {
+            Log::error('Gagal menghapus data SAP dataset: ' . $e->getMessage(), ['user_id' => auth()->id()]);
+            return redirect()->back()->with('error', 'Gagal menghapus data SAP dataset.');
+        }
     }
 
     public function deviation(Request $request){
@@ -462,16 +487,16 @@ class SapDatasetController extends Controller
     public function import_excel(Request $request){
         try {
             $request->validate([
-                'file' => 'required|file|extensions:xlsx,xls|max:20480',
+                'file' => 'required|file|mimes:xlsx,xls|max:20480',
             ], [
                 'file.required' => 'File wajib dipilih.',
-                'file.extensions' => 'File harus berformat xlsx atau xls.',
+                'file.mimes' => 'File harus berformat xlsx atau xls.',
                 'file.max' => 'Ukuran file maksimal 20 MB.',
             ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Validasi gagal.',
                 'errors' => $e->errors(),
             ], 422);
         }

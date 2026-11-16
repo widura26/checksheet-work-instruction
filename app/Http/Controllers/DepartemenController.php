@@ -7,6 +7,8 @@ use App\Models\Departemen;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class DepartemenController extends Controller
 {
@@ -65,11 +67,11 @@ class DepartemenController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nama_departemen' => 'required|string|max:255',
         ]);
 
-        Departemen::create($request->all());
+        Departemen::create($validated);
 
         return redirect()->route('lokasi.departemen.index')->with('success', 'Departemen created successfully.');
     }
@@ -84,33 +86,45 @@ class DepartemenController extends Controller
     }
 
     public function update(Request $request, $id){
-        $request->validate([
+        $validated = $request->validate([
             'nama_departemen' => 'required|string|max:255',
         ]);
 
         $departemen = Departemen::findOrFail($id);
-        $departemen->update($request->all());
+        $departemen->update($validated);
 
         return redirect()->route('lokasi.departemen.index')->with('success', 'Departemen updated successfully.');
     }
 
     public function destroy($id)
     {
-        Departemen::findOrFail($id)->delete();
-
-        return redirect()->route('lokasi.departemen.index')->with('success', 'Departemen deleted successfully.');
+        try {
+            Departemen::findOrFail($id)->delete();
+            return redirect()->route('lokasi.departemen.index')->with('success', 'Departemen deleted successfully.');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal menghapus departemen: ' . $e->getMessage(), ['departemen_id' => $id]);
+            return redirect()->route('lokasi.departemen.index')->with('error', 'Gagal menghapus departemen. Pastikan tidak ada data terkait.');
+        }
     }
 
     public function toggleDepartemen(Departemen $departemen){
-        $departemenActive = $departemen->is_active;
-        $departemen->is_active = !$departemen->is_active;
-        $departemen->save();
-        Bagian::where('departemen_id', $departemen->id)
-            ->update(['is_active' => !$departemenActive]);
-        Unit::whereHas('bagian', function ($q) use ($departemen) {
-            $q->where('departemen_id', $departemen->id);
-        })->update(['is_active' => !$departemenActive]);
+        try {
+            DB::transaction(function () use ($departemen) {
+                $departemenActive = (bool) $departemen->is_active;
+                $newStatus = !$departemenActive;
+                $departemen->is_active = $newStatus;
+                $departemen->save();
+                Bagian::where('departemen_id', $departemen->id)->update(['is_active' => $newStatus]);
+                Unit::whereHas('bagian', function ($q) use ($departemen) {
+                    $q->where('departemen_id', $departemen->id);
+                })->update(['is_active' => $newStatus]);
+            });
 
-        return redirect()->route('lokasi.departemen.index')->with('success', 'Departemen Berhasil Di Non Aktifkan.');
+            $message = $departemen->is_active ? 'Departemen berhasil diaktifkan.' : 'Departemen berhasil dinonaktifkan.';
+            return redirect()->route('lokasi.departemen.index')->with('success', $message);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal mengubah status departemen: ' . $e->getMessage(), ['departemen_id' => $departemen->id]);
+            return redirect()->route('lokasi.departemen.index')->with('error', 'Gagal mengubah status departemen.');
+        }
     }
 }

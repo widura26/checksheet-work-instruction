@@ -181,6 +181,10 @@
             var btn = e.target.closest('.btn-delete-document');
             if (!btn) return;
             var url = btn.dataset.url;
+            if (!url) {
+                Swal.fire('Error', 'URL hapus dokumen tidak ditemukan.', 'error');
+                return;
+            }
             Swal.fire({
                 title: 'Hapus dokumen?',
                 text: "Dokumen akan dihapus secara permanen!",
@@ -192,7 +196,28 @@
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = url;
+                    var form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = url;
+                    form.style.display = 'none';
+
+                    var csrfToken = document.querySelector('meta[name="csrf-token"]');
+                    var token = csrfToken ? csrfToken.getAttribute('content') : '{{ csrf_token() }}';
+
+                    var tokenInput = document.createElement('input');
+                    tokenInput.type = 'hidden';
+                    tokenInput.name = '_token';
+                    tokenInput.value = token;
+                    form.appendChild(tokenInput);
+
+                    var methodInput = document.createElement('input');
+                    methodInput.type = 'hidden';
+                    methodInput.name = '_method';
+                    methodInput.value = 'DELETE';
+                    form.appendChild(methodInput);
+
+                    document.body.appendChild(form);
+                    form.submit();
                 }
             });
         });

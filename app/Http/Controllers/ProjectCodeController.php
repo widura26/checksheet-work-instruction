@@ -116,7 +116,8 @@ class ProjectCodeController extends Controller
 
             return response()->json(['message' => 'Project created successfully', 'project' => $project], 201);
         } catch (\Throwable $th) {
-            return response()->json(['message' => 'Failed to create project', 'error' => $th->getMessage()], 500);
+            \Illuminate\Support\Facades\Log::error('Gagal membuat project: ' . $th->getMessage());
+            return response()->json(['message' => 'Failed to create project'], 500);
         }
     }
 }

@@ -6,6 +6,8 @@ use App\Models\Bagian;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
 class UnitController extends Controller
@@ -54,12 +56,12 @@ class UnitController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nama_unit' => 'required|string|max:255',
             'bagian_id' => 'required|exists:bagians,id',
         ]);
 
-        Unit::create($request->all());
+        Unit::create($validated);
 
         return redirect()->route('lokasi.unit.index')->with('success', 'Unit created successfully.');
     }
@@ -77,28 +79,38 @@ class UnitController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nama_unit' => 'required|string|max:255',
             'bagian_id' => 'required|exists:bagians,id',
         ]);
 
         $unit = Unit::findOrFail($id);
-        $unit->update($request->all());
+        $unit->update($validated);
 
         return redirect()->route('lokasi.unit.index')->with('success', 'Unit updated successfully.');
     }
 
     public function destroy($id)
     {
-        Unit::findOrFail($id)->delete();
-
-        return redirect()->route('lokasi.unit.index')->with('success', 'Unit deleted successfully.');
+        try {
+            Unit::findOrFail($id)->delete();
+            return redirect()->route('lokasi.unit.index')->with('success', 'Unit deleted successfully.');
+        } catch (\Throwable $e) {
+            Log::error('Gagal menghapus unit: ' . $e->getMessage(), ['unit_id' => $id]);
+            return redirect()->route('lokasi.unit.index')->with('error', 'Gagal menghapus unit. Pastikan tidak ada data terkait.');
+        }
     }
 
     public function toggleUnit(Unit $unit)
     {
-        $unit->is_active = !$unit->is_active;
-        $unit->save();
-        return redirect()->route('lokasi.unit.index')->with('success', 'unit Berhasil Di Non Aktifkan.');
+        try {
+            $unit->is_active = !$unit->is_active;
+            $unit->save();
+            $message = $unit->is_active ? 'Unit berhasil diaktifkan.' : 'Unit berhasil dinonaktifkan.';
+            return redirect()->route('lokasi.unit.index')->with('success', $message);
+        } catch (\Throwable $e) {
+            Log::error('Gagal mengubah status unit: ' . $e->getMessage(), ['unit_id' => $unit->id]);
+            return redirect()->route('lokasi.unit.index')->with('error', 'Gagal mengubah status unit.');
+        }
     }
 }
