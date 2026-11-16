@@ -388,3 +388,218 @@ body.sidebar-open .sidebar-overlay-backdrop {
   font-size: .875rem;
 }
 .offline-toast button { margin-top: .5rem; }
+/*
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+} */
+
+img, svg, video, canvas {
+  max-width: 100%;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-content {
+  flex: 1 0 auto;
+  width: 100%;
+}
+
+.app-container {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-bottom: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .app-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .app-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Header */
+.app-header {
+  z-index: 1020;
+}
+
+.app-header-inner {
+  min-height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  padding-top: .25rem;
+  padding-bottom: .25rem;
+}
+
+.app-header-left {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.app-sidebar-toggle {
+  margin-inline-start: 0;
+  flex: 0 0 auto;
+}
+
+.app-header-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.app-header-brand img {
+  height: 2rem;
+  width: auto;
+  max-width: 3.5rem;
+  object-fit: contain;
+}
+
+.app-header-title {
+  font-weight: 600;
+  font-size: .95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #1e293b;
+}
+
+.app-header-right {
+  flex: 0 0 auto;
+}
+
+.app-header-user {
+  max-width: 10rem;
+  font-size: .875rem;
+}
+
+.app-header-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #334155;
+}
+
+@media (max-width: 575.98px) {
+  .app-header-inner {
+    padding-left: .75rem !important;
+    padding-right: .75rem !important;
+  }
+  .app-header-brand img {
+    height: 1.75rem;
+    max-width: 3rem;
+  }
+}
+
+/* Cards & page headers */
+.card .card-body {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 575.98px) {
+  .card .p-3,
+  .card .card-header,
+  .card .card-body {
+    padding: .875rem;
+  }
+  .btn {
+    white-space: normal;
+  }
+}
+
+/* Tables: allow horizontal scroll without breaking layout */
+.table-responsive {
+  -webkit-overflow-scrolling: touch;
+}
+
+table.dataTable {
+  width: 100% !important;
+}
+
+/* DataTables controls: stack nicely on small screens */
+@media (max-width: 767.98px) {
+  div.dataTables_wrapper div.dataTables_length,
+  div.dataTables_wrapper div.dataTables_filter,
+  div.dataTables_wrapper div.dataTables_info,
+  div.dataTables_wrapper div.dataTables_paginate {
+    text-align: left !important;
+    margin-bottom: .5rem;
+  }
+  div.dataTables_wrapper div.dataTables_filter input {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-top: .25rem;
+  }
+  div.dataTables_wrapper div.dataTables_length select {
+    width: auto;
+  }
+  div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+    justify-content: flex-start !important;
+    flex-wrap: wrap;
+    gap: .25rem;
+  }
+}
+
+/* Forms & filters */
+.form-control, .form-select {
+  min-width: 0;
+}
+
+@media (max-width: 575.98px) {
+  .row.g-2 > [class*="col-"],
+  .row.g-3 > [class*="col-"] {
+    min-width: 0;
+  }
+}
+
+/* Charts & embeds */
+.chart-container,
+.chart-wrapper,
+.apexcharts-canvas,
+.apexcharts-svg {
+  max-width: 100% !important;
+}
+
+/* Generic responsive helpers for page-level fixed grids */
+@media (max-width: 991.98px) {
+  .grid-responsive-2,
+  .responsive-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Off-canvas sidebar width safety on very small screens */
+@media (max-width: 575.98px) {
+  #sidebar {
+    max-width: 85vw;
+  }
+}
+
+/* Footer spacing */
+.footer {
+  flex-shrink: 0;
+  padding-top: .75rem;
+  padding-bottom: .75rem;
+}

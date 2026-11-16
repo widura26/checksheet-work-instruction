@@ -26,6 +26,12 @@
             gap: 16px;
         }
 
+        @media (max-width: 991.98px) {
+            #charts {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .pie-charts {
             padding: 20px;
             display: flex;
