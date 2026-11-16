@@ -346,8 +346,8 @@ function loadData() {
     initBomTable();
 }
 
-function exportBomToCsv() {
-    const params = buildParams();
+function exportBom(format = 'csv') {
+    const params = buildParams({ format });
 
     if (bomDataTableInstance && bomDataTableInstance.search()) {
         params.set('search', bomDataTableInstance.search());
@@ -457,8 +457,9 @@ document.addEventListener('DOMContentLoaded', () => {
         loadData();
     });
 
-    // 5. CSV Export Button
-    $('#btnExportBomCsv').on('click', exportBomToCsv);
+    // 5. Export Buttons
+    $('#btnExportBomCsv').on('click', () => exportBom('csv'));
+    $('#btnExportBomXlsx').on('click', () => exportBom('xlsx'));
 
     // 6. File Uploader UI in Expander
     const bomFileInput = document.getElementById('bomFileInput');
