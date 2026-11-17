@@ -9,6 +9,65 @@ const filters = {
     selectedStatuses: new Set()
 };
 
+// --- Penghemat request -----------------------------------------------------
+// Respons /data untuk kombinasi filter yang sama dipakai ulang selama 60 detik.
+// Request yang sedang berjalan juga digabung (dedupe) agar perubahan filter
+// bersamaan tidak mengirim dua request identik.
+const DATA_CACHE_TTL_MS = 60_000;
+const dataCache = new Map();
+const pendingData = new Map();
+
+function clearDataCache() {
+    dataCache.clear();
+
+    // Bersihkan juga salinan di service worker agar data pasca-import tidak basi.
+    if ('caches' in window && navigator.serviceWorker && navigator.serviceWorker.controller) {
+        caches.keys()
+            .then(keys => Promise.all(keys
+                .filter(key => key.endsWith('-runtime'))
+                .map(async key => {
+                    const cache = await caches.open(key);
+                    const requests = await cache.keys();
+                    await Promise.all(requests
+                        .filter(req => new URL(req.url).pathname === '/material-planning/data')
+                        .map(req => cache.delete(req)));
+                })))
+            .catch(() => {});
+    }
+}
+
+function fetchDataOnce(url) {
+    const cached = dataCache.get(url);
+    if (cached && Date.now() - cached.at < DATA_CACHE_TTL_MS) {
+        return Promise.resolve(JSON.parse(cached.body));
+    }
+
+    if (pendingData.has(url)) {
+        return pendingData.get(url);
+    }
+
+    const promise = fetch(url, { headers: { 'Accept': 'application/json' } })
+        .then(res => {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+        })
+        .then(json => {
+            dataCache.set(url, { at: Date.now(), body: JSON.stringify(json) });
+            return json;
+        })
+        .finally(() => pendingData.delete(url));
+
+    pendingData.set(url, promise);
+    return promise;
+}
+
+let loadTimer = null;
+function scheduleLoad(delay = 250) {
+    clearTimeout(loadTimer);
+    loadTimer = setTimeout(() => loadData(), delay);
+}
+// ---------------------------------------------------------------------------
+
 const createTooltipConfig = (unitName = 'item') => ({
     enabled: true,
     external: null,
@@ -310,13 +369,7 @@ function initBomTable() {
                 }
             }
 
-            fetch('/material-planning/data?' + params.toString(), {
-                headers: { 'Accept': 'application/json' }
-            })
-                .then(res => {
-                    if (!res.ok) throw new Error('HTTP ' + res.status);
-                    return res.json();
-                })
+            fetchDataOnce('/material-planning/data?' + params.toString())
                 .then(json => {
                     renderSummary(json.summary);
 
@@ -415,44 +468,73 @@ function showUploadResult(type, message) {
     );
 }
 
+// Backoff: 8 request maksimal per import (dulu 80 × tiap 1,5 detik).
+// Polling dijeda saat tab tidak aktif dan dibatalkan bila import baru dimulai.
+const POLL_DELAYS_MS = [0, 1000, 2000, 4000, 7000, 10000, 10000, 10000];
+let activePollController = null;
+
 function pollImportStatus(importId, options = {}) {
-    const MAX_ATTEMPTS = 80;
-    const attempt = options.attempt || 0;
+    if (activePollController) activePollController.abort();
+
+    const controller = new AbortController();
+    activePollController = controller;
+
     const onCompleted = options.onCompleted || function () {};
     const onFailed = options.onFailed || function () {};
     const onTimeout = options.onTimeout || function () {};
     const onError = options.onError || function () {};
 
-    fetch('/material-planning/import-status/' + encodeURIComponent(importId), {
-        headers: { 'Accept': 'application/json' }
-    })
-        .then(res => res.json().then(json => ({ ok: res.ok, status: res.status, json })))
-        .then(({ ok, status, json }) => {
-            if (!ok) {
-                const message = json.message || ('HTTP ' + status);
+    function finish() {
+        if (activePollController === controller) activePollController = null;
+    }
 
-                if (status === 404 || status === 422) {
-                    onFailed(message);
-                    return;
+    function step(attempt) {
+        if (controller.signal.aborted) return;
+
+        if (document.hidden) {
+            setTimeout(() => step(attempt), 3000);
+            return;
+        }
+
+        fetch('/material-planning/import-status/' + encodeURIComponent(importId), {
+            headers: { 'Accept': 'application/json' },
+            signal: controller.signal
+        })
+            .then(res => res.json().then(json => ({ ok: res.ok, status: res.status, json })))
+            .then(({ ok, status, json }) => {
+                if (controller.signal.aborted) return;
+
+                if (!ok) {
+                    const message = json.message || ('HTTP ' + status);
+                    if (status === 404 || status === 422) {
+                        finish();
+                        onFailed(message);
+                        return;
+                    }
+                    throw new Error(message);
                 }
 
-                throw new Error(message);
-            }
+                if (json.status === 'completed') {
+                    finish();
+                    onCompleted(json);
+                } else if (json.status === 'failed') {
+                    finish();
+                    onFailed(json.message || 'Import gagal. Periksa log server.');
+                } else if (attempt + 1 >= POLL_DELAYS_MS.length) {
+                    finish();
+                    onTimeout('Proses masih berjalan di background. Silakan cek kembali nanti.');
+                } else {
+                    setTimeout(() => step(attempt + 1), POLL_DELAYS_MS[attempt + 1]);
+                }
+            })
+            .catch(err => {
+                if (err.name === 'AbortError' || controller.signal.aborted) return;
+                finish();
+                onError('Gagal memeriksa status import: ' + err.message);
+            });
+    }
 
-            if (json.status === 'completed') {
-                onCompleted(json);
-            } else if (json.status === 'failed') {
-                onFailed(json.message || 'Import gagal. Periksa log server.');
-            } else if (attempt + 1 >= MAX_ATTEMPTS) {
-                onTimeout('Proses masih berjalan di background. Silakan cek kembali nanti.');
-            } else {
-                setTimeout(() => pollImportStatus(importId, {
-                    ...options,
-                    attempt: attempt + 1
-                }), 1500);
-            }
-        })
-        .catch(err => onError('Gagal memeriksa status import: ' + err.message));
+    step(0);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -475,17 +557,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Dropdown filter changes
     $('#select-proyek').on('change', function() {
         filters.proyek = $(this).val();
-        loadData();
+        scheduleLoad();
     });
 
     $('#select-group').on('change', function() {
         filters.group = $(this).val();
-        loadData();
+        scheduleLoad();
     });
 
     $('#select-trainset').on('change', function() {
         filters.trainset = $(this).val();
-        loadData();
+        scheduleLoad();
     });
 
     // 4. Status PR Switches
@@ -496,7 +578,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             filters.selectedStatuses.delete(status);
         }
-        loadData();
+        scheduleLoad();
     });
 
     // 5. Export Buttons
@@ -574,6 +656,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                     'success',
                                     'Import selesai — ' + Number(json.imported || 0).toLocaleString('id-ID') + ' baris data berhasil direkap.'
                                 );
+                                setTimeout(() => {
+                                    location.reload()
+                                }, 300)
+                                clearDataCache();
                                 loadData();
                             },
                             onFailed: function (message) {
@@ -649,7 +735,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                 + Number(json.imported || 0).toLocaleString('id-ID')
                                 + ' baris data berhasil diimpor.</div>'
                             );
-                            setTimeout(() => location.reload(), 1000);
+                            // Tidak perlu reload seluruh halaman: cukup invalidasi cache
+                            // dan muat ulang tabel (1 request, bukan +10 request aset).
+                            clearDataCache();
+                            loadData();
                         },
                         onFailed: function (message) {
                             resetButton();
