@@ -39,7 +39,6 @@ function clearDataCache() {
 function fetchDataOnce(url) {
     const cached = dataCache.get(url);
     if (cached && Date.now() - cached.at < DATA_CACHE_TTL_MS) {
-        // Salinan baru: DataTables boleh memutasi objek baris tanpa merusak cache.
         return Promise.resolve(JSON.parse(cached.body));
     }
 
@@ -657,6 +656,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                     'success',
                                     'Import selesai — ' + Number(json.imported || 0).toLocaleString('id-ID') + ' baris data berhasil direkap.'
                                 );
+                                setTimeout(() => {
+                                    location.reload()
+                                }, 300)
                                 clearDataCache();
                                 loadData();
                             },
