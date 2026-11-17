@@ -28,6 +28,12 @@ $.fn.DataTable.defaults.scrollX = true;
 $.fn.DataTable.defaults.scrollCollapse = true;
 $.fn.DataTable.defaults.responsive = true;
 
+// Kurangi request: tunda pencarian saat user mengetik (ketikan cepat = 1 request).
+// `searchDelay` untuk kompatibilitas, `search.delay` untuk DataTables 2.x.
+$.fn.DataTable.defaults.searchDelay = 400;
+if (!$.fn.DataTable.defaults.search) $.fn.DataTable.defaults.search = {};
+$.fn.DataTable.defaults.search.delay = 400;
+
 // Loading indicator: tampilkan spinner (bukan teks "Processing..." / "Loading...")
 if (!$.fn.DataTable.defaults.language) {
     $.fn.DataTable.defaults.language = {};

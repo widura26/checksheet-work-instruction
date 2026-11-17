@@ -1,6 +1,10 @@
-const CACHE_VERSION = 'ct-offline-v2';
+const CACHE_VERSION = 'ct-offline-v3';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
+
+// Data dashboard sudah di-cache 5 menit di server. Di browser cukup simpan
+// 45 detik agar navigasi filter/halaman berulang tidak perlu request jaringan.
+const DATA_CACHE_TTL_MS = 45_000;
 
 const STATIC_ASSETS = [
     '/offline.html',
@@ -39,6 +43,13 @@ const isUnversionedAsset = (url) => {
         url.pathname.startsWith('/template/') ||
         url.pathname.startsWith('/manifest.json') ||
         url.pathname === '/favicon.ico'
+    );
+};
+
+const isDashboardData = (url) => {
+    return (
+        url.pathname === '/material-planning/data' ||
+        url.pathname === '/sap-dataset/deviation'
     );
 };
 
@@ -93,7 +104,38 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Navigations + GET JSON (DataTables, api): network-first, cached fallback.
+    // Data dashboard: cache-first dengan TTL pendek. Filter/page yang sama
+    // langsung dilayani dari cache tanpa menyentuh jaringan.
+    if (isDashboardData(url)) {
+        event.respondWith(
+            caches.match(request).then(async (cached) => {
+                const cachedAt = cached ? Number(cached.headers.get('x-sw-cached-at') || 0) : 0;
+                if (cached && Date.now() - cachedAt < DATA_CACHE_TTL_MS) {
+                    return cached;
+                }
+
+                try {
+                    const response = await fetch(request);
+                    if (response.ok && response.status !== 204) {
+                        const storedHeaders = new Headers(response.headers);
+                        storedHeaders.set('x-sw-cached-at', String(Date.now()));
+                        const stored = new Response(await response.clone().text(), {
+                            status: response.status,
+                            statusText: response.statusText,
+                            headers: storedHeaders,
+                        });
+                        caches.open(RUNTIME_CACHE).then(cache => cache.put(request, stored));
+                    }
+                    return response;
+                } catch (error) {
+                    return cached || Response.error();
+                }
+            })
+        );
+        return;
+    }
+
+    // Navigations + GET JSON lainnya: network-first, cached fallback.
     event.respondWith(
         fetch(request)
             .then((response) => {

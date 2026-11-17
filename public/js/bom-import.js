@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const POLL_INTERVAL_MS = 1500;
-    const MAX_POLL_ATTEMPTS = 80;
+    // Backoff: maksimal 8 request per import (dulu 80 request tiap 1,5 detik).
+    const POLL_DELAYS_MS = [0, 1000, 2000, 4000, 7000, 10000, 10000, 10000];
+    let activePollController = null;
 
     function getCsrfToken() {
         return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -24,34 +25,61 @@ document.addEventListener('DOMContentLoaded', function () {
         progress.classList.toggle('d-none', !busy);
     }
 
+    function finish() {
+        activePollController = null;
+    }
+
     function pollStatus(importId, attempt) {
-        fetch('/bom/status/' + encodeURIComponent(importId))
-            .then(function (response) {
-                if (!response.ok) {
-                    throw new Error('Server error: ' + response.status);
-                }
-                return response.json();
-            })
-            .then(function (data) {
-                if (data.status === 'completed') {
+        if (activePollController) activePollController.abort();
+
+        const controller = new AbortController();
+        activePollController = controller;
+
+        function step(currentAttempt) {
+            if (controller.signal.aborted) return;
+
+            if (document.hidden) {
+                setTimeout(function () { step(currentAttempt); }, 3000);
+                return;
+            }
+
+            fetch('/bom/status/' + encodeURIComponent(importId), { signal: controller.signal })
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error('Server error: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (controller.signal.aborted) return;
+
+                    if (data.status === 'completed') {
+                        finish();
+                        setBusy(false);
+                        showResult('success', 'Import selesai — ' + data.imported + ' baris.');
+                    } else if (data.status === 'failed') {
+                        finish();
+                        setBusy(false);
+                        showResult('danger', 'Import gagal. Cek log server (import_id: ' + importId + ').');
+                    } else if (currentAttempt + 1 >= POLL_DELAYS_MS.length) {
+                        finish();
+                        setBusy(false);
+                        showResult('warning', 'Masih diproses — coba lagi nanti.');
+                    } else {
+                        setTimeout(function () {
+                            step(currentAttempt + 1);
+                        }, POLL_DELAYS_MS[currentAttempt + 1]);
+                    }
+                })
+                .catch(function (error) {
+                    if (error.name === 'AbortError' || controller.signal.aborted) return;
+                    finish();
                     setBusy(false);
-                    showResult('success', 'Import selesai — ' + data.imported + ' baris.');
-                } else if (data.status === 'failed') {
-                    setBusy(false);
-                    showResult('danger', 'Import gagal. Cek log server (import_id: ' + importId + ').');
-                } else if (attempt + 1 >= MAX_POLL_ATTEMPTS) {
-                    setBusy(false);
-                    showResult('warning', 'Masih diproses — coba lagi nanti.');
-                } else {
-                    setTimeout(function () {
-                        pollStatus(importId, attempt + 1);
-                    }, POLL_INTERVAL_MS);
-                }
-            })
-            .catch(function (error) {
-                setBusy(false);
-                showResult('danger', 'Gagal cek status import: ' + error.message);
-            });
+                    showResult('danger', 'Gagal cek status import: ' + error.message);
+                });
+        }
+
+        step(0);
     }
 
     const btnBomImport = document.getElementById('btnBomImport');
@@ -88,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                 .then(function (data) {
                     if (data.success) {
-                        pollStatus(data.import_id, 0);
+                        pollStatus(data.import_id);
                     } else {
                         setBusy(false);
                         showResult('danger', data.message || 'Terjadi kesalahan saat import.');
