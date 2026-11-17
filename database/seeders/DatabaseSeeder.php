@@ -12,8 +12,7 @@ class DatabaseSeeder extends Seeder
     /**
      * Seed the application's database.
      */
-    public function run(): void
-    {
+    public function run(): void {
         Activity::disableLogging();
         $this->call([
             UserSeeder::class,
