@@ -21,7 +21,7 @@ const convertDate = (timestamp) => {
 }
 window.convertDate = convertDate;
 
-// Global DataTables defaults — seragamkan dengan menu "Kode Proses"
+// Global DataTables defaults — seragamkan tampilan tabel
 $.fn.DataTable.defaults.info = false;
 $.fn.DataTable.defaults.autoWidth = false;
 $.fn.DataTable.defaults.scrollX = true;

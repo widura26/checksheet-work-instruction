@@ -215,11 +215,13 @@ body.sidebar-open .sidebar-overlay-backdrop {
 }
 
 #sidebar .nav-group .nav-group-items-list {
-  min-height: 0;
-  overflow: hidden;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+    display: flex;
+    flex-flow: column;
+    min-height: 0;
+    overflow: hidden;
+    margin: 5px 0 0 0;
+    padding: 0;
+    list-style: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -86,6 +86,47 @@ const sharedLegendConfig = {
     }
 };
 
+// Plugin lokal: tampilkan persentase langsung di setiap potongan doughnut,
+// tanpa menghilangkan hover + tooltip bawaan Chart.js.
+const doughnutPercentageLabels = {
+    id: 'doughnutPercentageLabels',
+    afterDatasetsDraw(chart) {
+        const dataset = chart.data.datasets[0];
+        const meta = chart.getDatasetMeta(0);
+        if (!dataset || !meta || !meta.data.length) return;
+
+        const data = dataset.data.map(value => Number(value) || 0);
+        const isVisible = data.map((_, index) => chart.getDataVisibility(index));
+        const total = data.reduce((sum, value, index) => sum + (isVisible[index] ? value : 0), 0);
+        if (total <= 0) return;
+
+        const { ctx } = chart;
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        meta.data.forEach((element, index) => {
+            const value = data[index] || 0;
+            if (value <= 0 || !isVisible[index]) return;
+
+            // Perkecil font untuk potongan kecil agar tidak saling bertumpuk.
+            const pct = (value / total) * 100;
+            const fontSize = pct >= 10 ? 13 : pct >= 4 ? 11 : 9;
+            const { x, y } = element.tooltipPosition();
+
+            ctx.font = `400 ${fontSize}px 'Source Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`;
+            // Outline gelap supaya angka tetap terbaca di warna terang maupun gelap.
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = 'rgba(15, 23, 42, 0.55)';
+            ctx.strokeText(`${pct.toFixed(1)}%`, x, y);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(`${pct.toFixed(1)}%`, x, y);
+        });
+
+        ctx.restore();
+    }
+};
+
 const STATUS_PR_LABELS = ['BELUM PR', 'PR PARSIAL', 'SUDAH PR', 'STOK DAN PR', 'STOK'];
 const STATUS_PR_COLORS = ['#EF553B', '#FFA15A', '#00CC96', '#636EFA', '#AB63FA'];
 const GROUP_PALETTE    = ['#0068c9', '#83c9ff', '#ff2b2b', '#ffabab', '#29b09d', '#7defa1', '#ff8700', '#ffd16a'];
@@ -170,6 +211,7 @@ function renderDoughnut(instance, canvasId, labels, values, colors, unitName) {
 
     const chart = new Chart(canvas, {
         type: 'doughnut',
+        plugins: [doughnutPercentageLabels],
         data: {
             labels,
             datasets: [{
