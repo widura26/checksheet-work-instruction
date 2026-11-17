@@ -10,6 +10,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class SapDatasetImportStatusTest extends TestCase
@@ -18,7 +19,10 @@ class SapDatasetImportStatusTest extends TestCase
 
     private function actingUser(): static
     {
-        return $this->actingAs(User::factory()->create());
+        $user = User::factory()->create();
+        $user->assignRole(Role::findOrCreate('admin', 'web'));
+
+        return $this->actingAs($user);
     }
 
     public function test_status_rejects_invalid_import_id(): void

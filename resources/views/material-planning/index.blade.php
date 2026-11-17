@@ -277,7 +277,9 @@
             <h1 class="st-page-title mb-0">Dashboard Monitoring</h1>
         </div>
 
-        @include('components.monitoring.upload-section')
+        @if (Auth::user()->hasRole('admin'))
+            @include('components.monitoring.upload-section')
+        @endif
 
         @include('components.monitoring.dropdown-section')
 

@@ -18,7 +18,6 @@ class UserSeeder extends Seeder
     {
         // Create roles if they don't exist
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
-        $staffRole = Role::firstOrCreate(['name' => 'staff']);
         $viewer = Role::firstOrCreate(['name' => 'viewer']);
 
         // Create Admin User

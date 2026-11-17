@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class BomDatasetImportEndpointTest extends TestCase
@@ -21,8 +22,11 @@ class BomDatasetImportEndpointTest extends TestCase
 
     private function withImportAccess(): static
     {
+        $user = User::factory()->create();
+        $user->assignRole(Role::findOrCreate('admin', 'web'));
+
         return $this
-            ->actingAs(User::factory()->create())
+            ->actingAs($user)
             ->withoutMiddleware(VerifyCsrfToken::class);
     }
 
