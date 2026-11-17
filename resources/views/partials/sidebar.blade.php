@@ -44,27 +44,7 @@
                     'navtype' => 'nav-item',
                     'route' => 'roles.index',
                     'label' => 'Roles',
-                ],
-                // [
-                //     'navtype' => 'nav-item',
-                //     'route' => 'karyawan.index',
-                //     'label' => 'Daftar Karyawan',
-                // ],
-                // [
-                //     'navtype' => 'nav-item',
-                //     'route' => 'lokasi.departemen.index',
-                //     'label' => 'Departemen',
-                // ],
-                // [
-                //     'navtype' => 'nav-item',
-                //     'route' => 'lokasi.bagian.index',
-                //     'label' => 'Bagian',
-                // ],
-                // [
-                //     'navtype' => 'nav-item',
-                //     'route' => 'lokasi.unit.index',
-                //     'label' => 'Unit',
-                // ],
+                ]
             ]
         ])
     </ul>
