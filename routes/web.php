@@ -1,18 +1,12 @@
 <?php
 
-use App\Http\Controllers\BagianController;
 use App\Http\Controllers\BomController;
 use App\Http\Controllers\BomDocumentRevisionController;
 use App\Http\Controllers\BillOfMaterialController;
-use App\Http\Controllers\DaftarKaryawanController;
-use App\Http\Controllers\DepartemenController;
-use App\Http\Controllers\KodeMaterialController;
 use App\Http\Controllers\ProjectCodeController;
-use App\Http\Controllers\ProsesController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SapDatasetController;
 use App\Http\Controllers\StaffController;
-use App\Http\Controllers\UnitController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -21,24 +15,11 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'auth.active'])->group(function () {
 
-    Route::prefix('kode-material')->group(function () {
-        Route::get('/', [KodeMaterialController::class, 'index'])->name('kode-material.index');
-        Route::get('/data', [KodeMaterialController::class, 'data'])->name('kode-material.data');
-        Route::get('/{kodeMaterial}/edit', [KodeMaterialController::class, 'edit'])->name('kode-material.edit');
-        Route::put('/{kodeMaterial}', [KodeMaterialController::class, 'update'])->name('kode-material.update');
-        Route::delete('/{kodeMaterial}', [KodeMaterialController::class, 'destroy'])->name('kode-material.destroy');
-    });
-
     Route::prefix('project-code')->group(function(){
         Route::get('/', [ProjectCodeController::class, 'index'])->name('project-code.index');
         Route::get('/data', [ProjectCodeController::class, 'getData'])->name('project-code.data');
         Route::get('/{project}/edit', [ProjectCodeController::class, 'edit'])->name('project-code.edit');
         Route::put('/{project}', [ProjectCodeController::class, 'update'])->name('project-code.update');
-    });
-
-    Route::prefix("processes")->group(function(){
-        Route::get('/', [ProsesController::class, 'index'])->name('processes.index');
-        Route::get('/data', [ProsesController::class, 'data'])->name('processes.data');
     });
 
     Route::prefix('users')->name('staff.')->group(function () {
@@ -53,51 +34,6 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
 
     Route::get('roles/data', [RoleController::class, 'data'])->name('roles.data');
     Route::resource('roles', RoleController::class)->names('roles');
-
-    Route::prefix('karyawan')->name('karyawan.')->group(function () {
-        Route::get('/', [DaftarKaryawanController::class, 'index'])->name('index');
-        Route::get('/data', [DaftarKaryawanController::class, 'data'])->name('data');
-        Route::get('/api/bagian/{departemen_id}', [DaftarKaryawanController::class, 'getBagian'])->name('api.bagian');
-        Route::get('/api/unit/{bagian_id}', [DaftarKaryawanController::class, 'getUnit'])->name('api.unit');
-        Route::get('/{karyawan}', [DaftarKaryawanController::class, 'show'])->name('show');
-        Route::post('/', [DaftarKaryawanController::class, 'store'])->name('store');
-        Route::put('/{karyawan}', [DaftarKaryawanController::class, 'update'])->name('update');
-        Route::delete('/{karyawan}', [DaftarKaryawanController::class, 'destroy'])->name('destroy');
-        Route::post('/import', [DaftarKaryawanController::class, 'import'])->middleware('throttle:10,1')->name('import');
-    });
-
-    Route::prefix('lokasi/departemen')->name('lokasi.departemen.')->group(function () {
-        Route::get('/', [DepartemenController::class, 'index'])->name('index');
-        Route::get('/data', [DepartemenController::class, 'data'])->name('data');
-        Route::get('/create', [DepartemenController::class, 'create'])->name('create');
-        Route::post('/', [DepartemenController::class, 'store'])->name('store');
-        Route::get('/{id}/edit', [DepartemenController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [DepartemenController::class, 'update'])->name('update');
-        Route::delete('/{id}', [DepartemenController::class, 'destroy'])->name('destroy');
-        Route::post('/{departemen}/toggle', [DepartemenController::class, 'toggleDepartemen'])->name('toggle');
-    });
-
-    Route::prefix('lokasi/bagian')->name('lokasi.bagian.')->group(function () {
-        Route::get('/', [BagianController::class, 'index'])->name('index');
-        Route::get('/data', [BagianController::class, 'getData'])->name('data');
-        Route::get('/create', [BagianController::class, 'create'])->name('create');
-        Route::post('/', [BagianController::class, 'store'])->name('store');
-        Route::get('/{id}/edit', [BagianController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [BagianController::class, 'update'])->name('update');
-        Route::delete('/{id}', [BagianController::class, 'destroy'])->name('destroy');
-        Route::post('/{bagian}/toggle', [BagianController::class, 'toggleBagian'])->name('toggle');
-    });
-
-    Route::prefix('lokasi/unit')->name('lokasi.unit.')->group(function () {
-        Route::get('/', [UnitController::class, 'index'])->name('index');
-        Route::get('/data', [UnitController::class, 'data'])->name('data');
-        Route::get('/create', [UnitController::class, 'create'])->name('create');
-        Route::post('/', [UnitController::class, 'store'])->name('store');
-        Route::get('/{id}/edit', [UnitController::class, 'edit'])->name('edit');
-        Route::put('/{id}', [UnitController::class, 'update'])->name('update');
-        Route::delete('/{id}', [UnitController::class, 'destroy'])->name('destroy');
-        Route::post('/{unit}/toggle', [UnitController::class, 'toggleUnit'])->name('toggle');
-    });
 
     Route::prefix('material-planning')->group(function(){
         Route::get('/', [SapDatasetController::class, 'index'])->name('sap-dataset.index');
