@@ -41,7 +41,7 @@
 
 <div class="st-card mb-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="st-card-title mb-0">Data Daftar Kebutuhan Material (<span id="bomCountBadge">215</span>)</h5>
+        <h5 class="st-card-title mb-0">Data Daftar Kebutuhan Material (<span id="bomCountBadge"></span>)</h5>
         <div class="d-flex gap-2">
             <div class="btn-group">
                 <button type="button" class="btn btn-sm btn-light border py-1 px-3 d-flex align-items-center gap-1 fw-semibold text-secondary dropdown-toggle" data-bs-toggle="dropdown" data-coreui-toggle="dropdown" aria-expanded="false" title="Download Data">
@@ -53,6 +53,11 @@
                     <li><button type="button" class="dropdown-item" id="btnExportBomXlsx">Excel (.xlsx)</button></li>
                 </ul>
             </div>
+            @if (Auth::user()->hasRole('admin'))
+                <div class="">
+                    <button type="button" class="btn btn-ghost-danger border" id="reset-data-button">Reset Data</button>
+                </div>
+            @endif
         </div>
     </div>
     <div class="table-responsive">
@@ -78,6 +83,7 @@
                     <th>Qty PR (BOM)</th>
                     <th>Kode Material</th>
                     <th>Lot / Batch</th>
+                    <th>NO PR</th>
                     <th>Status PR</th>
                 </tr>
             </thead>

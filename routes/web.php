@@ -82,5 +82,7 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
             Route::post('/import', [BillOfMaterialController::class, 'import'])->middleware('throttle:10,1')->name('import');
             Route::get('/status/{importId}', [BillOfMaterialController::class, 'status'])->middleware('throttle:120,1')->name('status');
         });
+
+        Route::delete('/reset-data', [SapDatasetController::class, 'resetData'])->name('reset-data');
     });
 });

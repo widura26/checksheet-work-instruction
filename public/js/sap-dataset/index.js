@@ -393,7 +393,9 @@ function initBomTable() {
                 });
         },
         columns: [
-            { data: 'no', className: 'fw-semibold text-center' },
+            { data: 'no', className: 'fw-semibold text-center', render: (data, type, row, meta) => {
+                return meta.row + 1
+            } },
             { data: 'group' },
             { data: 'tindak_lanjut', render: $.fn.dataTable.render.text() },
             { data: 'deskripsi', render: $.fn.dataTable.render.text() },
@@ -413,6 +415,7 @@ function initBomTable() {
                     ">${data}</span>`;
                 }
             },
+            { data: 'no_pr', render: $.fn.dataTable.render.text() },
             {
                 data: 'status_pr',
                 className: 'text-center',
@@ -787,7 +790,7 @@ document.addEventListener('DOMContentLoaded', () => {
             scrollX: true,
             scrollCollapse: true,
             ajax: function (data, callback, settings) {
-                $.get("/sap-dataset/deviation", {
+                $.get("/material-planning/deviation", {
                     page: (data.start / data.length) + 1,
                     per_page: data.length,
                     search: data.search.value
@@ -798,16 +801,24 @@ document.addEventListener('DOMContentLoaded', () => {
                         recordsFiltered: json.total,
                         data: json.data
                     });
+                }).fail(function (xhr) {
+                    console.error('Gagal memuat data deviasi:', xhr.status, xhr.responseText);
+                    callback({
+                        draw: data.draw,
+                        recordsTotal: 0,
+                        recordsFiltered: 0,
+                        data: []
+                    });
                 });
             },
             columns: [
                 {
                     data: null,
-                    name: 'DT_RowIndex',
+                    name: 'no',
                     orderable: false,
                     searchable: false,
                     className: 'text-center',
-                    render: (data, type, row, meta) => meta.row + 1
+                    render: (data, type, row, meta) => meta.settings._iDisplayStart + meta.row + 1
                 },
                 { data: 'pr_number', name: 'pr_number' },
                 { data: 'wbs_elem', name: 'wbs_elem' },
@@ -822,6 +833,45 @@ document.addEventListener('DOMContentLoaded', () => {
                 { data: 'po_number', name: 'po_number' },
                 { data: 'created_by', name: 'created_by' }
             ]
+        });
+    }
+
+    const resetDataButton = document.querySelector('#reset-data-button');
+    if (resetDataButton) {
+        resetDataButton.addEventListener('click', () => {
+            if (!confirm('Hapus seluruh data daftar kebutuhan material? Tindakan ini tidak dapat dibatalkan.')) {
+                return;
+            }
+
+            const originalHtml = resetDataButton.innerHTML;
+            resetDataButton.disabled = true;
+            resetDataButton.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Menghapus...';
+
+            $.ajax({
+                url: '/reset-data',
+                type: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: (res) => {
+                    if (res.success) {
+                        loadData();
+                        alert(res.message || 'Data berhasil dihapus');
+                    } else {
+                        alert(res.message || 'Data gagal dihapus');
+                    }
+                },
+                error: (xhr) => {
+                    const message = xhr.responseJSON && xhr.responseJSON.message
+                        ? xhr.responseJSON.message
+                        : 'Data gagal dihapus';
+                    alert(message);
+                },
+                complete: () => {
+                    resetDataButton.disabled = false;
+                    resetDataButton.innerHTML = originalHtml;
+                }
+            });
         });
     }
 });

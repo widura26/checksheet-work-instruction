@@ -567,4 +567,31 @@ class SapDatasetController extends Controller
             ], 500);
         }
     }
+
+    public function resetData(){
+        try {
+            $deletedCount = DaftarKebutuhanMaterial::query()->delete();
+
+            ImportTracker::invalidateCache();
+
+            Log::warning('Seluruh data daftar kebutuhan material dihapus oleh user.', [
+                'user_id' => auth()->id(),
+                'deleted_count' => $deletedCount,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil dihapus'
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Gagal menghapus data daftar kebutuhan material: ' . $e->getMessage(), [
+                'user_id' => auth()->id(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Data gagal dihapus'
+            ], 500);
+        }
+    }
 }
