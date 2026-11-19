@@ -14,6 +14,7 @@ use App\Exports\SapDatasetExport;
 use App\Jobs\ImportExcelJob;
 use App\Services\DataProcessService;
 use App\Models\DaftarKebutuhanMaterial;
+use App\Support\ActivityLogger;
 use App\Support\ImportTracker;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
@@ -74,6 +75,13 @@ class SapDatasetController extends Controller
         $query->orderBy('no')->orderBy('kode_material');
 
         $baseName = 'Dataset_BOM_Monitoring_' . now()->format('Ymd_His');
+
+        ActivityLogger::record('export', 'Export dataset BOM Monitoring', [
+            'format' => ($format === 'xlsx' || $format === 'excel') ? 'xlsx' : 'csv',
+            'proyek' => $proyek,
+            'group' => $group,
+            'trainset' => $trainset,
+        ], null, 'SapDataset');
 
         if ($format === 'xlsx' || $format === 'excel') {
             return Excel::download(
@@ -248,6 +256,15 @@ class SapDatasetController extends Controller
                 $msg .= " (" . count($errors) . " baris gagal insert)";
             }
 
+            ActivityLogger::record('import', 'Import dataset SAP/BOM', [
+                'file' => $file->getClientOriginalName(),
+                'imported' => $totalAll,
+                'valid' => $totalImported,
+                'invalid' => $totalInvalid,
+                'shifted' => $totalShifted,
+                'elapsed' => $elapsed,
+            ], null, 'SapDataset');
+
             @unlink($tempFile);
             return response()->json([
                 'success' => true,
@@ -300,6 +317,11 @@ class SapDatasetController extends Controller
                 new SapDatasetImport($importId),
                 Storage::disk('local')->path('imports/' . $fileName)
             );
+
+            ActivityLogger::record('import_queued', 'Import dataset SAP/BOM diantrekan', [
+                'file' => $file->getClientOriginalName(),
+                'import_id' => $importId,
+            ], null, 'SapDataset');
 
             return response()->json([
                 'success' => true,
@@ -408,6 +430,8 @@ class SapDatasetController extends Controller
         ]);
 
         try {
+            $deletedCount = SapDataset::query()->count();
+
             DB::transaction(function () {
                 SapDataset::query()->delete();
             });
@@ -415,6 +439,10 @@ class SapDatasetController extends Controller
             Log::warning('Seluruh data SAP dataset dihapus oleh user.', [
                 'user_id' => auth()->id(),
             ]);
+
+            ActivityLogger::record('delete_all', 'Hapus seluruh data SAP dataset', [
+                'deleted_count' => $deletedCount,
+            ], null, 'SapDataset');
 
             return redirect()->back()->with('success', 'Data SAP dataset berhasil dihapus.');
         } catch (\Throwable $e) {
@@ -514,6 +542,11 @@ class SapDatasetController extends Controller
 
             ImportExcelJob::dispatchSync($importId, $path);
 
+            ActivityLogger::record('import', 'Import daftar kebutuhan material', [
+                'file' => $file->getClientOriginalName(),
+                'import_id' => $importId,
+            ], null, 'SapDataset');
+
             return response()->json([
                 'success' => true,
                 'import_id' => $importId,
@@ -531,6 +564,33 @@ class SapDatasetController extends Controller
                 'success' => false,
                 'import_id' => $importId,
                 'message' => 'Gagal memproses import.',
+            ], 500);
+        }
+    }
+
+    public function resetData(){
+        try {
+            $deletedCount = DaftarKebutuhanMaterial::query()->delete();
+
+            ImportTracker::invalidateCache();
+
+            Log::warning('Seluruh data daftar kebutuhan material dihapus oleh user.', [
+                'user_id' => auth()->id(),
+                'deleted_count' => $deletedCount,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil dihapus'
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Gagal menghapus data daftar kebutuhan material: ' . $e->getMessage(), [
+                'user_id' => auth()->id(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Data gagal dihapus'
             ], 500);
         }
     }

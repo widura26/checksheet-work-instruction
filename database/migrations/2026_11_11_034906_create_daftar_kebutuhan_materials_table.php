@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('sudah_pr');
             $table->string('belum_pr');
             $table->string('tindak_lanjut');
+            $table->string('no_pr');
             $table->timestamps();
         });
     }

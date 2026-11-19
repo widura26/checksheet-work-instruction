@@ -33,7 +33,7 @@ class DataProcessService {
     private const STATUS_RENAME = ['MENGGUNAKAN STOK GUDANG' => 'MENGGUNAKAN STOK'];
 
     private const SORTABLE = [
-        'no', 'group', 'tindak_lanjut', 'deskripsi', 'kebutuhan', 'qty_pr',
+        'no', 'no_pr', 'group', 'tindak_lanjut', 'deskripsi', 'kebutuhan', 'qty_pr',
         'kode_material', 'trainset', 'status_pr', 'proyek',
     ];
 
@@ -44,6 +44,7 @@ class DataProcessService {
     private const ROW_COLUMNS = [
         'wbs',
         'no',
+        'no_pr',
         'group',
         'lot',
         'kebutuhan',
@@ -164,6 +165,7 @@ class DataProcessService {
                     'first'     => $data,
                     'tl'        => [],
                     'trainsets' => [],
+                    'no_prs'    => [],
                     'kebutuhan' => 0.0,
                     'qty_pr'    => 0.0,
                     'raw_count' => 0,
@@ -178,6 +180,11 @@ class DataProcessService {
 
             if ($data['trainset'] !== '') {
                 $groups[$key]['trainsets'][$data['trainset']] = true;
+            }
+
+            $noPr = trim((string) ($data['no_pr'] ?? ''));
+            if ($noPr !== '') {
+                $groups[$key]['no_prs'][$noPr] = true;
             }
 
             $groups[$key]['kebutuhan'] += (float) ($data['sum'] ?? $data['kebutuhan'] ?? 0);
@@ -197,10 +204,14 @@ class DataProcessService {
             $trainsets = array_keys($group['trainsets']);
             usort($trainsets, fn ($a, $b) => $this->trainsetNo($a) <=> $this->trainsetNo($b));
 
+            $noPrs = array_keys($group['no_prs']);
+            usort($noPrs, fn ($a, $b) => strnatcasecmp($a, $b));
+
             $tlJoined = implode(', ', $tl);
 
             $rows[] = [
                 'no'                 => $first['no'],
+                'no_pr'              => implode(', ', $noPrs),
                 'group'              => $first['group'],
                 'tindak_lanjut'      => $tlJoined,
                 'deskripsi_material' => $first['deskripsi_material'],
@@ -277,6 +288,7 @@ class DataProcessService {
         return $this->dashboard($wbs, $group, $trainset)['frame']
             ->map(fn ($r) => [
                 'no'            => $r['no'],
+                'no_pr'         => $r['no_pr'] ?? '',
                 'group'         => $r['group'],
                 'tindak_lanjut' => $r['tindak_lanjut'],
                 'deskripsi'     => $r['deskripsi_material'],
@@ -406,7 +418,7 @@ class DataProcessService {
             return true;
         }
 
-        foreach (['no', 'group', 'tindak_lanjut', 'deskripsi', 'kode_material', 'trainset', 'status_pr', 'proyek'] as $key) {
+        foreach (['no', 'no_pr', 'group', 'tindak_lanjut', 'deskripsi', 'kode_material', 'trainset', 'status_pr', 'proyek'] as $key) {
             if (str_contains(mb_strtolower((string) ($row[$key] ?? '')), $needle)) {
                 return true;
             }

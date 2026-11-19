@@ -41,6 +41,7 @@ class ImportExcelJob implements ShouldQueue
         'N' => 'sudah_pr',
         'O' => 'belum_pr',
         'P' => 'tindak_lanjut',
+        'Q' => 'no_pr'
     ];
 
     public function __construct(public string $importId, public string $path) {}

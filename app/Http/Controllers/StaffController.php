@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -100,6 +101,10 @@ class StaffController extends Controller
 
         $user->syncRoles($request->role);
 
+        ActivityLogger::record('role_updated', "Role user {$user->name} ditetapkan", [
+            'roles' => array_values($request->role),
+        ], $user, 'User');
+
         return redirect()->route('staff.index')->with('success', 'Staff berhasil dibuat.');
     }
 
@@ -144,6 +149,10 @@ class StaffController extends Controller
         $staff->save();
 
         $staff->syncRoles($request->role);
+
+        ActivityLogger::record('role_updated', "Role user {$staff->name} diperbarui", [
+            'roles' => array_values($request->role),
+        ], $staff, 'User');
 
         if ($this->isApiRequest($request)) {
             return response()->json(['success' => 'Staff berhasil diperbarui.']);

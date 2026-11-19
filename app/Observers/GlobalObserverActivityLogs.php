@@ -2,86 +2,90 @@
 
 namespace App\Observers;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Request;
+use App\Support\ActivityLogger;
 
 class GlobalObserverActivityLogs
 {
-    protected function getFeature($model)
+    protected function getFeature($model): string
     {
-        return property_exists($model, 'featureName')
-            ? $model->featureName
-            : class_basename($model);
-    }
-
-    protected function getCauser()
-    {
-        return Auth::check() ? Auth::user() : null;
-    }
-
-    protected function buildProperties($model, array $extra = [])
-    {
-        return array_merge([
-            'ip' => Request::ip(),
-            'url' => Request::fullUrl(),
-            'user_agent' => Request::header('User-Agent'),
-        ], $extra);
-    }
-
-    protected function log($model, string $event, array $properties = [])
-    {
-        $causer = $this->getCauser();
-        $feature = $this->getFeature($model);
-        $modelName = class_basename($model);
-
-        // Format description yang jelas
-        $desc = "{$modelName} {$event}";
-        if ($causer) {
-            $desc .= " by {$causer->name}";
+        try {
+            if (property_exists($model, 'featureName') && ! empty($model->featureName)) {
+                return $model->featureName;
+            }
+        } catch (\Throwable $e) {
+            // Abaikan properti yang tidak dapat diakses dari luar model.
         }
 
-        activity()
-            ->useLog($feature)
-            ->causedBy($causer)
-            ->performedOn($model)
-            ->tap(function ($activity) use ($feature) {
-                $activity->feature = $feature;
-            })
-            ->withProperties(
-                $this->buildProperties($model, $properties)
-            )
-            ->event($event)
-            ->log($desc);
+        return class_basename($model);
+    }
+
+    protected function getDescription($model, string $event): string
+    {
+        $description = class_basename($model)." {$event}";
+
+        if (auth()->check() && auth()->user()->name) {
+            $description .= ' by '.auth()->user()->name;
+        }
+
+        return $description;
     }
 
     /**
      * CREATED
      */
-    public function created($model)
+    public function created($model): void
     {
-        $this->log($model, 'created', [
-            'new' => $model->getAttributes(),
-        ]);
+        ActivityLogger::record(
+            'created',
+            $this->getDescription($model, 'created'),
+            [
+                'new' => ActivityLogger::redact($model->getAttributes()),
+            ],
+            $model,
+            $this->getFeature($model)
+        );
     }
 
     /**
      * UPDATED
      */
-    public function updated($model)
+    public function updated($model): void
     {
-        $this->log($model, 'updated', [
-            'old' => $model->getOriginal(),
-            'new' => $model->getAttributes(),
-        ]);
+        $changes = $model->getChanges();
+        unset($changes['updated_at']);
+
+        // Jangan catat log jika tidak ada perubahan berarti (mis. hanya touch()).
+        if (empty($changes)) {
+            return;
+        }
+
+        $old = array_intersect_key($model->getOriginal(), $changes);
+
+        ActivityLogger::record(
+            'updated',
+            $this->getDescription($model, 'updated'),
+            [
+                'old' => ActivityLogger::redact($old),
+                'new' => ActivityLogger::redact($changes),
+            ],
+            $model,
+            $this->getFeature($model)
+        );
     }
 
     /**
      * DELETED
      */
-    public function deleted($model)
+    public function deleted($model): void
     {
-        $this->log($model, 'deleted', [
-            'old' => $model->getOriginal(),
-        ]);
+        ActivityLogger::record(
+            'deleted',
+            $this->getDescription($model, 'deleted'),
+            [
+                'old' => ActivityLogger::redact($model->getOriginal()),
+            ],
+            $model,
+            $this->getFeature($model)
+        );
     }
 }

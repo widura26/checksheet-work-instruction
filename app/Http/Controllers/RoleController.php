@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
@@ -66,7 +67,11 @@ class RoleController extends Controller
             'name' => 'required|string|max:255|unique:roles,name',
         ]);
 
-        Role::create(['name' => $request->name]);
+        $role = Role::create(['name' => $request->name]);
+
+        ActivityLogger::record('created', "Role {$request->name} ditambahkan", [
+            'new' => ['name' => $request->name],
+        ], $role, 'Role');
 
         return redirect()->route('roles.index')->with('success', 'Role berhasil ditambahkan.');
     }
@@ -90,7 +95,14 @@ class RoleController extends Controller
             'name' => 'required|string|max:255|unique:roles,name,' . $role->id,
         ]);
 
+        $oldName = $role->name;
+
         $role->update(['name' => $request->name]);
+
+        ActivityLogger::record('updated', "Role {$oldName} diperbarui", [
+            'old' => ['name' => $oldName],
+            'new' => ['name' => $request->name],
+        ], $role, 'Role');
 
         return redirect()->route('roles.index')->with('success', 'Role berhasil diperbarui.');
     }
@@ -101,7 +113,13 @@ class RoleController extends Controller
             abort(403);
         }
 
+        $roleName = $role->name;
+
         $role->delete();
+
+        ActivityLogger::record('deleted', "Role {$roleName} dihapus", [
+            'old' => ['name' => $roleName],
+        ], null, 'Role');
 
         return redirect()->route('roles.index')->with('success', 'Role berhasil dihapus.');
     }
