@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\ImportBomDatasetJob;
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -33,6 +34,11 @@ class BillOfMaterialController extends Controller
         $file->storeAs('bom-imports', $fileName);
 
         ImportBomDatasetJob::dispatch($importId, storage_path('app/bom-imports/' . $fileName));
+
+        ActivityLogger::record('import_queued', 'Import dataset Bill Of Material diantrekan', [
+            'file' => $file->getClientOriginalName(),
+            'import_id' => $importId,
+        ], null, 'BillOfMaterial');
 
         return response()->json([
             'success' => true,

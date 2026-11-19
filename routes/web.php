@@ -1,8 +1,9 @@
 <?php
 
+use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\BillOfMaterialController;
 use App\Http\Controllers\BomController;
 use App\Http\Controllers\BomDocumentRevisionController;
-use App\Http\Controllers\BillOfMaterialController;
 use App\Http\Controllers\ProjectCodeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SapDatasetController;
@@ -52,6 +53,14 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
 
         Route::get('roles/data', [RoleController::class, 'data'])->name('roles.data');
         Route::resource('roles', RoleController::class)->names('roles');
+
+        Route::prefix('activity-log')->name('activity-log.')->group(function () {
+            Route::get('/', [ActivityLogController::class, 'index'])->name('index');
+            Route::get('/data', [ActivityLogController::class, 'data'])->name('data');
+            Route::get('/{activity}', [ActivityLogController::class, 'show'])
+                ->whereNumber('activity')
+                ->name('show');
+        });
 
         Route::prefix('bill-of-material')->group(function () {
             Route::get('/', [BomController::class, 'index'])->name('bill-of-material.index');

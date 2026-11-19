@@ -12,7 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Bersihkan activity log lama agar tabel tidak terus membengkak.
+        $schedule->command('activitylog:clean --days=180')->dailyAt('02:00');
     }
 
     /**

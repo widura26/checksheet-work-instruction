@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BillOfMaterialRevision;
+use App\Support\ActivityLogger;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,12 @@ class BomDocumentRevisionController extends Controller
 {
     public function show(string $id){
         $data = BillOfMaterialRevision::find($id);
+
+        ActivityLogger::record('view', 'Lihat dokumen Bill Of Material', [
+            'file' => $data->original_name_file ?? null,
+            'revision_id' => $id,
+        ], $data, 'BillOfMaterialRevision');
+
         $path = storage_path('app/public/'. $data->path_file);
 
         return response()->file($path, [
@@ -41,6 +48,11 @@ class BomDocumentRevisionController extends Controller
 
     public function download(string $id){
         $revision = BillOfMaterialRevision::findOrFail($id);
+
+        ActivityLogger::record('download', 'Download dokumen Bill Of Material', [
+            'file' => $revision->original_name_file,
+            'revision_id' => $id,
+        ], $revision, 'BillOfMaterialRevision');
 
         /** @var FilesystemAdapter $disk */
         $disk = Storage::disk('public');

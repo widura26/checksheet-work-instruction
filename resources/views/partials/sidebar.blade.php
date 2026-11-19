@@ -48,6 +48,11 @@
                         'navtype' => 'nav-item',
                         'route' => 'roles.index',
                         'label' => 'Roles',
+                    ],
+                    [
+                        'navtype' => 'nav-item',
+                        'route' => 'activity-log.index',
+                        'label' => 'Activity Log',
                     ]
                 ]
             ])
