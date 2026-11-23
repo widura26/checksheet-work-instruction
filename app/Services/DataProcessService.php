@@ -48,8 +48,7 @@ class DataProcessService {
         'group',
         'lot',
         'kebutuhan',
-        'sum',
-        'sudah_pr',
+        'qty_pr',
         'tindak_lanjut',
         'deskripsi_material',
         'kode_material',
@@ -187,8 +186,8 @@ class DataProcessService {
                 $groups[$key]['no_prs'][$noPr] = true;
             }
 
-            $groups[$key]['kebutuhan'] += (float) ($data['sum'] ?? $data['kebutuhan'] ?? 0);
-            $groups[$key]['qty_pr'] += (float) ($data['sudah_pr'] ?? 0);
+            $groups[$key]['kebutuhan'] += (float) ($data['kebutuhan'] ?? 0);
+            $groups[$key]['qty_pr'] += (float) ($data['qty_pr'] ?? 0);
         }
 
         $rows = [];
@@ -292,8 +291,8 @@ class DataProcessService {
                 'group'         => $r['group'],
                 'tindak_lanjut' => $r['tindak_lanjut'],
                 'deskripsi'     => $r['deskripsi_material'],
-                'kebutuhan'     => $r['sum'] ?? $r['kebutuhan'] ?? 0,
-                'qty_pr'        => $r['qty_pr_bom'] ?? ($r['sudah_pr'] ?? 0),
+                'kebutuhan'     => $r['kebutuhan'] ?? 0,
+                'qty_pr'        => $r['qty_pr_bom'] ?? ($r['qty_pr'] ?? 0),
                 'kode_material' => $r['kode_material'],
                 'trainset'      => $r['trainset'],
                 'status_pr'     => $r['status_pr'] ?? $this->checkPrStatus($r['tindak_lanjut']),

@@ -18,17 +18,18 @@ return new class extends Migration
             $table->string('no');
             $table->string('rev');
             $table->string('kode_material');
+            $table->string('kode_material_konversi')->nullable();
             $table->string('kode_material_delete');
             $table->string('deskripsi_material');
             $table->string('satuan');
             $table->string('group');
             $table->string('lot');
             $table->string('kebutuhan');
-            $table->string('sum');
-            $table->string('sudah_pr');
-            $table->string('belum_pr');
             $table->string('tindak_lanjut');
             $table->string('no_pr');
+            $table->string('no_po')->nullable();
+            $table->string('qty_pr')->nullable();
+            $table->string('deliv_date_sap')->nullable();
             $table->timestamps();
         });
     }

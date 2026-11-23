@@ -31,17 +31,18 @@ class ImportExcelJob implements ShouldQueue
         'C' => 'no',
         'D' => 'rev',
         'E' => 'kode_material',
-        'F' => 'kode_material_delete',
+        'F' => 'kode_material_konversi',
+        'G' => 'kode_material_delete',
         'H' => 'deskripsi_material',
         'I' => 'satuan',
         'J' => 'group',
         'K' => 'lot',
         'L' => 'kebutuhan',
-        'M' => 'sum',
-        'N' => 'sudah_pr',
-        'O' => 'belum_pr',
-        'P' => 'tindak_lanjut',
-        'Q' => 'no_pr'
+        'M' => 'tindak_lanjut',
+        'N' => 'no_pr',
+        'O' => 'no_po',
+        'P' => 'qty_pr',
+        'Q' => 'deliv_date_sap',
     ];
 
     public function __construct(public string $importId, public string $path) {}
@@ -61,7 +62,7 @@ class ImportExcelJob implements ShouldQueue
                         continue;
                     }
 
-                    $row = ['id' => (string) Str::uuid(), 'sheet_asal' => $sheetName];
+                    $row = ['id' => (string) Str::uuid()];
                     $filled = false;
 
                     foreach (self::MAP as $col => $field) {
@@ -70,6 +71,11 @@ class ImportExcelJob implements ShouldQueue
                             $filled = true;
                         }
                         $row[$field] = $value;
+                    }
+
+                    // Fallback ke nama sheet bila kolom "Sheet Asal" kosong.
+                    if ($row['sheet_asal'] === '') {
+                        $row['sheet_asal'] = $sheetName;
                     }
 
                     if (! $filled) {

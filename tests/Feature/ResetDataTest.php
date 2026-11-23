@@ -22,17 +22,18 @@ class ResetDataTest extends TestCase
             'no' => '1',
             'rev' => '',
             'kode_material' => 'PP-1',
+            'kode_material_konversi' => '',
             'kode_material_delete' => '',
             'deskripsi_material' => 'BOTTOM PLATE',
             'satuan' => 'PCS',
             'group' => 'PIECE PART',
             'lot' => 'TANPA TRAINSET',
             'kebutuhan' => '1',
-            'sum' => '1',
-            'sudah_pr' => '0',
-            'belum_pr' => '0',
             'tindak_lanjut' => 'PR BARU',
             'no_pr' => 'PR-1',
+            'no_po' => '',
+            'qty_pr' => '0',
+            'deliv_date_sap' => '',
         ]);
 
         $countBefore = DB::table('daftar_kebutuhan_materials')->count();
