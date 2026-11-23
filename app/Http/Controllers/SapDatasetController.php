@@ -53,6 +53,8 @@ class SapDatasetController extends Controller
         $proyek   = (string) $request->input('proyek', 'Semua');
         $group    = (string) $request->input('group', 'Semua');
         $trainset = (string) $request->input('trainset', 'Semua');
+        $statuses = $this->statusesFromRequest($request);
+        $search   = trim((string) $request->input('search', ''));
         $format   = strtolower((string) $request->input('format', 'csv'));
 
         $columns = \Illuminate\Support\Facades\Schema::getColumnListing('daftar_kebutuhan_materials');
@@ -81,18 +83,27 @@ class SapDatasetController extends Controller
             'proyek' => $proyek,
             'group' => $group,
             'trainset' => $trainset,
+            'statuses' => $statuses,
+            'search' => $search,
         ], null, 'SapDataset');
 
         if ($format === 'xlsx' || $format === 'excel') {
+            $rows = collect();
+            foreach ($query->cursor() as $row) {
+                if ($svc->matchesExportFilters($row, $statuses, $search)) {
+                    $rows->push($row);
+                }
+            }
+
             return Excel::download(
-                new SapDatasetExport($query->get(), $columns),
+                new SapDatasetExport($rows, $columns),
                 $baseName . '.xlsx'
             );
         }
 
         $filename = $baseName . '.csv';
 
-        return response()->streamDownload(function () use ($query, $columns) {
+        return response()->streamDownload(function () use ($query, $columns, $svc, $statuses, $search) {
             $output = fopen('php://output', 'w');
 
             // BOM + delimiter semicolon agar terbaca rapi per kolom di Excel.
@@ -100,6 +111,10 @@ class SapDatasetController extends Controller
             fputcsv($output, $columns, ';');
 
             foreach ($query->cursor() as $row) {
+                if (! $svc->matchesExportFilters($row, $statuses, $search)) {
+                    continue;
+                }
+
                 $data = [];
                 foreach ($columns as $column) {
                     $data[] = $row->{$column};

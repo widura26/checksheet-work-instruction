@@ -38,7 +38,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('123456789'),
             ]
         );
-        $adminDmtp->assignRole($adminRole);
+        $adminDmtp->assignRole($viewer);
         $adminIt = User::firstOrCreate(
             ['email' => 'it@gmail.com'],
             [

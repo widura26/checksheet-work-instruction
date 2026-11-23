@@ -12,10 +12,8 @@ class DaftarKebutuhanMaterial extends Model
 
     protected $guarded = ['id'];
     protected $casts = [
-        'sum'       => 'float',
         'kebutuhan' => 'float',
-        'qty_pr_ve' => 'float',
-        'qty_pr_ms' => 'float',
+        'qty_pr'    => 'float',
     ];
 
     public $incrementing = false;

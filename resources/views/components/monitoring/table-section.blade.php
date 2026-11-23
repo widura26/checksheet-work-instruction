@@ -64,25 +64,14 @@
         <table id="bom-table" class="table table-bordered table-hover align-middle st-table w-100">
             <thead>
                 <tr>
-                    {{-- <th class="text-center" style="width: 40px;">#</th>
-                    <th class="text-center">NO</th>
-                    <th>Kode Material Konversi</th>
-                    <th>Group</th>
-                    <th>Tindak Lanjut</th>
-                    <th>Deskripsi Material</th>
-                    <th class="text-end">Kebutuhan</th>
-                    <th class="text-end">Qty PR (BOM)</th>
-                    <th>Kode Material</th>
-                    <th>Trainset</th>
-                    <th class="text-center">Status PR</th> --}}
                     <th>NO</th>
                     <th>Group</th>
-                    <th>Tindak Lanjut</th>
+                    <th>Kode Material</th>
                     <th>Deskripsi Material</th>
                     <th>Kebutuhan</th>
-                    <th>Qty PR (BOM)</th>
-                    <th>Kode Material</th>
                     <th>Lot / Batch</th>
+                    <th>Tindak Lanjut</th>
+                    <th>Quantity PR</th>
                     <th>NO PR</th>
                     <th>Status PR</th>
                 </tr>
