@@ -340,7 +340,7 @@ function formatStatusBadge(status) {
 
 function initBomTable() {
     bomDataTableInstance = $('#bom-table').DataTable({
-        processing: true,
+        processing: false,
         serverSide: true,
         pageLength: 10,
         lengthChange: false,
@@ -430,7 +430,7 @@ function initBomTable() {
                 next: "›"
             },
             info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ item",
-            processing: "Memuat data..."
+            processing: '<div class="d-flex align-items-center justify-content-center gap-2 py-2 text-secondary small"><span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span><span>Memuat data...</span></div>'
         }
     });
 }
