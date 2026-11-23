@@ -80,7 +80,7 @@
                     <th>Tindak Lanjut</th>
                     <th>Deskripsi Material</th>
                     <th>Kebutuhan</th>
-                    <th>Qty PR (BOM)</th>
+                    <th>Quantity PR</th>
                     <th>Kode Material</th>
                     <th>Lot / Batch</th>
                     <th>NO PR</th>
