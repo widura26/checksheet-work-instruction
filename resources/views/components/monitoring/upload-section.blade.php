@@ -13,7 +13,7 @@
             <h6 class="fw-bold mb-2 text-dark" style="font-size: 13px;">Kriteria File:</h6>
             <ul class="mb-0 text-muted small ps-3">
                 <li class="mb-1"><strong>Format:</strong> Excel (<code>.xlsx</code> / <code>.xls</code>) maksimal <strong>25 MB</strong>.</li>
-                <li>Gunakan <a href="https://docs.google.com/spreadsheets/d/1b3kH9CyGzWNEiYSRL7enafyEO8jhaGVbz7DuTQrOZ1k/edit?usp=sharing" target="_blank" rel="noopener noreferrer" class="text-primary text-decoration-none fw-semibold">Template</a> agar kolom terdeteksi dengan baik.</li>
+                <li>Gunakan <a href="https://docs.google.com/spreadsheets/d/1heeQtMxGHTqlh5CYRdnmsHYoG8YRQlREUHWmZsYZXdM/edit?usp=sharing" target="_blank" rel="noopener noreferrer" class="text-primary text-decoration-none fw-semibold">Template</a> agar kolom terdeteksi dengan baik.</li>
             </ul>
         </div>
 
