@@ -226,6 +226,36 @@ class DataProcessService {
         return collect($rows);
     }
 
+    /**
+     * Filter baris mentah (export) memakai status PR dan pencarian yang sama
+     * dengan dataset yang tampil di tabel.
+     */
+    public function matchesExportFilters(DaftarKebutuhanMaterial $row, array $statuses, string $search): bool {
+        $tindakLanjut = (string) ($row->tindak_lanjut ?? '');
+        $tindakLanjut = self::STATUS_RENAME[$tindakLanjut] ?? $tindakLanjut;
+
+        $data = [
+            'no'            => str_replace(',', '.', trim((string) ($row->no ?? ''))),
+            'no_pr'         => (string) ($row->no_pr ?? ''),
+            'group'         => (string) ($row->group ?? ''),
+            'tindak_lanjut' => $tindakLanjut,
+            'deskripsi'     => (string) ($row->deskripsi_material ?? ''),
+            'kode_material' => (string) ($row->kode_material ?? ''),
+            'trainset'      => trim((string) ($row->lot ?? '')),
+            'proyek'        => (string) ($row->wbs ?? ''),
+            'kebutuhan'     => $row->kebutuhan,
+            'qty_pr'        => $row->qty_pr,
+        ];
+
+        $data['status_pr'] = $this->checkPrStatus($tindakLanjut === '' ? null : $tindakLanjut);
+
+        if (!empty($statuses) && !in_array($data['status_pr'], $statuses, true)) {
+            return false;
+        }
+
+        return $this->matchesSearch($data, $search);
+    }
+
     public function countByStatus(Collection $frame, string $statusCol, array $order): array {
         $groups = $frame->pluck('group')->unique()->sort()->values()->all();
         $tally  = $frame->countBy(fn ($r) => $r[$statusCol] . '|' . $r['group']);
