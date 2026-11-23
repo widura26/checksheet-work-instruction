@@ -397,11 +397,9 @@ function initBomTable() {
                 return meta.row + 1
             } },
             { data: 'group' },
-            { data: 'tindak_lanjut', render: $.fn.dataTable.render.text() },
+            { data: 'kode_material' },
             { data: 'deskripsi', render: $.fn.dataTable.render.text() },
             { data: 'kebutuhan', className: 'text-end' },
-            { data: 'qty_pr', className: 'text-end' },
-            { data: 'kode_material' },
             {
                 data: 'trainset',
                 render: (data) => {
@@ -415,6 +413,8 @@ function initBomTable() {
                     ">${data}</span>`;
                 }
             },
+            { data: 'tindak_lanjut', render: $.fn.dataTable.render.text() },
+            { data: 'qty_pr', className: 'text-end' },
             { data: 'no_pr', render: $.fn.dataTable.render.text() },
             {
                 data: 'status_pr',
