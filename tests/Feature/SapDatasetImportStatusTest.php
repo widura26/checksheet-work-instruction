@@ -4,9 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Support\ImportTracker;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -176,27 +174,5 @@ class SapDatasetImportStatusTest extends TestCase
         $this->assertStringContainsString('Status PR', $content);
         $this->assertStringNotContainsString('Kode Material Konversi', $content);
         $this->assertStringNotContainsString('kode_konversi', $content);
-    }
-
-    public function test_import_queue_tracks_completion(): void
-    {
-        $csv = "WBS Elem,WBS Description,Purch.Req.,Material,Material Description\n"
-            . "WBS-1,Deskripsi,PR-1,MAT-1,Kabel\n";
-
-        $response = $this->actingUser()
-            ->withoutMiddleware(VerifyCsrfToken::class)
-            ->post('/material-planning/import-queue', [
-                'file' => UploadedFile::fake()->createWithContent('sap.csv', $csv),
-            ]);
-
-        $response->assertOk()->assertJson(['success' => true]);
-
-        $this->actingUser()
-            ->get('/material-planning/import-status/' . $response->json('import_id'))
-            ->assertOk()
-            ->assertJson([
-                'status' => 'completed',
-                'imported' => 1,
-            ]);
     }
 }

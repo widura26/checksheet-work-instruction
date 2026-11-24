@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -77,6 +78,60 @@ class ActivityLogTest extends TestCase
         $this->assertSame($admin->id, $log->causer_id);
         $this->assertSame('***', $log->properties['new']['password']);
         $this->assertSame('***', $log->properties['old']['password']);
+    }
+
+    public function test_activity_time_is_displayed_in_indonesia_timezone(): void
+    {
+        $admin = $this->userWithRole('admin');
+
+        $activity = Activity::create([
+            'log_name' => 'Auth',
+            'feature' => 'Auth',
+            'description' => 'CEK ZONA WAKTU',
+            'event' => 'login',
+            'created_at' => Carbon::parse('2026-01-01 17:00:00', 'UTC'),
+            'updated_at' => Carbon::parse('2026-01-01 17:00:00', 'UTC'),
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->withHeader('X-Requested-With', 'XMLHttpRequest')
+            ->getJson('/activity-log/data?search=' . urlencode('CEK ZONA WAKTU'))
+            ->assertOk();
+
+        $row = collect($response->json('data'))->firstWhere('id', $activity->id);
+        $this->assertNotNull($row);
+        $this->assertSame('02-01-2026 00:00:00', $row['created_at']);
+
+        $this->actingAs($admin)
+            ->getJson('/activity-log/' . $activity->id)
+            ->assertOk()
+            ->assertJson(['created_at' => '02-01-2026 00:00:00']);
+    }
+
+    public function test_date_filter_uses_indonesia_timezone(): void
+    {
+        $admin = $this->userWithRole('admin');
+
+        $activity = Activity::create([
+            'log_name' => 'Auth',
+            'feature' => 'Auth',
+            'description' => 'FILTER ZONA WAKTU',
+            'event' => 'login',
+            'created_at' => Carbon::parse('2026-01-01 17:00:00', 'UTC'),
+            'updated_at' => Carbon::parse('2026-01-01 17:00:00', 'UTC'),
+        ]);
+
+        $this->actingAs($admin)
+            ->withHeader('X-Requested-With', 'XMLHttpRequest')
+            ->getJson('/activity-log/data?date_from=2026-01-02&date_to=2026-01-02')
+            ->assertOk()
+            ->assertJsonFragment(['id' => $activity->id]);
+
+        $this->actingAs($admin)
+            ->withHeader('X-Requested-With', 'XMLHttpRequest')
+            ->getJson('/activity-log/data?date_from=2026-01-01&date_to=2026-01-01')
+            ->assertOk()
+            ->assertJsonMissing(['id' => $activity->id]);
     }
 
     public function test_login_and_failed_login_are_logged_without_credentials(): void

@@ -12,8 +12,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // Bersihkan activity log lama agar tabel tidak terus membengkak.
-        $schedule->command('activitylog:clean --days=180')->dailyAt('02:00');
+        // Hapus activity log yang lebih tua dari 7 hari (zona Indonesia).
+        $schedule->command('activitylog:clean --days=7')
+            ->timezone('Asia/Jakarta')
+            ->dailyAt('02:00');
     }
 
     /**

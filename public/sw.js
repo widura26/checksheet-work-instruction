@@ -47,10 +47,7 @@ const isUnversionedAsset = (url) => {
 };
 
 const isDashboardData = (url) => {
-    return (
-        url.pathname === '/material-planning/data' ||
-        url.pathname === '/sap-dataset/deviation'
-    );
+    return url.pathname === '/material-planning/data';
 };
 
 self.addEventListener('fetch', (event) => {

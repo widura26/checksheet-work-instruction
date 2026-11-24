@@ -28,9 +28,4 @@ class Oka extends Model
             }
         });
     }
-
-    public function proyek()
-    {
-        return $this->belongsTo(Proyek::class, 'project_id');
-    }
 }
