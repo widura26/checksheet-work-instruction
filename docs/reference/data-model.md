@@ -9,7 +9,7 @@ Rangkuman dari migrasi di `database/migrations/` dan model di `app/Models/`. Sem
 | `bill_of_materials` | Master dokumen BOM (nomor, nama, proyek, tanggal terbit) | Halaman Bill of Material |
 | `bill_of_material_revisions` | File lampiran per versi revisi BOM | Halaman edit BOM, view/download dokumen |
 | `bill_of_material_dataset` | Rekap komponen hasil import Excel BOM | Arsip import BOM (tabel penuh, selalu ditimpa) |
-| `sap_datasets` | Baris purchase requisition dari SAP hasil import | Deviasi, dashboard, salah satu jalur import |
+| `sap_datasets` | Baris purchase requisition dari SAP (data lama) | Deviasi, dashboard; tidak ada jalur isi aktif |
 | `daftar_kebutuhan_materials` | Rekap kebutuhan material (17 kolom A-Q) | Dashboard Material Planning, ekspor, filter status |
 | `projects` | Daftar kode proyek | Form BOM, dropdown filter, manajemen kode proyek |
 | `okas` | Data OKA, terhubung ke proyek | Data pendukung proyek |
@@ -66,7 +66,9 @@ Migrasi: `2026_09_17_071123_create_sap_datasets_table.php:14-43`. UUID PK, sekit
 
 Dipakai untuk:
 - perhitungan deviasi (`qty` dibandingkan dengan `ordered`, dikelompokkan per `pr_number`);
-- baris data SAP yang diimpor lewat jalur sinkron maupun antrean.
+- baris data SAP lama yang masih tersisa di database.
+
+Tidak ada jalur import yang mengisi tabel ini setelah `POST /material-planning/import` dihapus. `import_excel` mengisi `daftar_kebutuhan_materials`, bukan tabel ini.
 
 ### `daftar_kebutuhan_materials`
 
@@ -82,7 +84,6 @@ Model `DaftarKebutuhanMaterial` meng-cast `kebutuhan` dan `qty_pr` menjadi `floa
 - `projects`: UUID PK, `project_id`, `name_project`, `status`, `closed_at`.
 - `okas`: UUID PK, `oka` unik, `project_id` nullable dengan FK fisik dari migrasi `2026_08_19_101100_add_foreign_keys_to_checksheet_tables.php:11-13`.
 - `Project::okas()` : `hasMany(Oka::class)` (`Project.php:32-35`).
-- `Oka::proyek()` merujuk `Proyek::class` yang tidak ada di `app/Models`; relasi ini rusak dan sebaiknya tidak dipanggil (`Oka.php:32-35`).
 
 ## Tabel pendukung
 

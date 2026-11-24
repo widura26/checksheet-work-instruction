@@ -27,9 +27,9 @@ Default `APP_TIMEZONE` adalah `UTC` dan `.env.example` tidak mengisinya, sehingg
 
 Perubahan on-device di branch aktif menambahkan konversi ini; versi ter-commit sebelumnya memakai waktu aplikasi apa adanya dan retensi 180 hari.
 
-### Empat jalur import yang tumbuh terpisah
+### Dua jalur import yang tumbuh terpisah
 
-Import BOM rekap memakai job + pencarian payload di tabel `jobs`, import PR SAP memakai `ImportTracker` berbasis cache, import rekap material memakai `ImportTracker` tetapi dijalankan `dispatchSync()` di request, dan jalur CSV lama memparse teks langsung di controller. Perbedaan ini bukan pilihan arsitektur yang disengaja di satu titik, melainkan hasil pertumbuhan fitur. Konsekuensinya: status tidak bisa dipakai lintas jalur, perilaku header tidak seragam, dan sebagian UI belum tersambung ke endpoint yang benar. Detail ada di [panduan import](../guides/imports.md).
+Import BOM rekap memakai job + pencarian payload di tabel `jobs`, sedangkan import rekap material memakai `ImportTracker` berbasis cache tetapi dijalankan `dispatchSync()` di request. Perbedaan ini bukan pilihan arsitektur yang disengaja di satu titik, melainkan hasil pertumbuhan fitur. Konsekuensinya: status tidak bisa dipakai lintas jalur. Jalur CSV SAP lama sudah dihapus; sebagai gantinya, tabel `sap_datasets` kini hanya berisi data lama tanpa jalur isi dari aplikasi. Detail ada di [panduan import](../guides/imports.md).
 
 Dua keputusan import yang perlu diingat:
 
@@ -53,19 +53,16 @@ Baris konfigurasi SQLite di `phpunit.xml:24-25` sengaja dikomentari. Test featur
 | Area | Masalah | Dampak |
 | --- | --- | --- |
 | Registrasi | `CreateNewUser` tidak mengisi `nip` wajib dan tidak memberi peran | Akun baru gagal dibuat / tidak bisa login |
-| User model | `materialTransferPostings()` merujuk kelas `MaterialtransferPosting` yang tidak ada | Relasi akan melempar error jika dipanggil |
 | Peran | `StaffController::update()` bisa mengubah peran sendiri; pemeriksaan "admin terakhir" hanya di `changeStatus()`/`destroy()` | Risiko kehilangan satu-satunya admin |
 | Activity log | Observer dan controller bisa mencatat event ganda; `old` diambil setelah `save()` | Duplikat dan diff yang kurang tepat |
 | Offline | `client.request.id` hanya dipakai test; URL antrean tidak ada di route | Header replay diabaikan, antrean tidak bisa diproses |
 | Service worker | Path deviasi dan ikon manifest tidak cocok dengan route/file aktual | Cache deviasi tidak terpakai, ikon PWA 404 |
 | Keamanan | Seeder memakai password default `123456789` | Harus diganti sebelum produksi |
 | File lama | Tabel `audit_logs` dan beberapa model/view legacy tidak terpakai | Menambah kebingungan saat membaca schema |
-| Import | Empat jalur import dengan format header dan mekanisme status berbeda | Perubahan format SAP harus diubah di beberapa tempat |
-| Import | File PR SAP yang masuk antrean tidak pernah dihapus | `storage/app/imports/` terus bertambah |
+| Import | `sap_datasets` tidak punya jalur isi aktif setelah jalur CSV legacy dihapus | Halaman deviasi hanya menampilkan data lama dan tidak bisa diisi ulang dari aplikasi |
 | Import | `/bom/status` mengembalikan `completed` untuk ID asing | Polling bisa salah lapor sukses |
 | UI | Tombol import BOM menargetkan modal yang tidak ada; `bom-import.js` memakai DOM ID usang | Endpoint import BOM belum bisa dipakai dari UI |
 | UI | `bill-of-material/index.js` memanggil `initBomAnalytics()` yang tidak terdefinisi dan membuat form delete tanpa CSRF | Error JS dan risiko hapus gagal atau ditolak |
-| Model | `Oka::proyek()` merujuk kelas `Proyek` yang tidak ada | Relasi akan error jika dipanggil |
 | Dokumen | `BomDocumentRevisionController::show()` memakai `find()` bukan `findOrFail()` | ID tidak ditemukan menghasilkan 500 |
 | Validasi | UI mengiklankan 25 MB dan format doc/docx/gambar, server membatasi 20 MB serta pdf/xls/xlsx | User mendapat error setelah memilih file |
 | Test | Beberapa assertion lama tidak lagi cocok dengan implementasi (`groupLabels`, header CSV) | Test gagal bukan karena regresi nyata |
@@ -76,5 +73,4 @@ Baris konfigurasi SQLite di `phpunit.xml:24-25` sengaja dikomentari. Test featur
 - Menambah kolom sensitif: daftarkan nama kolom ke `ActivityLogger::SENSITIVE_KEYS` atau redaksi tidak akan terjadi.
 - Menambah field pada form antrean offline: perbarui `serializeForm()` dan `registerStockDeltaFromForm()` sekaligus.
 - Mengganti zona waktu: ubah di satu tempat (misalnya `config/app.php` dan `.env.example`) lalu sesuaikan konversi di `ActivityLogController` dan scheduler agar tidak bertolak belakang.
-- Mengubah format header SAP: perbarui `SapDatasetController::buildHeaderMap()` **dan** `SapDatasetImport::mapRow()`; keduanya tidak saling memakai helper yang sama.
 - Menambah jalur import: putuskan dulu apakah memakai `jobs`, `ImportTracker`, atau `dispatchSync()`, lalu dokumentasikan endpoint statusnya. Jangan langsung memakai pola `/bom/status` untuk data SAP.

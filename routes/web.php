@@ -27,8 +27,6 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
     // Aksi upload/import dan pengelolaan data hanya untuk admin
     Route::middleware('role:admin')->group(function () {
         Route::prefix('material-planning')->group(function () {
-            Route::post('/import', [SapDatasetController::class, 'import'])->middleware('throttle:10,1')->name('sap-dataset.import');
-            Route::post('/import-queue', [SapDatasetController::class, 'importQueue'])->middleware('throttle:10,1')->name('sap-dataset.import-queue');
             Route::get('/import-status/{importId}', [SapDatasetController::class, 'importStatus'])->middleware('throttle:120,1')->name('sap-dataset.import-status');
             Route::post('/delete', [SapDatasetController::class, 'delete'])->middleware('throttle:10,1')->name('sap-dataset.delete');
             Route::post('/import-excel', [SapDatasetController::class, 'import_excel'])->middleware('throttle:10,1')->name('sap-dataset.import-excel');

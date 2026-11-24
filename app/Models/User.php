@@ -44,9 +44,4 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-
-    public function materialTransferPostings()
-    {
-        return $this->hasMany(MaterialtransferPosting::class, 'created_by');
-    }
 }

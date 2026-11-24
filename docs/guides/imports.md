@@ -1,24 +1,24 @@
 # Panduan import BOM dan dataset material
 
-Ada **empat** jalur import dengan mekanisme berbeda. Memilih jalur yang salah adalah sumber bug paling umum di aplikasi ini.
+Ada **dua** jalur import dengan mekanisme berbeda. Memilih jalur yang salah adalah sumber bug paling umum di aplikasi ini.
 
 | Jalur | Endpoint | Eksekusi | Pelacakan status | Tujuan tabel |
 | --- | --- | --- | --- | --- |
 | Rekap BOM | `POST /bom/import` | Job antrean | `GET /bom/status/{importId}` (payload `jobs`) | `bill_of_material_dataset` (ditimpa penuh) |
-| PR SAP | `POST /material-planning/import-queue` | `Excel::queueImport` | `GET /material-planning/import-status/{importId}` (cache) | `sap_datasets` (append) |
-| Rekap kebutuhan material | `POST /material-planning/import-excel` | `dispatchSync` (langsung di request) | Endpoint status yang sama, tetapi tanpa antrean nyata | `daftar_kebutuhan_materials` (append) |
-| CSV SAP legacy | `POST /material-planning/import` | Sinkron, parser teks | Tidak ada | `sap_datasets` (append) |
+| Rekap kebutuhan material | `POST /material-planning/import-excel` | `dispatchSync` (langsung di request) | `GET /material-planning/import-status/{importId}` (cache) | `daftar_kebutuhan_materials` (append) |
+
+Tabel `sap_datasets` yang dipakai halaman deviasi **tidak memiliki jalur import aktif**. Jalur CSV legacy (`POST /material-planning/import`) sudah dihapus, dan `import_excel` hanya mengisi `daftar_kebutuhan_materials`.
 
 Semua endpoint import berada di dalam `role:admin` dan `throttle:10,1`. File diunggah maksimal 20 MB.
 
 ## Prasyarat bersama
 
 ```bash
-QUEUE_CONNECTION=database   # agar job BOM dan PR SAP diproses
+QUEUE_CONNECTION=database   # agar job BOM diproses
 php artisan queue:work      # harus berjalan terus
 ```
 
-Status PR SAP dan rekap material disimpan di cache (`mp:import:{id}`, TTL 24 jam). Web dan worker **harus memakai cache store yang sama**, misalnya `CACHE_DRIVER=file` pada satu host atau Redis bersama pada beberapa host. Jika tidak, polling status tidak pernah melihat perubahan dari worker.
+Status rekap material disimpan di cache (`mp:import:{id}`, TTL 24 jam) dan bisa dibaca lewat `GET /material-planning/import-status/{importId}`. Karena import berjalan di dalam request HTTP, polling terutama berguna untuk memantau progres sebelum response selesai. Pastikan cache store yang dipakai konsisten antar proses yang mengaksesnya.
 
 ## 1. Rekap BOM (`/bom/import`)
 
@@ -77,51 +77,7 @@ Aturan status: ada failed -> `failed`; masih ada di `jobs` -> `pending`; jika ti
 
 `public/js/bom-import.js` menargetkan DOM ID `btnBomImport`, `bomFile`, `bomImportResult`, dan `bomImportProgress`, yang **tidak ada** di view saat ini. Tombol "Import Excel" di halaman BOM juga menargetkan modal `#importExcelModal` yang tidak tersedia. Endpoint `/bom/import` saat ini hanya diuji lewat test feature, bukan lewat UI yang berfungsi.
 
-## 2. PR SAP (`/material-planning/import-queue`)
-
-### Alur
-
-```
-POST /material-planning/import-queue
-  -> validasi xlsx,xls,csv,txt (20 MB)
-  -> storage/app/imports/{uuid}.{ext}
-  -> ImportTracker::start(uuid)
-  -> Excel::queueImport(new SapDatasetImport(uuid), path)
-  -> response { success, import_id, message }
-```
-
-`SapDatasetImport` (`app/Imports/SapDatasetImport.php`) memakai `ToCollection`, `WithBatchInserts`, `WithChunkReading`, `WithStartRow`, `SkipsEmptyRows`, `WithHeadingRow`, `WithEvents`, dan `ShouldQueue` (`timeout=600`, `tries=3`).
-
-| Pengaturan | Nilai |
-| --- | --- |
-| Baris mulai | 2 (baris 1 dianggap header) |
-| Ukuran chunk baca | 2000 |
-| Ukuran batch insert | 1000 |
-| Valid | `wbs_elem` atau `material_code` terisi |
-| Invalid | keduanya kosong -> `status = invalid` |
-| Baris dilewati | jumlah kolom terisi ≤ 1 |
-
-Event `BeforeImport`, `AfterImport`, dan `ImportFailed` memperbarui `ImportTracker`. `completed()` juga menaikkan `mp:version` agar cache dashboard dan filter langsung diperbarui.
-
-### Pelacakan
-
-`GET /material-planning/import-status/{importId}`:
-
-- `importId` bukan UUID -> 422;
-- state tidak ada/kedaluwarsa -> 404 `{ status: 'not_found' }`;
-- selain itu mengembalikan state cache: `pending`, `processing`, `completed`, atau `failed` beserta `imported`, `error`, dan `updated_at`.
-
-`ImportTracker` tersimpan 24 jam. Job ini **tidak menghapus file yang diunggah**, jadi `storage/app/imports/` perlu dibersihkan berkala.
-
-### Ketidaksesuaian header
-
-Alias di `SapDatasetImport::mapRow()` lebih sempit daripada `SapDatasetController::buildHeaderMap()` yang dipakai jalur CSV sinkron. Contoh: `purch.req.`, `req.date`, dan `mat. description` dikenali jalur sinkron tetapi tidak oleh jalur antrean. Jika eksport SAP mengubah format header, perbarui kedua tempat.
-
-### Catatan UI
-
-Handler `btnImport` / `importForm` di `public/js/sap-dataset/index.js:695-782` menargetkan DOM ID yang tidak ada di view. Endpoint tetap tersedia untuk dipanggil langsung atau lewat test.
-
-## 3. Rekap kebutuhan material (`/material-planning/import-excel`)
+## 2. Rekap kebutuhan material (`/material-planning/import-excel`)
 
 Ini jalur yang dipakai tombol unggah di dashboard.
 
@@ -160,21 +116,6 @@ Baris 1 dilewati sebagai header. Jika kolom B kosong, `sheet_asal` diisi dari na
 
 File sumber dihapus di blok `finally`. Setelah selesai, `ImportTracker::completed()` menaikkan `mp:version`, sehingga dashboard mengambil data baru.
 
-## 4. CSV SAP legacy (`/material-planning/import`)
-
-Endpoint lama yang masih ada. Validasi menerima `xlsx|xls|csv|txt`, tetapi implementasinya membaca file sebagai teks dengan `file_get_contents`, deteksi encoding, dan `fgetcsv`. **XLS/XLSX biner akan terbaca sebagai sampah**. Gunakan jalur antrean untuk Excel.
-
-Karakteristik:
-
-- delimiter: TAB jika baris pertama mengandung tab, `;` jika lebih banyak semicolon daripada koma, jika tidak `,`;
-- alias header 26 kolom dibangun `SapDatasetController::buildHeaderMap()` (`L384-425`);
-- baris dengan jumlah kolom = jumlah header + 1 dan sel pertama kosong diperbaiki dengan `array_shift`;
-- baris dengan ≤ 50% kolom terisi dilewati;
-- baris invalid jika `wbs_elem` dan `material_code` kosong; nilai string pada baris invalid dipotong 255 karakter;
-- insert langsung tanpa transaksi, sehingga kegagalan di tengah bisa menyisakan data sebagian;
-- file sementara di `sys_get_temp_dir()` dihapus di akhir;
-- tidak ada endpoint status untuk jalur ini.
-
 ## Polling status di frontend
 
 `public/js/sap-dataset/index.js` memakai jeda `[0, 1000, 2000, 4000, 7000, 10000, 10000, 10000]` ms, membatalkan polling sebelumnya, dan berhenti sementara saat tab tidak aktif. Status 404/422 dianggap gagal segera. Setelah `completed`, cache data dan cache service worker dibersihkan, lalu halaman dimuat ulang.
@@ -195,10 +136,8 @@ curl http://localhost:8000/material-planning/import-status/<import_id>
 
 | Masalah | Dampak |
 | --- | --- |
-| Tiga mekanisme status berbeda | `/bom/status` tidak bisa dipakai untuk import SAP dan sebaliknya |
+| Dua mekanisme status berbeda | `/bom/status` tidak bisa dipakai untuk import rekap material dan sebaliknya |
 | `/bom/status` menganggap ID asing sebagai `completed` | UI bisa melaporkan sukses padahal tidak ada job |
-| File PR SAP tidak pernah dihapus | `storage/app/imports/` terus bertambah |
-| Jalur sinkron SAP menerima XLS/XLSX | File Excel diparse sebagai CSV |
 | UI menyebut batas 25 MB, server 20 MB | User bisa mendapat 422 setelah memilih file |
 | Input file dokumen BOM menerima doc/docx/gambar, server hanya pdf/xls/xlsx | Validasi client-server tidak cocok |
 | Import BOM menghapus seluruh tabel | Pastikan file baru lengkap sebelum mengunggah |
@@ -211,7 +150,7 @@ curl http://localhost:8000/material-planning/import-status/<import_id>
 | `tests/Unit/BomColumnMapperTest.php` | Normalisasi dan pemetaan 10 header BOM |
 | `tests/Feature/BomDatasetImportParserTest.php` | Status baris, replace penuh, header salah, file kosong |
 | `tests/Feature/BomDatasetImportEndpointTest.php` | Unggah `/bom/import`, status sukses/gagal |
-| `tests/Feature/SapDatasetImportStatusTest.php` | Validasi UUID, state cache, versi cache, ekspor, `/import-queue` |
+| `tests/Feature/SapDatasetImportStatusTest.php` | Validasi UUID, state cache, versi cache, ekspor |
 | `tests/Feature/MaterialImportColumnsTest.php` | Pemetaan 17 kolom A-Q `ImportExcelJob` |
 | `tests/Feature/MaterialExportFilterTest.php` | Filter status dan pencarian pada ekspor |
 | `tests/Feature/ResetDataTest.php` | Pembersihan data dan inkrementasi versi cache |

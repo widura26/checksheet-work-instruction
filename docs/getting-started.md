@@ -64,7 +64,7 @@ Setelah login, Fortify mengarahkan ke `/material-planning` (`fortify.home`).
 
 ### Queue worker
 
-Import dataset BOM dan SAP masuk antrean database (`QUEUE_CONNECTION=database`, tabel `jobs`). Tanpa worker, status import tidak akan berubah dari `pending`.
+Import dataset BOM masuk antrean database (`QUEUE_CONNECTION=database`, tabel `jobs`). Tanpa worker, status import tidak akan berubah dari `pending`. Import rekap material (`/material-planning/import-excel`) berjalan langsung di request HTTP dan tidak memerlukan worker.
 
 ```bash
 php artisan queue:work

@@ -18,8 +18,6 @@ Sumber utama: `routes/web.php`, `routes/api.php`, dan konfigurasi Fortify. Jalan
 | GET | `/material-planning/data` | `material-planning.data` | viewer/admin | 120,1 | `SapDatasetController@data` |
 | GET | `/material-planning/export` | `material-planning.export` | viewer/admin | 30,1 | `SapDatasetController@export` |
 | GET | `/material-planning/deviation` | `sap-dataset.deviation` | viewer/admin | 60,1 | `SapDatasetController@deviation` |
-| POST | `/material-planning/import` | `sap-dataset.import` | admin | 10,1 | `SapDatasetController@import` |
-| POST | `/material-planning/import-queue` | `sap-dataset.import-queue` | admin | 10,1 | `SapDatasetController@importQueue` |
 | GET | `/material-planning/import-status/{importId}` | `sap-dataset.import-status` | admin | 120,1 | `SapDatasetController@importStatus` |
 | POST | `/material-planning/delete` | `sap-dataset.delete` | admin | 10,1 | `SapDatasetController@delete` |
 | POST | `/material-planning/import-excel` | `sap-dataset.import-excel` | admin | 10,1 | `SapDatasetController@import_excel` |
@@ -90,9 +88,8 @@ Fortify menambahkan route `/login`, `/logout`, `/register`, `/forgot-password`, 
 | --- | --- |
 | `POST /material-planning/delete` | Butuh konfirmasi `confirm_delete=HAPUS`; bisa menghapus seluruh data |
 | `DELETE /reset-data` | Reset data aplikasi; hanya admin |
-| `POST /material-planning/import-queue` | Menjawab dengan `importId` untuk dipantau lewat `import-status` |
 
-Detail format file dan alur antrean ada di [panduan import](../guides/imports.md).
+Detail format file dan alur import ada di [panduan import](../guides/imports.md).
 
 ## Penanganan error
 

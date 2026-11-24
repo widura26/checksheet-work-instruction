@@ -4,7 +4,7 @@ Aplikasi internal berbasis Laravel 10 untuk monitoring **material planning / pur
 
 ## Fitur utama
 
-- **Material Planning**: dashboard dataset SAP, unggah/import CSV atau Excel, ekspor hasil filter, dan tampilan deviasi.
+- **Material Planning**: dashboard, unggah/import Excel rekap kebutuhan material, ekspor hasil filter, dan tampilan deviasi.
 - **Bill of Material**: kelola BOM, impor dataset BOM lewat antrean, riwayat revisi, dan unduh dokumen PDF.
 - **Kode Proyek, Users, Roles**: pengelolaan data pendukung (khusus admin).
 - **Activity Log**: jejak aktivitas aplikasi dengan filter tanggal, pengguna, dan fitur.
@@ -42,7 +42,7 @@ Buka `http://localhost:8000` dan masuk memakai NIP.
 
 ### Worker dan scheduler
 
-Import BOM dan SAP dijalankan sebagai job antrean, sehingga `QUEUE_CONNECTION=database` memerlukan worker yang berjalan terus:
+Import dataset BOM dijalankan sebagai job antrean, sehingga `QUEUE_CONNECTION=database` memerlukan worker yang berjalan terus:
 
 ```bash
 php artisan queue:work

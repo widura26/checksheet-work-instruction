@@ -333,28 +333,6 @@ class DataProcessService {
             ->all();
     }
 
-    public function filteredDataset(
-        string $wbs,
-        string $group,
-        string $trainset,
-        array $statuses = [],
-        string $search = '',
-        string $sort = 'no',
-        string $direction = 'asc'
-    ): Collection {
-        $rows = collect($this->dataset($wbs, $group, $trainset));
-
-        if (!empty($statuses)) {
-            $rows = $rows->filter(fn ($r) => in_array($r['status_pr'], $statuses, true))->values();
-        }
-
-        if (trim($search) !== '') {
-            $rows = $rows->filter(fn ($r) => $this->matchesSearch($r, $search))->values();
-        }
-
-        return $this->sortRows($rows, $sort, $direction);
-    }
-
     public function paginateDataset(
         string $wbs,
         string $group,

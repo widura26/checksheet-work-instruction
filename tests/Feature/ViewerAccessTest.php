@@ -70,16 +70,6 @@ class ViewerAccessTest extends TestCase
 
         $this->actingAs($viewer)
             ->withoutMiddleware(VerifyCsrfToken::class)
-            ->post('/material-planning/import', ['file' => $file])
-            ->assertForbidden();
-
-        $this->actingAs($viewer)
-            ->withoutMiddleware(VerifyCsrfToken::class)
-            ->post('/material-planning/import-queue', ['file' => $file])
-            ->assertForbidden();
-
-        $this->actingAs($viewer)
-            ->withoutMiddleware(VerifyCsrfToken::class)
             ->post('/bom/import', ['file' => $file])
             ->assertForbidden();
     }

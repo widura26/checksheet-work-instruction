@@ -100,24 +100,4 @@ class ProjectCodeController extends Controller
         return redirect()->route('project-code.index')
             ->with('success', 'Data project berhasil diperbarui.');
     }
-
-    public function create(Request $request){
-        $validated = $request->validate([
-            'project_code' => 'required|unique:projects,project_code',
-            'name' => 'required',
-        ]);
-
-        try {
-            $project = Project::create([
-                'project_code' => $validated['project_code'],
-                'name' => $validated['name'],
-                'status' => true,
-            ]);
-
-            return response()->json(['message' => 'Project created successfully', 'project' => $project], 201);
-        } catch (\Throwable $th) {
-            \Illuminate\Support\Facades\Log::error('Gagal membuat project: ' . $th->getMessage());
-            return response()->json(['message' => 'Failed to create project'], 500);
-        }
-    }
 }
