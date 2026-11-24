@@ -29,14 +29,14 @@ Nama cache: `ct-offline-v3-static` dan `ct-offline-v3-runtime` (`public/sw.js:1-
 | --- | --- | --- |
 | `/build/*` | Cache-first | Aman karena aset Vite punya hash konten; hanya response `ok` yang disimpan (`L69-86`) |
 | `/template/*`, `/manifest.json`, `/favicon.ico` | Network-first, fallback cache | `cache: 'no-cache'` (`L88-105`) |
-| `/material-planning/data`, `/sap-dataset/deviation` | Cache-first dengan TTL 45 detik | TTL memakai header buatan `x-sw-cached-at` (`L107-136`) |
+| `/material-planning/data` | Cache-first dengan TTL 45 detik | TTL memakai header buatan `x-sw-cached-at` (`L107-136`) |
 | Lainnya | Network-first, fallback cache lalu `/offline.html` untuk navigasi | `ignoreSearch: true` saat mencari fallback (`L138-159`) |
 
 Non-GET dan request cross-origin tidak disentuh (`L60-67`). `serveCachedResponse()` (`L162-182`) menulis ulang parameter `draw` pada JSON DataTables yang diambil dari cache agar halaman berikutnya tidak mengulang nomor halaman yang sama.
 
-Path deviasi yang sebenarnya adalah `/material-planning/deviation` (`routes/web.php:24`), bukan `/sap-dataset/deviation`. Jadi cabang cache 45 detik untuk deviasi saat ini tidak pernah terpakai; request tersebut masuk strategi generik.
+Hanya `/material-planning/data` yang memakai strategi cache-first 45 detik di service worker.
 
-Selain SW, `public/js/sap-dataset/index.js:12-69` punya cache 60 detik di memori per URL plus deduplikasi request paralel. Setelah import selesai (`L665`, `L743`), cache SW runtime untuk `/material-planning/data` dihapus agar data langsung segar.
+Selain SW, `public/js/sap-dataset/index.js` punya cache 60 detik di memori per URL plus deduplikasi request paralel. Setelah import selesai, cache SW runtime untuk `/material-planning/data` dihapus agar data langsung segar.
 
 ## Antrean form
 

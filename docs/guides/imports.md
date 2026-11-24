@@ -7,7 +7,7 @@ Ada **dua** jalur import dengan mekanisme berbeda. Memilih jalur yang salah adal
 | Rekap BOM | `POST /bom/import` | Job antrean | `GET /bom/status/{importId}` (payload `jobs`) | `bill_of_material_dataset` (ditimpa penuh) |
 | Rekap kebutuhan material | `POST /material-planning/import-excel` | `dispatchSync` (langsung di request) | `GET /material-planning/import-status/{importId}` (cache) | `daftar_kebutuhan_materials` (append) |
 
-Tabel `sap_datasets` yang dipakai halaman deviasi **tidak memiliki jalur import aktif**. Jalur CSV legacy (`POST /material-planning/import`) sudah dihapus, dan `import_excel` hanya mengisi `daftar_kebutuhan_materials`.
+Tabel legacy `sap_datasets` sudah dihapus dari kode beserta file migrasinya; satu-satunya tujuan import material adalah `daftar_kebutuhan_materials`.
 
 Semua endpoint import berada di dalam `role:admin` dan `throttle:10,1`. File diunggah maksimal 20 MB.
 

@@ -29,7 +29,7 @@ Perubahan on-device di branch aktif menambahkan konversi ini; versi ter-commit s
 
 ### Dua jalur import yang tumbuh terpisah
 
-Import BOM rekap memakai job + pencarian payload di tabel `jobs`, sedangkan import rekap material memakai `ImportTracker` berbasis cache tetapi dijalankan `dispatchSync()` di request. Perbedaan ini bukan pilihan arsitektur yang disengaja di satu titik, melainkan hasil pertumbuhan fitur. Konsekuensinya: status tidak bisa dipakai lintas jalur. Jalur CSV SAP lama sudah dihapus; sebagai gantinya, tabel `sap_datasets` kini hanya berisi data lama tanpa jalur isi dari aplikasi. Detail ada di [panduan import](../guides/imports.md).
+Import BOM rekap memakai job + pencarian payload di tabel `jobs`, sedangkan import rekap material memakai `ImportTracker` berbasis cache tetapi dijalankan `dispatchSync()` di request. Perbedaan ini bukan pilihan arsitektur yang disengaja di satu titik, melainkan hasil pertumbuhan fitur. Konsekuensinya: status tidak bisa dipakai lintas jalur. Jalur CSV SAP lama dan tabel `sap_datasets`-nya sudah dihapus. Detail ada di [panduan import](../guides/imports.md).
 
 Dua keputusan import yang perlu diingat:
 
@@ -56,10 +56,9 @@ Baris konfigurasi SQLite di `phpunit.xml:24-25` sengaja dikomentari. Test featur
 | Peran | `StaffController::update()` bisa mengubah peran sendiri; pemeriksaan "admin terakhir" hanya di `changeStatus()`/`destroy()` | Risiko kehilangan satu-satunya admin |
 | Activity log | Observer dan controller bisa mencatat event ganda; `old` diambil setelah `save()` | Duplikat dan diff yang kurang tepat |
 | Offline | `client.request.id` hanya dipakai test; URL antrean tidak ada di route | Header replay diabaikan, antrean tidak bisa diproses |
-| Service worker | Path deviasi dan ikon manifest tidak cocok dengan route/file aktual | Cache deviasi tidak terpakai, ikon PWA 404 |
+| Service worker | Ikon manifest tidak cocok dengan file aktual | Ikon PWA 404 |
 | Keamanan | Seeder memakai password default `123456789` | Harus diganti sebelum produksi |
 | File lama | Tabel `audit_logs` dan beberapa model/view legacy tidak terpakai | Menambah kebingungan saat membaca schema |
-| Import | `sap_datasets` tidak punya jalur isi aktif setelah jalur CSV legacy dihapus | Halaman deviasi hanya menampilkan data lama dan tidak bisa diisi ulang dari aplikasi |
 | Import | `/bom/status` mengembalikan `completed` untuk ID asing | Polling bisa salah lapor sukses |
 | UI | Tombol import BOM menargetkan modal yang tidak ada; `bom-import.js` memakai DOM ID usang | Endpoint import BOM belum bisa dipakai dari UI |
 | UI | `bill-of-material/index.js` memanggil `initBomAnalytics()` yang tidak terdefinisi dan membuat form delete tanpa CSRF | Error JS dan risiko hapus gagal atau ditolak |

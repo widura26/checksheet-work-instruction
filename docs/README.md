@@ -10,7 +10,7 @@ Dokumen ini menjelaskan aplikasi **Sistem Monitoring Checksheet Work Instruction
 | Saya ingin paham bentuk aplikasi dan alur request | [Arsitektur](architecture.md) |
 | Saya mencari route, parameter, atau response JSON | [Referensi route](reference/routes.md) |
 | Saya ingin tahu tabel, kolom, dan relasi | [Model dan data](reference/data-model.md) |
-| Saya perlu mengimpor BOM atau dataset SAP | [Panduan import](guides/imports.md) |
+| Saya perlu mengimpor BOM atau rekap kebutuhan material | [Panduan import](guides/imports.md) |
 | Saya menangani kendala koneksi / mode offline | [Mode offline](guides/offline-mode.md) |
 | Saya menangani login, peran, atau log aktivitas | [Auth & activity log](guides/auth-and-activity-log.md) |
 | Saya ingin tahu mengapa desainnya begini | [Catatan desain](explanation/design-notes.md) |

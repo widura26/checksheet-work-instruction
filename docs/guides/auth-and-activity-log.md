@@ -33,7 +33,7 @@ Fortify mengaktifkan registrasi, reset password, update profil/password, dan 2FA
 
 | Peran | Bisa | Tidak bisa |
 | --- | --- | --- |
-| `viewer` | Lihat dashboard `/material-planning`, `/data`, `/export`, `/deviation` | Semua route di dalam grup `role:admin` |
+| `viewer` | Lihat dashboard `/material-planning`, `/data`, `/export` | Semua route di dalam grup `role:admin` |
 | `admin` | Semua route, termasuk import, BOM, project code, users, roles, activity log, reset data | Mengubah atau menghapus peran `admin` lewat halaman Roles |
 
 Route dikelompokkan di `routes/web.php:17-87`:
@@ -41,7 +41,7 @@ Route dikelompokkan di `routes/web.php:17-87`:
 - `middleware('role:admin')` (`routes/web.php:28`) membungkus semua aksi tulis dan halaman administrasi.
 - Alias `role`, `permission`, `role_or_permission` ada di `app/Http/Kernel.php:68-70`, tetapi hanya `role` yang dipakai. Tidak ada Gate atau Policy di `AuthServiceProvider`.
 
-Beberapa controller mengulang pemeriksaan peran di constructor (`StaffController`, `RoleController`, `ActivityLogController`). `SapDatasetController::delete()` juga meminta konfirmasi eksplisit `confirm_delete=HAPUS` (`SapDatasetController.php:432-437`).
+Beberapa controller mengulang pemeriksaan peran di constructor (`StaffController`, `RoleController`, `ActivityLogController`).
 
 ### Guardrail admin
 
@@ -72,9 +72,9 @@ Tabel lama `audit_logs` (`database/migrations/2026_08_19_101001_create_audit_log
 
 | Sumber | Event | Keterangan |
 | --- | --- | --- |
-| `GlobalObserverActivityLogs` | `created`, `updated`, `deleted` | Dipasang otomatis ke semua model di `app/Models` oleh `AppServiceProvider::boot()` (`L23-40`). Nama log = `class_basename` model (mis. `User`, `SapDataset`) karena tidak ada model yang mendefinisikan `$featureName`. |
+| `GlobalObserverActivityLogs` | `created`, `updated`, `deleted` | Dipasang otomatis ke semua model di `app/Models` oleh `AppServiceProvider::boot()` (`L23-40`). Nama log = `class_basename` model (mis. `User`, `DaftarKebutuhanMaterial`) karena tidak ada model yang mendefinisikan `$featureName`. |
 | `LogAuthenticationActivity` | `login`, `logout`, `login_failed` | Didaftarkan di `EventServiceProvider.php:21-34`. `login_failed` memakai `email` atau `nip` dari kredensial, **tanpa password**. User nonaktif yang ditolak login juga masuk kategori ini. |
-| Controller | `import`, `import_queued`, `export`, `delete_all`, `view`, `download`, `role_updated`, `created`, `updated`, `deleted` | Lihat `SapDatasetController`, `BillOfMaterialController`, `BomDocumentRevisionController`, `RoleController`, `StaffController`. |
+| Controller | `import`, `import_queued`, `export`, `view`, `download`, `role_updated`, `created`, `updated`, `deleted` | Lihat `SapDatasetController`, `BillOfMaterialController`, `BomDocumentRevisionController`, `RoleController`, `StaffController`. `delete_all` masih dikenal sebagai filter untuk log historis, tetapi tidak lagi dihasilkan controller mana pun. |
 | `DatabaseSeeder` | tidak ada | Seeding dibungkus `Activity::disableLogging()` / `enableLogging()` (`L10-17`). |
 
 Observer dan controller bisa menghasilkan dua baris log untuk satu perubahan yang sama (contoh: `RoleController::store()` memanggil `create()` dan kemudian `ActivityLogger::record()`). Observer mengambil `old` dari `getOriginal()` setelah `save()`, jadi snapshot nilai lama perlu diverifikasi jika dipakai untuk audit diff.

@@ -9,7 +9,6 @@ Rangkuman dari migrasi di `database/migrations/` dan model di `app/Models/`. Sem
 | `bill_of_materials` | Master dokumen BOM (nomor, nama, proyek, tanggal terbit) | Halaman Bill of Material |
 | `bill_of_material_revisions` | File lampiran per versi revisi BOM | Halaman edit BOM, view/download dokumen |
 | `bill_of_material_dataset` | Rekap komponen hasil import Excel BOM | Arsip import BOM (tabel penuh, selalu ditimpa) |
-| `sap_datasets` | Baris purchase requisition dari SAP (data lama) | Deviasi, dashboard; tidak ada jalur isi aktif |
 | `daftar_kebutuhan_materials` | Rekap kebutuhan material (17 kolom A-Q) | Dashboard Material Planning, ekspor, filter status |
 | `projects` | Daftar kode proyek | Form BOM, dropdown filter, manajemen kode proyek |
 | `okas` | Data OKA, terhubung ke proyek | Data pendukung proyek |
@@ -59,16 +58,6 @@ Migrasi: `2026_09_21_000000_create_bill_of_material_dataset_table.php:11-30`.
 Kolom utama: `sheet_name`, `kode_material`, `kode_material_delete`, `kode_material_stock`, `material_komponen`, `spesifikasi`, `qty_ts_series`, `uom_car`, `qty_total_series_allowance`, `qty_pr_total`, `status` (`enum valid|invalid`, default `valid`), `import_id` (terindeks), timestamps. Ada index pada `sheet_name` dan `kode_material`.
 
 Sifat penting: setiap import yang berhasil **menghapus seluruh isi tabel** lalu mengisi ulang dari file (`BomDatasetImport.php:75-81`).
-
-### `sap_datasets`
-
-Migrasi: `2026_09_17_071123_create_sap_datasets_table.php:14-43`. UUID PK, sekitar 26 field nullable (sebagian besar string, `material_description` bertipe text), serta `status enum nullable`. Tidak ada `import_id` dan tidak ada index khusus.
-
-Dipakai untuk:
-- perhitungan deviasi (`qty` dibandingkan dengan `ordered`, dikelompokkan per `pr_number`);
-- baris data SAP lama yang masih tersisa di database.
-
-Tidak ada jalur import yang mengisi tabel ini setelah `POST /material-planning/import` dihapus. `import_excel` mengisi `daftar_kebutuhan_materials`, bukan tabel ini.
 
 ### `daftar_kebutuhan_materials`
 

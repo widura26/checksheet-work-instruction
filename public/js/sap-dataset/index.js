@@ -692,61 +692,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 9. Existing Deviasi Table (DataTable)
-    if ($('#deviasi-table').length) {
-        $('#deviasi-table').DataTable({
-            processing: false,
-            serverSide: true,
-            responsive: false,
-            scrollX: true,
-            scrollCollapse: true,
-            ajax: function (data, callback, settings) {
-                $.get("/material-planning/deviation", {
-                    page: (data.start / data.length) + 1,
-                    per_page: data.length,
-                    search: data.search.value
-                }).done(function (json) {
-                    callback({
-                        draw: data.draw,
-                        recordsTotal: json.total,
-                        recordsFiltered: json.total,
-                        data: json.data
-                    });
-                }).fail(function (xhr) {
-                    console.error('Gagal memuat data deviasi:', xhr.status, xhr.responseText);
-                    callback({
-                        draw: data.draw,
-                        recordsTotal: 0,
-                        recordsFiltered: 0,
-                        data: []
-                    });
-                });
-            },
-            columns: [
-                {
-                    data: null,
-                    name: 'no',
-                    orderable: false,
-                    searchable: false,
-                    className: 'text-center',
-                    render: (data, type, row, meta) => meta.settings._iDisplayStart + meta.row + 1
-                },
-                { data: 'pr_number', name: 'pr_number' },
-                { data: 'wbs_elem', name: 'wbs_elem' },
-                { data: 'wbs_description', name: 'wbs_description' },
-                { data: 'material_code', name: 'material_code' },
-                { data: 'material_description', name: 'material_description' },
-                { data: 'total_records', name: 'total_records', className: 'text-center' },
-                { data: 'total_requested', name: 'total_requested', className: 'text-end' },
-                { data: 'total_ordered', name: 'total_ordered', className: 'text-end' },
-                { data: 'selisih', name: 'selisih', className: 'text-end fw-semibold text-danger' },
-                { data: 'unit', name: 'unit' },
-                { data: 'po_number', name: 'po_number' },
-                { data: 'created_by', name: 'created_by' }
-            ]
-        });
-    }
-
     const resetDataButton = document.querySelector('#reset-data-button');
     if (resetDataButton) {
         resetDataButton.addEventListener('click', () => {

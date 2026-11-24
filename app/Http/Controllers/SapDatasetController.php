@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SapDataset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use App\Exports\SapDatasetExport;
@@ -157,101 +155,6 @@ class SapDatasetController extends Controller
         }
 
         return response()->json($state);
-    }
-
-    public function delete(Request $request){
-        if (!auth()->user()->hasRole(['admin'])) {
-            abort(403);
-        }
-
-        $request->validate([
-            'confirm_delete' => 'required|string|in:HAPUS',
-        ], [
-            'confirm_delete.required' => 'Konfirmasi penghapusan wajib diisi.',
-            'confirm_delete.in' => 'Konfirmasi tidak valid.',
-        ]);
-
-        try {
-            $deletedCount = SapDataset::query()->count();
-
-            DB::transaction(function () {
-                SapDataset::query()->delete();
-            });
-            Cache::forget('mp:version');
-            Log::warning('Seluruh data SAP dataset dihapus oleh user.', [
-                'user_id' => auth()->id(),
-            ]);
-
-            ActivityLogger::record('delete_all', 'Hapus seluruh data SAP dataset', [
-                'deleted_count' => $deletedCount,
-            ], null, 'SapDataset');
-
-            return redirect()->back()->with('success', 'Data SAP dataset berhasil dihapus.');
-        } catch (\Throwable $e) {
-            Log::error('Gagal menghapus data SAP dataset: ' . $e->getMessage(), ['user_id' => auth()->id()]);
-            return redirect()->back()->with('error', 'Gagal menghapus data SAP dataset.');
-        }
-    }
-
-    public function deviation(Request $request){
-        if (! $request->ajax()) {
-            abort(404);
-        }
-
-        $query = SapDataset::select(
-            'pr_number',
-            DB::raw('MIN(wbs_elem) as wbs_elem'),
-            DB::raw('MIN(wbs_description) as wbs_description'),
-            DB::raw('MIN(material_code) as material_code'),
-            DB::raw('MIN(material_description) as material_description'),
-            DB::raw('MIN(unit) as unit'),
-            DB::raw('MIN(po_number) as po_number'),
-            DB::raw('MIN(created_by) as created_by'),
-            DB::raw('COUNT(*) as total_records'),
-            DB::raw('SUM(CAST(REPLACE(requested_quantity, ",", ".") AS DECIMAL(15,2))) as total_requested'),
-            DB::raw('SUM(CAST(REPLACE(ordered_quantity, ",", ".") AS DECIMAL(15,2))) as total_ordered'),
-            DB::raw('SUM(CAST(REPLACE(requested_quantity, ",", ".") AS DECIMAL(15,2))) - SUM(CAST(REPLACE(ordered_quantity, ",", ".") AS DECIMAL(15,2))) as selisih')
-        )
-        ->groupBy('pr_number')
-        ->havingRaw('SUM(CAST(REPLACE(requested_quantity, ",", ".") AS DECIMAL(15,2))) != SUM(CAST(REPLACE(ordered_quantity, ",", ".") AS DECIMAL(15,2)))');
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('pr_number', 'LIKE', "%{$search}%")
-                    ->orWhere('wbs_description', 'LIKE', "%{$search}%")
-                    ->orWhere('material_description', 'LIKE', "%{$search}%")
-                    ->orWhereIn('pr_number', function ($sub) use ($search) {
-                        $sub->select('pr_number')
-                            ->from('sap_datasets')
-                            ->where('material_code', 'LIKE', "%{$search}%");
-                    });
-            });
-        }
-
-        $perPage = (int) $request->get('per_page', 10);
-        $data = $query->orderBy('pr_number')->paginate($perPage);
-
-        $data->setCollection(
-            $data->getCollection()->map(function ($item) {
-                return [
-                    'pr_number'            => $item->pr_number,
-                    'wbs_elem'             => $item->wbs_elem,
-                    'wbs_description'      => $item->wbs_description,
-                    'material_code'        => $item->material_code,
-                    'material_description' => $item->material_description,
-                    'unit'                 => $item->unit,
-                    'po_number'            => $item->po_number,
-                    'created_by'           => $item->created_by,
-                    'total_records'        => $item->total_records,
-                    'total_requested'      => number_format($item->total_requested, 2, ',', '.'),
-                    'total_ordered'        => number_format($item->total_ordered, 2, ',', '.'),
-                    'selisih'              => number_format($item->selisih, 2, ',', '.'),
-                ];
-            })
-        );
-
-        return response()->json($data);
     }
 
     public function import_excel(Request $request){

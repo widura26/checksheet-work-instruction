@@ -37,12 +37,12 @@ flowchart LR
 
 ## Dua domain utama
 
-### Material Planning / SAP dataset
+### Material Planning
 
 - Entry point: `SapDatasetController@index` di `/material-planning`.
-- Data dibaca lewat `GET /material-planning/data` (DataTables server-side), diekspor lewat `/material-planning/export`, dan diringkas di `/material-planning/deviation`.
-- Tulis data dilakukan admin lewat import Excel rekap kebutuhan (langsung di request), dan hapus data dengan konfirmasi.
-- Model utama: `SapDataset` dan `DaftarKebutuhanMaterial`, dengan `Project` dan `Oka` sebagai data pendukung. Hubungan antaranya berupa kolom kode/proyek yang di-join di query, bukan foreign key fisik di sebagian besar tabel (lihat [model dan data](reference/data-model.md)).
+- Data dibaca lewat `GET /material-planning/data` (DataTables server-side) dan diekspor lewat `/material-planning/export`.
+- Tulis data dilakukan admin lewat import Excel rekap kebutuhan (langsung di request); penghapusan data rekap memakai `/reset-data`.
+- Model utama: `DaftarKebutuhanMaterial`, dengan `Project` dan `Oka` sebagai data pendukung. Hubungan antaranya berupa kolom kode/proyek yang di-join di query, bukan foreign key fisik di sebagian besar tabel (lihat [model dan data](reference/data-model.md)).
 - Frontend: `public/js/sap-dataset/index.js` menyimpan cache 60 detik di memori, menduplikasi request paralel, dan membersihkan cache service worker setelah import.
 
 ### Bill of Material
@@ -89,7 +89,7 @@ sequenceDiagram
 
 Tanpa worker, job menumpuk di tabel `jobs` dan endpoint status tidak pernah mencapai kondisi selesai.
 
-Diagram di atas menggambarkan jalur rekap BOM. Jalur rekap material tidak mengikuti pola ini: `ImportExcelJob::dispatchSync()` berjalan di request HTTP dan memakai `ImportTracker` berbasis cache, bukan tabel `jobs`. Jalur CSV SAP legacy sudah dihapus, sehingga tabel `sap_datasets` yang dipakai halaman deviasi tidak lagi memiliki jalur isi aktif. Lihat [panduan import](guides/imports.md) untuk detail.
+Diagram di atas menggambarkan jalur rekap BOM. Jalur rekap material tidak mengikuti pola ini: `ImportExcelJob::dispatchSync()` berjalan di request HTTP dan memakai `ImportTracker` berbasis cache, bukan tabel `jobs`. Lihat [panduan import](guides/imports.md) untuk detail.
 
 ## Observabilitas
 
@@ -109,6 +109,6 @@ Diagram di atas menggambarkan jalur rekap BOM. Jalur rekap material tidak mengik
 
 ## Batas dan integrasi
 
-- Tidak ada klien HTTP keluar maupun jalur unggah yang tercatat di kode aplikasi untuk SAP; tabel `sap_datasets` kini hanya berisi data lama, bukan hasil sinkronisasi API atau import baru.
+- Tidak ada klien HTTP keluar maupun sinkronisasi API dengan SAP; data material planning berasal dari unggah Excel rekap kebutuhan oleh admin.
 - Template Excel referensi ditautkan dari halaman dashboard; cek komentar dan konstanta di `SapDatasetController` / view terkait untuk URL terbaru.
 - Autentikasi API hanya `GET /api/user` via Sanctum. Endpoint JSON lainnya memakai session web + CSRF.

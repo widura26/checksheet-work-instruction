@@ -17,9 +17,7 @@ Sumber utama: `routes/web.php`, `routes/api.php`, dan konfigurasi Fortify. Jalan
 | GET | `/material-planning` | `sap-dataset.index` | auth + auth.active | - | `SapDatasetController@index` |
 | GET | `/material-planning/data` | `material-planning.data` | viewer/admin | 120,1 | `SapDatasetController@data` |
 | GET | `/material-planning/export` | `material-planning.export` | viewer/admin | 30,1 | `SapDatasetController@export` |
-| GET | `/material-planning/deviation` | `sap-dataset.deviation` | viewer/admin | 60,1 | `SapDatasetController@deviation` |
 | GET | `/material-planning/import-status/{importId}` | `sap-dataset.import-status` | admin | 120,1 | `SapDatasetController@importStatus` |
-| POST | `/material-planning/delete` | `sap-dataset.delete` | admin | 10,1 | `SapDatasetController@delete` |
 | POST | `/material-planning/import-excel` | `sap-dataset.import-excel` | admin | 10,1 | `SapDatasetController@import_excel` |
 | GET | `/project-code` | `project-code.index` | admin | - | `ProjectCodeController@index` |
 | GET | `/project-code/data` | `project-code.data` | admin | - | `ProjectCodeController@getData` |
@@ -82,12 +80,11 @@ Fortify menambahkan route `/login`, `/logout`, `/register`, `/forgot-password`, 
 | `date_from`, `date_to` | Tanggal `Y-m-d`, diinterpretasikan di `Asia/Jakarta` |
 | `per_page` | 1..100, default 10 |
 
-### Aksi dataset SAP
+### Aksi dataset
 
 | Endpoint | Catatan penting |
 | --- | --- |
-| `POST /material-planning/delete` | Butuh konfirmasi `confirm_delete=HAPUS`; bisa menghapus seluruh data |
-| `DELETE /reset-data` | Reset data aplikasi; hanya admin |
+| `DELETE /reset-data` | Reset data rekap kebutuhan material; hanya admin |
 
 Detail format file dan alur import ada di [panduan import](../guides/imports.md).
 

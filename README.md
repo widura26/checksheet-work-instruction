@@ -4,7 +4,7 @@ Aplikasi internal berbasis Laravel 10 untuk monitoring **material planning / pur
 
 ## Fitur utama
 
-- **Material Planning**: dashboard, unggah/import Excel rekap kebutuhan material, ekspor hasil filter, dan tampilan deviasi.
+- **Material Planning**: dashboard, unggah/import Excel rekap kebutuhan material, dan ekspor hasil filter.
 - **Bill of Material**: kelola BOM, impor dataset BOM lewat antrean, riwayat revisi, dan unduh dokumen PDF.
 - **Kode Proyek, Users, Roles**: pengelolaan data pendukung (khusus admin).
 - **Activity Log**: jejak aktivitas aplikasi dengan filter tanggal, pengguna, dan fitur.
