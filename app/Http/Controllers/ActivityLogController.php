@@ -10,6 +10,8 @@ use Spatie\Activitylog\Models\Activity;
 
 class ActivityLogController extends Controller
 {
+    private const TIMEZONE = 'Asia/Jakarta';
+
     private const KNOWN_LOG_NAMES = [
         'Auth',
         'User',
@@ -122,11 +124,11 @@ class ActivityLogController extends Controller
         }
 
         if (! empty($validated['date_from'])) {
-            $query->where('created_at', '>=', Carbon::parse($validated['date_from'])->startOfDay());
+            $query->where('created_at', '>=', Carbon::parse($validated['date_from'], self::TIMEZONE)->startOfDay()->utc());
         }
 
         if (! empty($validated['date_to'])) {
-            $query->where('created_at', '<=', Carbon::parse($validated['date_to'])->endOfDay());
+            $query->where('created_at', '<=', Carbon::parse($validated['date_to'], self::TIMEZONE)->endOfDay()->utc());
         }
 
         $perPage = (int) $request->input('per_page', 10);
@@ -141,7 +143,7 @@ class ActivityLogController extends Controller
 
                 return [
                     'id' => $activity->id,
-                    'created_at' => optional($activity->created_at)->format('d-m-Y H:i:s'),
+                    'created_at' => $this->formatTime($activity->created_at),
                     'user' => $causer->name ?? ($properties['causer_name'] ?? 'Sistem'),
                     'user_email' => $causer->email ?? null,
                     'role' => $this->roleNames($causer),
@@ -174,7 +176,7 @@ class ActivityLogController extends Controller
 
         return response()->json([
             'id' => $activity->id,
-            'created_at' => optional($activity->created_at)->format('d-m-Y H:i:s'),
+            'created_at' => $this->formatTime($activity->created_at),
             'description' => $activity->description,
             'event' => $activity->event,
             'log_name' => $activity->log_name ?? $activity->feature,
@@ -190,6 +192,18 @@ class ActivityLogController extends Controller
             'new' => $new,
             'properties' => $properties,
         ]);
+    }
+
+    private function formatTime($timestamp): ?string
+    {
+        if (! $timestamp) {
+            return null;
+        }
+
+        return Carbon::parse($timestamp)
+            ->copy()
+            ->setTimezone(self::TIMEZONE)
+            ->format('d-m-Y H:i:s');
     }
 
     private function properties(Activity $activity): array
