@@ -416,6 +416,9 @@ function initBomTable() {
             { data: 'tindak_lanjut', render: $.fn.dataTable.render.text() },
             { data: 'qty_pr', className: 'text-end' },
             { data: 'no_pr', render: $.fn.dataTable.render.text() },
+            { data: 'deliv_date_sap', render: $.fn.dataTable.render.text() },
+            { data: 'status', render: $.fn.dataTable.render.text() },
+            { data: 'no_po', render: $.fn.dataTable.render.text() },
             {
                 data: 'status_pr',
                 className: 'text-center',

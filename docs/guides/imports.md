@@ -96,21 +96,21 @@ Karena memakai `dispatchSync()`, request HTTP menunggu sampai file selesai dipro
 
 ### Format file
 
-`ImportExcelJob` tidak membaca header. Posisi kolom tetap A sampai Q:
+`ImportExcelJob` membaca baris pertama setiap sheet sebagai header. Pemetaan memakai **nama header**, bukan posisi kolom, sehingga urutan kolom boleh berubah. Huruf besar/kecil dan spasi diabaikan saat mencocokkan.
 
-| Kolom | Field | Kolom | Field |
+| Header Excel | Field | Header Excel | Field |
 | --- | --- | --- | --- |
-| A | `wbs` | J | `group` |
-| B | `sheet_asal` | K | `lot` |
-| C | `no` | L | `kebutuhan` |
-| D | `rev` | M | `tindak_lanjut` |
-| E | `kode_material` | N | `no_pr` |
-| F | `kode_material_konversi` | O | `no_po` |
-| G | `kode_material_delete` | P | `qty_pr` |
-| H | `deskripsi_material` | Q | `deliv_date_sap` |
-| I | `satuan` | | |
+| WBS | `wbs` | Group | `group` |
+| Sheet Asal | `sheet_asal` | Lot | `lot` |
+| NO | `no` | Kebutuhan | `kebutuhan` |
+| REV | `rev` | Tindak Lanjut | `tindak_lanjut` |
+| Kode Material | `kode_material` | NO PR | `no_pr` |
+| Kode Material Konversi | `kode_material_konversi` | Qty PR | `qty_pr` |
+| Kode Material Delete | `kode_material_delete` | Satuan | `satuan` |
+| Deskripsi Material | `deskripsi_material` | Deliv Date SAP | `deliv_date_sap` |
+| Status | `status` | NO PO | `no_po` |
 
-Baris 1 dilewati sebagai header. Jika kolom B kosong, `sheet_asal` diisi dari nama worksheet. Baris yang semua kolomnya kosong dilewati. Insert dilakukan per 500 baris ke `daftar_kebutuhan_materials`.
+Header lama `Trainset` tetap dikenali sebagai alias `lot`. Header yang tidak dikenali diabaikan; field yang tidak ada pada file diisi string kosong. Sheet yang tidak memiliki header dikenali dilewati (dicatat di log). Jika kolom `Sheet Asal` kosong, `sheet_asal` diisi dari nama worksheet. Baris yang semua kolom dikenali kosong dilewati. Insert dilakukan per 500 baris ke `daftar_kebutuhan_materials`.
 
 `ExcelReader` (`app/Support/ExcelReader.php`) membaca XLSX langsung sebagai ZIP/XML: `workbook.xml` + relasinya untuk daftar sheet, lalu `XMLReader` pada `xl/worksheets/{sheet}.xml`. Shared string, inline string, dan nilai `<v>` didukung. Tidak ada konversi serial tanggal dan tidak ada evaluasi formula selain nilai cache.
 
@@ -151,7 +151,7 @@ curl http://localhost:8000/material-planning/import-status/<import_id>
 | `tests/Feature/BomDatasetImportParserTest.php` | Status baris, replace penuh, header salah, file kosong |
 | `tests/Feature/BomDatasetImportEndpointTest.php` | Unggah `/bom/import`, status sukses/gagal |
 | `tests/Feature/SapDatasetImportStatusTest.php` | Validasi UUID, state cache, versi cache, ekspor |
-| `tests/Feature/MaterialImportColumnsTest.php` | Pemetaan 17 kolom A-Q `ImportExcelJob` |
+| `tests/Feature/MaterialImportColumnsTest.php` | Pemetaan 18 kolom berdasarkan header, urutan bebas, header asing diabaikan |
 | `tests/Feature/MaterialExportFilterTest.php` | Filter status dan pencarian pada ekspor |
 | `tests/Feature/ResetDataTest.php` | Pembersihan data dan inkrementasi versi cache |
 

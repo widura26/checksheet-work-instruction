@@ -35,6 +35,7 @@ class DataProcessService {
     private const SORTABLE = [
         'no', 'no_pr', 'group', 'tindak_lanjut', 'deskripsi', 'kebutuhan', 'qty_pr',
         'kode_material', 'trainset', 'status_pr', 'proyek',
+        'deliv_date_sap', 'status', 'no_po',
     ];
 
     private const NUMERIC_SORTS = ['kebutuhan', 'qty_pr'];
@@ -52,6 +53,9 @@ class DataProcessService {
         'tindak_lanjut',
         'deskripsi_material',
         'kode_material',
+        'deliv_date_sap',
+        'status',
+        'no_po',
     ];
 
     private function validRowsQuery(): Builder {
@@ -161,13 +165,16 @@ class DataProcessService {
 
             if (!isset($groups[$key])) {
                 $groups[$key] = [
-                    'first'     => $data,
-                    'tl'        => [],
-                    'trainsets' => [],
-                    'no_prs'    => [],
-                    'kebutuhan' => 0.0,
-                    'qty_pr'    => 0.0,
-                    'raw_count' => 0,
+                    'first'       => $data,
+                    'tl'          => [],
+                    'trainsets'   => [],
+                    'no_prs'      => [],
+                    'deliv_dates' => [],
+                    'statuses'    => [],
+                    'no_pos'      => [],
+                    'kebutuhan'   => 0.0,
+                    'qty_pr'      => 0.0,
+                    'raw_count'   => 0,
                 ];
             }
 
@@ -184,6 +191,13 @@ class DataProcessService {
             $noPr = trim((string) ($data['no_pr'] ?? ''));
             if ($noPr !== '') {
                 $groups[$key]['no_prs'][$noPr] = true;
+            }
+
+            foreach (['deliv_date_sap' => 'deliv_dates', 'status' => 'statuses', 'no_po' => 'no_pos'] as $field => $bucket) {
+                $value = trim((string) ($data[$field] ?? ''));
+                if ($value !== '') {
+                    $groups[$key][$bucket][$value] = true;
+                }
             }
 
             $groups[$key]['kebutuhan'] += (float) ($data['kebutuhan'] ?? 0);
@@ -211,6 +225,9 @@ class DataProcessService {
             $rows[] = [
                 'no'                 => $first['no'],
                 'no_pr'              => implode(', ', $noPrs),
+                'deliv_date_sap'     => implode(', ', array_keys($group['deliv_dates'])),
+                'status'             => implode(', ', array_keys($group['statuses'])),
+                'no_po'              => implode(', ', array_keys($group['no_pos'])),
                 'group'              => $first['group'],
                 'tindak_lanjut'      => $tlJoined,
                 'deskripsi_material' => $first['deskripsi_material'],
@@ -316,18 +333,21 @@ class DataProcessService {
     private function buildDataset(string $wbs, string $group, string $trainset): array {
         return $this->dashboard($wbs, $group, $trainset)['frame']
             ->map(fn ($r) => [
-                'no'            => $r['no'],
-                'no_pr'         => $r['no_pr'] ?? '',
-                'group'         => $r['group'],
-                'tindak_lanjut' => $r['tindak_lanjut'],
-                'deskripsi'     => $r['deskripsi_material'],
-                'kebutuhan'     => $r['kebutuhan'] ?? 0,
-                'qty_pr'        => $r['qty_pr_bom'] ?? ($r['qty_pr'] ?? 0),
-                'kode_material' => $r['kode_material'],
-                'trainset'      => $r['trainset'],
-                'status_pr'     => $r['status_pr'] ?? $this->checkPrStatus($r['tindak_lanjut']),
-                'proyek'        => $wbs !== 'Semua' ? $wbs : ($r['wbs'] ?? ''),
-                'raw_count'     => (int) ($r['raw_count'] ?? 1),
+                'no'             => $r['no'],
+                'no_pr'          => $r['no_pr'] ?? '',
+                'deliv_date_sap' => $r['deliv_date_sap'] ?? '',
+                'status'         => $r['status'] ?? '',
+                'no_po'          => $r['no_po'] ?? '',
+                'group'          => $r['group'],
+                'tindak_lanjut'  => $r['tindak_lanjut'],
+                'deskripsi'      => $r['deskripsi_material'],
+                'kebutuhan'      => $r['kebutuhan'] ?? 0,
+                'qty_pr'         => $r['qty_pr_bom'] ?? ($r['qty_pr'] ?? 0),
+                'kode_material'  => $r['kode_material'],
+                'trainset'       => $r['trainset'],
+                'status_pr'      => $r['status_pr'] ?? $this->checkPrStatus($r['tindak_lanjut']),
+                'proyek'         => $wbs !== 'Semua' ? $wbs : ($r['wbs'] ?? ''),
+                'raw_count'      => (int) ($r['raw_count'] ?? 1),
             ])
             ->values()
             ->all();

@@ -73,6 +73,9 @@
                     <th>Tindak Lanjut</th>
                     <th>Quantity PR</th>
                     <th>NO PR</th>
+                    <th>Deliv Date</th>
+                    <th>Status</th>
+                    <th>NO PO</th>
                     <th>Status PR</th>
                 </tr>
             </thead>

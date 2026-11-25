@@ -25,24 +25,30 @@ class ImportExcelJob implements ShouldQueue
     private const CHUNK = 500;
     private const TABLE = 'daftar_kebutuhan_materials';
 
-    private const MAP = [
-        'A' => 'wbs',
-        'B' => 'sheet_asal',
-        'C' => 'no',
-        'D' => 'rev',
-        'E' => 'kode_material',
-        'F' => 'kode_material_konversi',
-        'G' => 'kode_material_delete',
-        'H' => 'deskripsi_material',
-        'I' => 'satuan',
-        'J' => 'group',
-        'K' => 'lot',
-        'L' => 'kebutuhan',
-        'M' => 'tindak_lanjut',
-        'N' => 'no_pr',
-        'O' => 'no_po',
-        'P' => 'qty_pr',
-        'Q' => 'deliv_date_sap',
+    /**
+     * Nama header Excel yang sudah dinormalisasi => kolom database.
+     * Urutan header di file tidak lagi menentukan pemetaan.
+     */
+    private const HEADER_MAP = [
+        'wbs' => 'wbs',
+        'sheet asal' => 'sheet_asal',
+        'no' => 'no',
+        'rev' => 'rev',
+        'kode material' => 'kode_material',
+        'kode material konversi' => 'kode_material_konversi',
+        'kode material delete' => 'kode_material_delete',
+        'deskripsi material' => 'deskripsi_material',
+        'group' => 'group',
+        'lot' => 'lot',
+        'trainset' => 'lot', // alias header lama
+        'kebutuhan' => 'kebutuhan',
+        'tindak lanjut' => 'tindak_lanjut',
+        'no pr' => 'no_pr',
+        'qty pr' => 'qty_pr',
+        'satuan' => 'satuan',
+        'deliv date sap' => 'deliv_date_sap',
+        'status' => 'status',
+        'no po' => 'no_po',
     ];
 
     public function __construct(public string $importId, public string $path) {}
@@ -57,15 +63,33 @@ class ImportExcelJob implements ShouldQueue
             $total = 0;
 
             foreach (ExcelReader::sheets($file) as $sheetName => $sheetFile) {
+                $columns = [];
+
                 foreach (ExcelReader::rows($file, $sheetFile) as $rowNumber => $cells) {
                     if ($rowNumber === 1) {
+                        $columns = self::columnsFromHeader($cells);
+
+                        if ($columns === []) {
+                            Log::warning("Sheet '{$sheetName}' dilewati: tidak ada header yang dikenali.", [
+                                'import_id' => $this->importId,
+                            ]);
+                            break;
+                        }
+
                         continue;
                     }
 
-                    $row = ['id' => (string) Str::uuid()];
+                    if ($columns === []) {
+                        break;
+                    }
+
+                    $row = ['id' => (string) Str::uuid()] + array_fill_keys(
+                        array_values(self::HEADER_MAP),
+                        ''
+                    );
                     $filled = false;
 
-                    foreach (self::MAP as $col => $field) {
+                    foreach ($columns as $col => $field) {
                         $value = trim($cells[$col] ?? '');
                         if ($value !== '') {
                             $filled = true;
@@ -113,6 +137,30 @@ class ImportExcelJob implements ShouldQueue
         } finally {
             Storage::disk('local')->delete($this->path);
         }
+    }
+
+    /**
+     * @param  array<string, string>  $cells  Baris header: A => "WBS", ...
+     * @return array<string, string>          Kolom sheet => field database
+     */
+    private static function columnsFromHeader(array $cells): array
+    {
+        $columns = [];
+
+        foreach ($cells as $col => $header) {
+            $field = self::HEADER_MAP[self::normalizeHeader((string) $header)] ?? null;
+
+            if ($field !== null) {
+                $columns[$col] = $field;
+            }
+        }
+
+        return $columns;
+    }
+
+    private static function normalizeHeader(string $header): string
+    {
+        return Str::slug(trim($header), ' ');
     }
 
     public function failed(\Throwable $e): void

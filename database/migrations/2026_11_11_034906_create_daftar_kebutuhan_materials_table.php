@@ -29,6 +29,7 @@ return new class extends Migration
             $table->string('no_pr');
             $table->string('no_po')->nullable();
             $table->string('qty_pr')->nullable();
+            $table->string('status')->nullable();
             $table->string('deliv_date_sap')->nullable();
             $table->timestamps();
         });
