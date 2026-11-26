@@ -201,56 +201,69 @@ const STATUS_TABLE_KEYS = {
 
 let optionsController = null;
 
+const dropdownEls = () => ({
+    proyek: document.getElementById('select-proyek'),
+    group: document.getElementById('select-group'),
+    trainset: document.getElementById('select-trainset'),
+});
+
 // Lot / Batch hanya bisa dipilih setelah proyek tertentu dipilih.
 function syncTrainsetAvailability() {
-    const proyek = $('#select-proyek').val();
-    const trainset = $('#select-trainset');
-    const aktif = proyek && proyek !== 'Semua';
+    const { proyek, trainset } = dropdownEls();
+    if (!proyek || !trainset) return;
 
-    trainset.prop('disabled', !aktif);
+    const aktif = proyek.value && proyek.value !== 'Semua';
+    trainset.disabled = !aktif;
 
     if (!aktif) {
-        trainset.val('Semua');
+        trainset.value = 'Semua';
         filters.trainset = 'Semua';
     }
 }
 
-function replaceSelectOptions(selector, values, selected) {
-    const select = $(selector);
+function replaceSelectOptions(select, values, selected) {
+    if (!select) return;
+
     const daftar = Array.isArray(values) ? values : [];
     const pilihan = daftar.includes(selected) ? selected : 'Semua';
 
-    select.empty().append($('<option>', { value: 'Semua', text: 'Semua' }));
+    select.options.length = 0;
+    select.add(new Option('Semua', 'Semua'));
     daftar.forEach(function (value) {
-        select.append($('<option>', { value: value, text: value }));
+        select.add(new Option(value, value));
     });
-    select.val(pilihan);
+    select.value = pilihan;
 }
 
 // Group mengikuti proyek; Lot / Batch mengikuti proyek dan group.
 function refreshDropdownOptions() {
+    const { proyek, group, trainset } = dropdownEls();
+    if (!proyek || !group || !trainset) return Promise.resolve();
+
     if (optionsController) optionsController.abort();
-    optionsController = new AbortController();
+    optionsController = typeof AbortController === 'function' ? new AbortController() : null;
 
     const params = new URLSearchParams({
-        proyek: String($('#select-proyek').val() || 'Semua'),
-        group: String($('#select-group').val() || 'Semua'),
+        proyek: proyek.value || 'Semua',
+        group: group.value || 'Semua',
     });
+
+    const init = optionsController ? { signal: optionsController.signal } : {};
 
     return fetch('/material-planning/options?' + params.toString(), {
         headers: { 'Accept': 'application/json' },
-        signal: optionsController.signal,
+        ...init,
     })
         .then(function (res) {
             if (!res.ok) throw new Error('HTTP ' + res.status);
             return res.json();
         })
         .then(function (json) {
-            replaceSelectOptions('#select-group', json.group, $('#select-group').val());
-            replaceSelectOptions('#select-trainset', json.trainset, $('#select-trainset').val());
+            replaceSelectOptions(group, json.group, group.value);
+            replaceSelectOptions(trainset, json.trainset, trainset.value);
 
-            filters.group = String($('#select-group').val() || 'Semua');
-            filters.trainset = String($('#select-trainset').val() || 'Semua');
+            filters.group = group.value || 'Semua';
+            filters.trainset = trainset.value || 'Semua';
             syncTrainsetAvailability();
         })
         .catch(function (err) {
@@ -258,6 +271,39 @@ function refreshDropdownOptions() {
                 console.error('Gagal memuat opsi filter:', err);
             }
         });
+}
+
+// Pasang listener lebih dulu, sebelum loadData()/jQuery dipakai. Dengan begitu
+// dropdown tetap berfungsi walau bundle jQuery gagal dimuat di server deploy.
+function initDependentDropdowns() {
+    const { proyek, group, trainset } = dropdownEls();
+    if (!proyek || !group || !trainset) return;
+
+    proyek.addEventListener('change', function () {
+        filters.proyek = proyek.value || 'Semua';
+        group.value = 'Semua';
+        filters.group = 'Semua';
+        syncTrainsetAvailability();
+        refreshDropdownOptions();
+        scheduleLoad();
+    });
+
+    group.addEventListener('change', function () {
+        filters.group = group.value || 'Semua';
+        trainset.value = 'Semua';
+        filters.trainset = 'Semua';
+        refreshDropdownOptions();
+        scheduleLoad();
+    });
+
+    trainset.addEventListener('change', function () {
+        filters.trainset = trainset.value || 'Semua';
+        scheduleLoad();
+    });
+
+    syncTrainsetAvailability();
+    filters.group = group.value || 'Semua';
+    filters.trainset = trainset.value || 'Semua';
 }
 
 function buildParams(extra = {}) {
@@ -605,11 +651,8 @@ function pollImportStatus(importId, options = {}) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    syncTrainsetAvailability();
-    filters.group = $('#select-group').val();
-    filters.trainset = $('#select-trainset').val();
+    initDependentDropdowns();
     loadData();
-    refreshDropdownOptions();
 
     // 2. Expander Accordion Toggle
     const expanderToggle = document.getElementById('expanderToggle');
@@ -623,29 +666,6 @@ document.addEventListener('DOMContentLoaded', () => {
             expanderChevron.style.transform = isExpanded ? 'rotate(-90deg)' : 'rotate(0deg)';
         });
     }
-
-    // 3. Dropdown filter changes
-    $('#select-proyek').on('change', function() {
-        filters.proyek = $(this).val();
-        $('#select-group').val('Semua');
-        filters.group = 'Semua';
-        syncTrainsetAvailability();
-        refreshDropdownOptions();
-        scheduleLoad();
-    });
-
-    $('#select-group').on('change', function() {
-        filters.group = $(this).val();
-        $('#select-trainset').val('Semua');
-        filters.trainset = 'Semua';
-        refreshDropdownOptions();
-        scheduleLoad();
-    });
-
-    $('#select-trainset').on('change', function() {
-        filters.trainset = $(this).val();
-        scheduleLoad();
-    });
 
     // 4. Status PR Switches
     $('.status-filter-switch').on('change', function() {
@@ -804,4 +824,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    refreshDropdownOptions();
 });
