@@ -118,6 +118,36 @@ class DataProcessService {
         ];
     }
 
+    /**
+     * Opsi group mengikuti proyek yang dipilih; opsi Lot/Batch mengikuti
+     * proyek dan group yang dipilih.
+     */
+    public function dependentOptions(string $wbs, string $group): array {
+        $version = (int) Cache::get('mp:version', 1);
+        $key = 'mp:options:v' . $version . ':' . md5($wbs . '|' . $group);
+
+        return Cache::remember($key, 300, function () use ($wbs, $group) {
+            $distinctFor = function (string $column, string $selectedWbs, string $selectedGroup) {
+                $query = clone $this->filteredQuery($selectedWbs, $selectedGroup, 'Semua');
+
+                return $query->select($column)
+                    ->whereNotNull($column)
+                    ->where($column, '<>', '')
+                    ->distinct()
+                    ->pluck($column)
+                    ->filter(fn ($value) => trim((string) $value) !== '')
+                    ->sort(SORT_NATURAL)
+                    ->values()
+                    ->all();
+            };
+
+            return [
+                'group' => $distinctFor('group', $wbs, 'Semua'),
+                'trainset' => $distinctFor('lot', $wbs, $group),
+            ];
+        });
+    }
+
     public function dashboard(string $wbs, string $group, string $trainset): array {
         $usePr = $wbs === 'Semua' || $group === 'Semua' || $trainset === 'Semua';
         $totalTrainset = $wbs === 'Semua' || $group === 'Semua';

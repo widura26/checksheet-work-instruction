@@ -199,6 +199,8 @@ const STATUS_TABLE_KEYS = {
     'STATUS LAIN / TIDAK DIKENAL': 'lain'
 };
 
+let optionsController = null;
+
 // Lot / Batch hanya bisa dipilih setelah proyek tertentu dipilih.
 function syncTrainsetAvailability() {
     const proyek = $('#select-proyek').val();
@@ -211,6 +213,51 @@ function syncTrainsetAvailability() {
         trainset.val('Semua');
         filters.trainset = 'Semua';
     }
+}
+
+function replaceSelectOptions(selector, values, selected) {
+    const select = $(selector);
+    const daftar = Array.isArray(values) ? values : [];
+    const pilihan = daftar.includes(selected) ? selected : 'Semua';
+
+    select.empty().append($('<option>', { value: 'Semua', text: 'Semua' }));
+    daftar.forEach(function (value) {
+        select.append($('<option>', { value: value, text: value }));
+    });
+    select.val(pilihan);
+}
+
+// Group mengikuti proyek; Lot / Batch mengikuti proyek dan group.
+function refreshDropdownOptions() {
+    if (optionsController) optionsController.abort();
+    optionsController = new AbortController();
+
+    const params = new URLSearchParams({
+        proyek: String($('#select-proyek').val() || 'Semua'),
+        group: String($('#select-group').val() || 'Semua'),
+    });
+
+    return fetch('/material-planning/options?' + params.toString(), {
+        headers: { 'Accept': 'application/json' },
+        signal: optionsController.signal,
+    })
+        .then(function (res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+        })
+        .then(function (json) {
+            replaceSelectOptions('#select-group', json.group, $('#select-group').val());
+            replaceSelectOptions('#select-trainset', json.trainset, $('#select-trainset').val());
+
+            filters.group = String($('#select-group').val() || 'Semua');
+            filters.trainset = String($('#select-trainset').val() || 'Semua');
+            syncTrainsetAvailability();
+        })
+        .catch(function (err) {
+            if (err.name !== 'AbortError') {
+                console.error('Gagal memuat opsi filter:', err);
+            }
+        });
 }
 
 function buildParams(extra = {}) {
@@ -559,8 +606,10 @@ function pollImportStatus(importId, options = {}) {
 
 document.addEventListener('DOMContentLoaded', () => {
     syncTrainsetAvailability();
+    filters.group = $('#select-group').val();
     filters.trainset = $('#select-trainset').val();
     loadData();
+    refreshDropdownOptions();
 
     // 2. Expander Accordion Toggle
     const expanderToggle = document.getElementById('expanderToggle');
@@ -578,12 +627,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Dropdown filter changes
     $('#select-proyek').on('change', function() {
         filters.proyek = $(this).val();
+        $('#select-group').val('Semua');
+        filters.group = 'Semua';
         syncTrainsetAvailability();
+        refreshDropdownOptions();
         scheduleLoad();
     });
 
     $('#select-group').on('change', function() {
         filters.group = $(this).val();
+        $('#select-trainset').val('Semua');
+        filters.trainset = 'Semua';
+        refreshDropdownOptions();
         scheduleLoad();
     });
 

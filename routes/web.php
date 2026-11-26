@@ -20,6 +20,7 @@ Route::middleware(['auth', 'auth.active'])->group(function () {
     Route::prefix('material-planning')->group(function () {
         Route::get('/', [SapDatasetController::class, 'index'])->name('sap-dataset.index');
         Route::get('/data', [SapDatasetController::class, 'data'])->middleware('throttle:120,1')->name('material-planning.data');
+        Route::get('/options', [SapDatasetController::class, 'options'])->middleware('throttle:120,1')->name('material-planning.options');
         Route::get('/export', [SapDatasetController::class, 'export'])->middleware('throttle:30,1')->name('material-planning.export');
     });
 

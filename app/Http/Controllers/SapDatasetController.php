@@ -43,6 +43,13 @@ class SapDatasetController extends Controller
         ));
     }
 
+    public function options(Request $request, DataProcessService $svc){
+        return response()->json($svc->dependentOptions(
+            (string) $request->input('proyek', 'Semua'),
+            (string) $request->input('group', 'Semua')
+        ));
+    }
+
     public function export(Request $request, DataProcessService $svc){
         $proyek   = (string) $request->input('proyek', 'Semua');
         $group    = (string) $request->input('group', 'Semua');
