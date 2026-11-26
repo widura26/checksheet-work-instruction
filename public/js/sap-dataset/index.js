@@ -214,6 +214,7 @@ function syncTrainsetAvailability() {
 
     const aktif = proyek.value && proyek.value !== 'Semua';
     trainset.disabled = !aktif;
+    console.log("test")
 
     if (!aktif) {
         trainset.value = 'Semua';
