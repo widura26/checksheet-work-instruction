@@ -199,6 +199,20 @@ const STATUS_TABLE_KEYS = {
     'STATUS LAIN / TIDAK DIKENAL': 'lain'
 };
 
+// Lot / Batch hanya bisa dipilih setelah proyek tertentu dipilih.
+function syncTrainsetAvailability() {
+    const proyek = $('#select-proyek').val();
+    const trainset = $('#select-trainset');
+    const aktif = proyek && proyek !== 'Semua';
+
+    trainset.prop('disabled', !aktif);
+
+    if (!aktif) {
+        trainset.val('Semua');
+        filters.trainset = 'Semua';
+    }
+}
+
 function buildParams(extra = {}) {
     const params = new URLSearchParams({
         proyek: filters.proyek,
@@ -544,6 +558,7 @@ function pollImportStatus(importId, options = {}) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    syncTrainsetAvailability();
     filters.trainset = $('#select-trainset').val();
     loadData();
 
@@ -563,6 +578,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Dropdown filter changes
     $('#select-proyek').on('change', function() {
         filters.proyek = $(this).val();
+        syncTrainsetAvailability();
         scheduleLoad();
     });
 

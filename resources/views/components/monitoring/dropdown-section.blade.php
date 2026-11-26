@@ -15,7 +15,7 @@
     </div>
     <div class="col-md-4">
         <label class="st-select-label d-block">Pilih Lot / Batch</label>
-        <select id="select-trainset" class="form-select st-select">
+        <select id="select-trainset" class="form-select st-select" disabled>
             <option value="Semua" @selected($defaultTrainset === 'Semua')>Semua</option>
             @foreach ($options['trainset'] as $o)
                 <option value="{{ $o }}" @selected($defaultTrainset === $o)>{{ $o }}</option>
