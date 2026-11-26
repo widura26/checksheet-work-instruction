@@ -6,13 +6,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use App\Exports\SapDatasetExport;
 use App\Jobs\ImportExcelJob;
 use App\Services\DataProcessService;
 use App\Models\DaftarKebutuhanMaterial;
 use App\Support\ActivityLogger;
 use App\Support\ImportTracker;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Support\XlsxWriter;
 use Illuminate\Support\Facades\Cache;
 
 class SapDatasetController extends Controller
@@ -83,17 +82,21 @@ class SapDatasetController extends Controller
         ], null, 'SapDataset');
 
         if ($format === 'xlsx' || $format === 'excel') {
-            $rows = collect();
-            foreach ($query->cursor() as $row) {
-                if ($svc->matchesExportFilters($row, $statuses, $search)) {
-                    $rows->push($row);
-                }
-            }
+            $rows = function () use ($query, $columns, $svc, $statuses, $search) {
+                yield $columns;
 
-            return Excel::download(
-                new SapDatasetExport($rows, $columns),
-                $baseName . '.xlsx'
-            );
+                foreach ($query->cursor() as $row) {
+                    if ($svc->matchesExportFilters($row, $statuses, $search)) {
+                        yield array_map(fn ($column) => $row->{$column}, $columns);
+                    }
+                }
+            };
+
+            return response()->download(
+                XlsxWriter::write($rows()),
+                $baseName . '.xlsx',
+                ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
+            )->deleteFileAfterSend(true);
         }
 
         $filename = $baseName . '.csv';
